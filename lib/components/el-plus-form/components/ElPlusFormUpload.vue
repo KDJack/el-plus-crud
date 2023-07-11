@@ -80,6 +80,8 @@ const previewList = computed(() =>
 )
 
 onBeforeMount(async () => {
+  // // 如果没有配置，则抛出一个警告
+  // if (defaultConf.upload?.action)
   attrs.value = await getAttrs(props, {
     drag: true,
     listType: props.desc.upType === 'file' ? 'text' : 'picture-card',

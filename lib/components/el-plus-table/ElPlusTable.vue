@@ -1,0 +1,744 @@
+<template>
+  <div class="el-plus-table-content">
+    <!-- <div class="select-items" v-if="type === 'selection' && selectRowList && selectRowList.length > 0">
+      <span class="title">已选择({{ selectRowList.length }}个): </span>
+      <el-tag v-for="(item, i) in selectRowList" :key="item.id" class="select-item" size="small" closable @close="() => handelRemoveSelect(i, item)">
+        {{ item[tableConfig.showSelectNameKey || 'name'] }}
+      </el-tag>
+    </div> -->
+    <EleTabletHeader ref="tableHeaderRef" v-model="toolFormData" :tbName="props.tableConfig.tbName" :column="props.tableConfig.column" :size="size" :isShowRefresh="isShowRefresh" :loading="loading" :toolbar="tableConfig.toolbar" :isDialog="isDialog" @query="handelTopQuery" />
+
+    <!-- 中部的Tabs -->
+    <div class="table-tabs-panel" v-if="tableConfig.tabConf">
+      <el-radio-group v-model="tableTabVal" size="default" @change="handelTabChange">
+        <el-radio-button v-for="(item, i) in tableConfig.tabConf?.tabs" :key="i" :label="item.value" :loading="true">
+          {{ item.label }}
+          <template v-if="loadingTab">
+            <el-icon class="is-loading"><Loading /></el-icon>
+          </template>
+          <template v-else>
+            {{ getTabLabel(item) }}
+          </template>
+        </el-radio-button>
+      </el-radio-group>
+    </div>
+
+    <!-- 中间列表 -->
+    <div class="el-plus-table-main" v-loading="loading">
+      <template v-if="isDIYMain">
+        <slot name="main" :tableData="tableData"></slot>
+      </template>
+      <!-- 这里开始是表格内容  -->
+      <el-table ref="elPlusTableRef" v-else style="width: 100%" height="100%" :maxHeight="tableConfig.maxHeight || 'auto'" v-bind="tableConfig.tableAttr" :data="tableData" :row-key="rowKey" lazy :load="loadExpandData" :size="size" :row-class-name="initRowClassName" @select="handelTableSelect" @select-all="handelTableSelectAll" @expand-change="handelTableExpandChange" :treeProps="treeProps">
+        <!-- 复选框 -->
+        <el-table-column v-if="type === 'selection'" type="selection" width="55px" :selectable="(row: any, index: number) => tableConfig?.tableAttr?.selectable(row, index) ?? true" header-align="center" align="center" />
+        <!-- 下标 -->
+        <el-table-column v-if="isIndex" type="index" width="60" label="序号" />
+        <!-- 首列 -->
+        <template v-if="useSlots().firstColumn">
+          <slot name="firstColumn" />
+        </template>
+        <template v-for="(item, i) in headerColumns" :key="item.label + i">
+          <!-- 二级表头 -->
+          <template v-if="item.children && item.children.length > 0">
+            <!-- <el-table-column :prop="item.label" :label="item.label" header-align="center">
+              <template v-for="(item2, j) in item.children" :key="item2.label + i + j">
+                <el-table-column :prop="item2.prop" v-if="columnShowList[i][j]" v-bind="item2">
+                  <template #header>
+                    <div :class="{ 'th-required': item2.required }">
+                      {{ item2.label }}
+                    </div>
+                  </template>
+                  <template #default="scope: any">
+                    <slot name="default"></slot>
+                    <ColumnItem v-if="scope.$index >= 0" :field="item2.prop" :desc="item2" :scope="scope" :size="size" v-model="scope.row[item2.prop]" />
+                  </template>
+                </el-table-column>
+              </template>
+            </el-table-column> -->
+          </template>
+          <!-- 单级表头 -->
+          <template v-else>
+            <el-table-column v-if="columnShowList[i]" :prop="item.prop" v-bind="item">
+              <template #header="{ column }: any">
+                <div :class="{ 'th-required': item.required }" :style="item.hstyle">
+                  {{ column.label }}
+                </div>
+              </template>
+              <template #default="scope: any">
+                <ColumnItem v-if="scope.$index >= 0" :field="item.prop" :desc="item" :scope="scope" :size="size" v-model="scope.row[item.prop]" />
+              </template>
+            </el-table-column>
+          </template>
+        </template>
+        <template v-if="!loading && loadingStatus === 2" #empty>
+          <el-empty v-if="isEmptyImg" :description="nullText" />
+          <span v-else>{{ nullText }}</span>
+        </template>
+        <!-- 合计行 -->
+        <template v-if="tableConfig.summaryConf?.prop" #append>
+          <div :style="tableConfig.summaryConf?.hstyle" class="summary-row" v-if="summaryList && summaryList.length > 0">
+            <div class="summary-item" v-for="(item, i) in summaryList" :key="i">
+              <span>{{ item.label || '合计' }}:</span>
+              <p>{{ item.value || 0 }}</p>
+            </div>
+          </div>
+        </template>
+      </el-table>
+    </div>
+    <div class="bottom-page-static-info" v-if="isPager || tableConfig.statistic">
+      <el-pagination class="page-info" small @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="+pageInfo.current" :page-sizes="[5, 10, 20, 50, 100]" :page-size="pageInfo.size" layout="total, sizes, prev, pager, next, jumper" :total="pageInfo.total" />
+    </div>
+    <slot name="bottom"></slot>
+  </div>
+</template>
+<script lang="ts">
+export default {
+  name: 'ElPlusTable',
+  inheritAttrs: false,
+  customOptions: {}
+}
+</script>
+<script lang="ts" setup>
+import { ref, reactive, onMounted, computed, watch, nextTick, useSlots, inject } from 'vue'
+import EleTabletHeader from './components/header.vue'
+import ColumnItem from './components/columnItem.vue'
+import { handelListColumn } from './util'
+import { cloneDeep } from 'lodash'
+import { Loading } from '@element-plus/icons-vue'
+
+const defaultConf = inject('defaultConf') as ICRUDConfig
+const format = inject('format') as any
+
+const emits = defineEmits(['getUrlConsumerIds', 'selection', 'select', 'selectAll', 'update:modelValue', 'tabChange', 'expandChange'])
+const props = withDefaults(
+  defineProps<{
+    tableConfig: ITableConfig
+    // 外部数据
+    modelValue?: Array<any> | null
+    // 列表类型 默认为index
+    type?: string
+    // 是否显示第一列的Index下标
+    isIndex?: boolean
+    // 是否分页
+    isPager?: boolean
+    // 每页显示条数
+    pageSize?: number
+    // 是否在弹框中
+    isDialog?: boolean
+    // 空占位文本
+    nullText?: string
+    // 是否显示暂无数据的图片
+    isEmptyImg?: boolean
+    // 是否显示刷新文本
+    isShowRefresh?: boolean
+    // rowKey默认为id
+    rowKey?: string
+    // 自定义table主体
+    isDIYMain?: boolean
+    // 默认选中项
+    selectList?: Array<any> | []
+    // 默认列宽
+    colMinWidth?: string
+  }>(),
+  {
+    modelValue: null,
+    type: 'index',
+    isIndex: true,
+    isPager: true,
+    pageSize: 10,
+    isDialog: false,
+    nullText: '暂无数据',
+    isShowRefresh: true,
+    rowKey: 'id',
+    isEmptyImg: true,
+    isDIYMain: false,
+    selectList: () => [],
+    colMinWidth: 'auto'
+  }
+)
+
+const elPlusTableRef = ref()
+
+// 顶部Tab数据
+const tableTabVal = ref(props.tableConfig?.tabConf?.tabs[0].value ?? '')
+const tabStatic = ref({} as any)
+const getTabLabel = computed(() => (item: ITableTabItem) => {
+  if (item.key) {
+    return tabStatic.value[item.key] || 0
+  }
+  return ''
+})
+
+const tableHeaderRef = ref()
+
+// 加载
+const loading = ref(false)
+const loadingTab = ref(!!props.tableConfig.tabConf?.fetch)
+const listLoading = ref(false)
+const size = defaultConf.size || 'small'
+
+// 顶部查询条件数据缓存
+const topQueryData = ref({} as any)
+
+// 数据
+let toolFormData = reactive({} as any)
+const tableData = reactive((props.modelValue || []) as any[])
+const haveClassRowList = reactive([])
+
+// 初始化表头
+const headerColumns = reactive(handelListColumn(props.tableConfig.column, props.isDialog ? 'auto' : props.colMinWidth))
+
+// 0:未加载; 1:加载中；2:加载完成
+const loadingStatus = ref(0)
+
+// 保存所有的选中行
+const allSelectRowList = reactive((cloneDeep(props.selectList) || []) as any[])
+// 记录树形展开的数组的下标
+const treeIndexList = reactive([] as any[][])
+
+// 分页信息
+const pageInfo = reactive({
+  current: !props.isDialog && toolFormData.current ? parseInt(toolFormData.current as any) : 1,
+  total: 0,
+  size: !props.isDialog && toolFormData.size ? parseInt(toolFormData.size as any) : props.pageSize
+})
+// 数型解析
+const treeProps = (props.tableConfig?.explan?.treeProps || { children: 'children', hasChildren: 'hasChildren' }) as ITreeProps
+
+// 列的显示
+const columnShowList = computed(() => {
+  return props.tableConfig.column.map((item) => {
+    if (props.tableConfig.tbName) {
+      return item._vif && item.scShow
+    } else {
+      // 这里初始化一下vif
+      if (item.vif !== undefined && item.vif !== null) {
+        if (typeof item.vif === 'function') {
+          item._vif = item.vif(item)
+        } else {
+          item._vif = !!item.vif
+        }
+      } else {
+        item._vif = true
+      }
+      return item._vif
+    }
+  })
+})
+
+// 合计行数据
+const summaryList = computed(() => {
+  const tempList = [] as any[]
+  if (props.tableConfig.summaryConf?.vif) {
+    if (typeof props.tableConfig.summaryConf?.vif === 'boolean') {
+      if (!props.tableConfig.summaryConf?.vif) {
+        return tempList
+      }
+    } else {
+      if (!props.tableConfig.summaryConf?.vif()) {
+        return tempList
+      }
+    }
+  }
+  if (props.tableConfig.summaryConf?.prop) {
+    const propList = props.tableConfig.summaryConf.prop.split(',')
+    const labelList = props.tableConfig.summaryConf?.label?.split(',') || []
+    // 遍历
+    propList.map((prop, i: number) => {
+      let value = ''
+      if (props.tableConfig.summaryConf?.sumFn) {
+        value = props.tableConfig.summaryConf?.sumFn(tableData, allSelectRowList)
+      } else {
+        value = format.yuan(tableData.reduce((total: number, current) => (total += current[prop]), 0))
+      }
+      tempList.push({ label: labelList[i], value })
+    })
+  }
+  return tempList
+})
+
+/**
+ * Tab切换
+ * @param val
+ */
+function handelTabChange(val: string | number | boolean) {
+  // 这里直接重新查询
+  reload(true)
+  // 通知父类
+  emits('tabChange', val)
+}
+
+/**
+ * 加载自身展开的数据
+ * @param row
+ * @param treeNode
+ * @param resolve
+ */
+function loadExpandData(row: any, treeNode: any, resolve: any) {
+  const postData = getListQueryData()
+  postData[props.tableConfig?.explan?.idName || 'parentId'] = row.id
+  props.tableConfig.fetch &&
+    props.tableConfig.fetch(postData).then((pageInfo) => {
+      resolve(pageInfo?.records)
+    })
+}
+
+/**
+ * 初始化每行的颜色
+ * @param data
+ */
+function initRowClassName(data: any) {
+  if (haveClassRowList.length > data.rowIndex) {
+    return haveClassRowList[data.rowIndex * 1]
+  }
+  return ''
+}
+
+/**
+ * 处理单个选中的情况
+ * @param selection
+ * @param row
+ */
+function handelTableSelect(selection: any[], item: any) {
+  checkAndRemove(item, !selection.some((i) => i[props.rowKey] === item[props.rowKey]))
+  // 通知父类
+  emits('select', selection, item)
+  emits('selection', cloneDeep(allSelectRowList))
+}
+
+/**
+ * 处理全选
+ * @param selection
+ * @param row
+ */
+function handelTableSelectAll(selection: any[]) {
+  const isRemove = !(selection && selection.length > 0)
+  ;(isRemove ? tableData : selection).map((item) => {
+    checkAndRemove(item, isRemove)
+  })
+  // 通知父类
+  emits('selectAll', selection, isRemove)
+  emits('selection', cloneDeep(allSelectRowList))
+}
+
+/**
+ * 处理行展开
+ * @param row
+ * @param expanded
+ */
+function handelTableExpandChange(row: any, expanded: boolean) {
+  // console.log('row: ', row, expanded)
+  emits('expandChange', row, expanded)
+}
+
+/**
+ * 选中或者取消
+ * @param item
+ */
+function checkAndRemove(item: any, isRemove: boolean = false) {
+  // 校验是否已经有了
+  const index = allSelectRowList.findIndex((i) => i[props.rowKey] === item[props.rowKey])
+  if (isRemove) {
+    if (index >= 0) {
+      allSelectRowList.splice(index, 1)
+    }
+  } else {
+    if (index < 0) {
+      allSelectRowList.push(item)
+    }
+  }
+}
+
+/**
+ * 外部修改选中项
+ * @param item
+ */
+function changeSelect(itemList: any[], isSelect: boolean = false) {
+  if (itemList && itemList.length) {
+    itemList.map((item) => {
+      checkAndRemove(
+        allSelectRowList.find((i) => i[props.rowKey] === item[props.rowKey]),
+        !isSelect
+      )
+    })
+  }
+  // 这里要刷新一下tab的选中
+  refreshTableSelect()
+}
+
+/**
+ * 重置选中
+ */
+function resetSelect() {
+  allSelectRowList.splice(0, allSelectRowList.length, ...props.selectList)
+}
+
+/**
+ * 封装分页查询条件
+ */
+async function getListQueryData() {
+  let queryMap = {
+    // 封装查询条件
+    // ...route.query,
+    // ...tableHeaderRef.value.getData(),
+    ...topQueryData.value,
+    ...(typeof props.tableConfig.queryMap === 'function' ? await props.tableConfig.queryMap() : props.tableConfig.queryMap),
+    t_: new Date().getTime()
+  } as any
+  if (props.isPager) {
+    // 封装分页信息
+    queryMap.current = pageInfo.current
+    queryMap.size = pageInfo.size
+  }
+  // 这里处理一下列表Tab的查询条件
+  if (props.tableConfig.tabConf && props.tableConfig.tabConf.prop) {
+    queryMap[props.tableConfig.tabConf.prop] = tableTabVal.value
+  }
+
+  queryMap = handelQueryData(queryMap)
+  if (!props.isDialog) {
+    // setQuery(route.path, queryMap)
+  }
+  // 这里是导出的权限判定-增加登陆信息
+  if (props.tableConfig?.toolbar?.export?.isAuth) {
+    // TODO GET Auth
+  }
+  return queryMap
+}
+
+/**
+ * 处理下请求参数
+ * @param queryMap
+ */
+function handelQueryData(queryMap: object) {
+  if (!queryMap) return {}
+  const tempMap = {}
+  Object.keys(queryMap).map((key) => {
+    if (queryMap[key] !== undefined && queryMap[key] !== null && queryMap[key] !== '') {
+      tempMap[key] = queryMap[key]
+    }
+  })
+  return tempMap
+}
+
+/**
+ * 处理显示
+ * @param rowInfo
+ */
+// function handelHeaderVIf(rowInfo: any) {
+//   let vif = false
+//   if (rowInfo.children && rowInfo.children.length > 0) {
+//     vif = rowInfo.children.some((item: any) => {
+//       return !(item.vif === false)
+//     })
+//   }
+//   return vif
+// }
+
+/**
+ * 处理列的显示
+ * @param item
+ */
+// function handelColumnVIf(item: any) {
+//   if (item.vif !== undefined && item.vif !== null && item.vif !== '') {
+//     if (typeof item.vif === 'boolean') return item.vif
+//     if (typeof item.vif === 'function') return item.vif(item)
+//     return !!item.vif
+//   }
+//   return true
+// }
+
+/**
+ * 处理分页工具中pageSize变化
+ * @param val
+ */
+function handleSizeChange(val: number) {
+  // 回到第一页
+  pageInfo.current = 1
+  pageInfo.size = val
+  loadData(true)
+}
+
+/**
+ * 处理分页工具中current变化
+ * @param val
+ */
+function handleCurrentChange(val: number) {
+  if (pageInfo.current !== val) {
+    pageInfo.current = val
+    loadData(false)
+  }
+}
+
+/**
+ * 处理行展开
+ * @param list
+ * @param pIndexList
+ */
+function handelTreeIndex(list: any[], pIndexList: number[]) {
+  let tempList = []
+  if (list && list.length > 0) {
+    list.map((item, i) => {
+      treeIndexList.push([...pIndexList, i])
+      tempList = item[treeProps.children] as any[]
+      if (tempList && tempList.length > 0) {
+        handelTreeIndex(tempList, [i])
+      }
+    })
+  }
+}
+
+/**
+ * 真正调用查询的接口
+ * @param isInit
+ */
+async function loadData(isInit: Boolean) {
+  if (!props.tableConfig.fetch) {
+    loadingStatus.value = 2
+    // if (props.modelValue) {
+    //   tableData.splice(0, tableData.length, ...props.modelValue)
+    // }
+    return false
+  }
+  if (loadingStatus.value === 1 || loading.value) return false
+  loadingStatus.value = 1
+  loading.value = true
+  tableData.splice(0, tableData.length)
+  if (isInit) {
+    pageInfo.current = 1
+  }
+  let postData = await getListQueryData()
+  // 这里处理一下外部数据格式化
+  if (props.tableConfig?.toolbar?.formConfig?.beforeRequest) {
+    postData = props.tableConfig?.toolbar?.formConfig?.beforeRequest(JSON.parse(JSON.stringify(postData))) || postData
+  }
+  const dataPage = (await props.tableConfig.fetch(postData)) as any
+  try {
+    if (props.isPager) {
+      pageInfo.total = dataPage?.total * 1 || 0
+      pageInfo.current = dataPage?.current || 1
+      tableData.push(...(dataPage?.records || null))
+    } else {
+      tableData.push(...(dataPage?.records || dataPage || null))
+    }
+    if (isInit) {
+      // 初始化完毕后，调用一次父类更新
+      // emits('update:modelValue', tableData)
+    }
+    // 如果是树形结构
+    if (props.type === 'expand') {
+      treeIndexList.splice(0, treeIndexList.length)
+      handelTreeIndex(tableData, [])
+    }
+    listLoading.value = false
+    nextTick(() => {
+      // 遍历以及选中当前页面数据
+      refreshTableSelect()
+    })
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log('error: ', e)
+  }
+  loadingStatus.value = 2
+  loading.value = false
+}
+
+/**
+ * 渲染列表的选中项
+ */
+function refreshTableSelect() {
+  if (tableData && tableData.length > 0 && props.type === 'selection') {
+    tableData.map((item: any) => {
+      elPlusTableRef.value!.toggleRowSelection(
+        item,
+        allSelectRowList.some((i) => i[props.rowKey] === item[props.rowKey])
+      )
+    })
+  }
+}
+
+/**
+ * 重新加载
+ */
+async function reload(isTab: boolean = false) {
+  await loadData(true)
+  // 这里判断一下Tab
+  if (!isTab && props.tableConfig.tabConf && props.tableConfig.tabConf.fetch) {
+    tabStatic.value = await props.tableConfig.tabConf.fetch(Object.assign({}, await getListQueryData(), props.tableConfig.tabConf.queryMap))
+    loadingTab.value = false
+  }
+  return tableData
+}
+
+/**
+ * 处理顶部条件表单筛选
+ */
+function handelTopQuery() {
+  topQueryData.value = cloneDeep(tableHeaderRef.value.getData())
+  reload()
+}
+
+// 监听父类数据变更
+watch(
+  () => props.modelValue,
+  (data) => {
+    // console.log('data: ', JSON.parse(JSON.stringify(data)))
+    if (!props.tableConfig.fetch) {
+      if (JSON.parse(JSON.stringify(data)) !== JSON.parse(JSON.stringify(tableData))) {
+        loadingStatus.value = 2
+        tableData.splice(0, tableData.length, ...(data || []))
+      }
+    }
+  },
+  { deep: true }
+)
+
+watch(
+  () => props.selectList,
+  (val: any[]) => {
+    allSelectRowList.splice(0, allSelectRowList.length, ...val)
+    // 遍历以及选中当前页面数据
+    refreshTableSelect()
+  },
+  {
+    deep: true
+  }
+)
+
+onMounted(() => {
+  reload()
+})
+
+defineExpose({ reload, tableData, changeSelect, resetSelect })
+</script>
+<style lang="scss">
+.el-plus-table-content {
+  background-color: #ffffff;
+  border-radius: 5px;
+  padding: 10px;
+  width: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  .th-required {
+    position: relative;
+    &::before {
+      content: '*';
+      position: absolute;
+      left: -10px;
+      font-size: 16px;
+      top: 2px;
+      color: #ff3b30;
+      font-weight: bold;
+    }
+  }
+  .select-items {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+
+    .title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-right: 20px;
+    }
+
+    .select-item {
+      margin: 5px 10px 5px 0;
+
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+
+  .table-tabs-panel {
+    margin-bottom: 16px;
+  }
+  .summary-row {
+    width: 100%;
+    background-color: var(--el-table-row-hover-bg-color);
+    color: var(--el-table-text-color);
+    padding: 16px 20px;
+    line-height: 24px;
+    height: 40px;
+    display: flex;
+    position: relative;
+    .summary-item {
+      display: flex;
+      align-items: center;
+      margin-right: 30px;
+      & > span {
+        margin-right: 20px;
+      }
+    }
+  }
+
+  .el-plus-table-main {
+    width: 100%;
+    flex: 1;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+    .el-table .cell {
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  .pager-statistic {
+    width: 100%;
+    position: fixed;
+    height: 32px;
+    line-height: 32px;
+    bottom: 0;
+    text-align: right;
+    min-width: 900px;
+
+    .statistic-item {
+      display: inline-block;
+    }
+  }
+
+  .el-cascader__label {
+    width: 300px !important;
+  }
+
+  .bottom-page-static-info {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    min-height: 41px;
+    margin-top: 10px;
+
+    .page-info {
+      margin-right: 30px;
+    }
+  }
+
+  .common-list-export-excel {
+    background: #20a0ff;
+    text-decoration: none;
+    color: #ffffff;
+    font-size: 12px;
+    height: 29px;
+    line-height: 30px;
+    display: block;
+    margin-top: 5px;
+    border-radius: 3px;
+    padding: 0 10px;
+  }
+
+  .common-list-export-excel:hover {
+    background: #58b6ff;
+  }
+
+  .el-table__empty-block {
+    height: auto !important;
+  }
+}
+</style>

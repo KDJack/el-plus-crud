@@ -1,0 +1,71 @@
+{
+  "name": "el-plus-crud",
+  "description": "采用Vue3 + TS，封装的element-plus数据驱动表单、列表组件",
+  "author": "K.D.Jack",
+  "version": "0.0.12",
+  "license": "MIT",
+  "private": false,
+  "main": "dist/el-plus-crud.js",
+  "module": "lib/index",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "start": "vite",
+    "build": "node build.js && vite build",
+    "build-comp": "node ./build.js",
+    "lint-fix": "eslint --fix --ext .js --ext .jsx --ext .vue lib/",
+    "preview": "vite preview",
+    "release": "standard-version",
+    "prepare": "npx husky install && npx husky add .husky/pre-commit \"npx lint-staged\"",
+    "pub": "yarn build && yarn release && yarn publish"
+  },
+  "keywords": [
+    "element+",
+    "element plus",
+    "element plus form",
+    "element plus table",
+    "element plus crud",
+    "el-plus-form",
+    "el-plus-table",
+    "el-plus-crud"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KDJack/el-plus-crud"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.1.0",
+    "element-plus": "^2.3.6",
+    "lodash": "^4.17.21",
+    "vue": "^3.2.47"
+  },
+  "devDependencies": {
+    "@types/node": "^20.4.1",
+    "@typescript-eslint/eslint-plugin": "^5.53.0",
+    "@typescript-eslint/parser": "^5.53.0",
+    "@vitejs/plugin-vue": "^4.1.0",
+    "@vue/eslint-config-standard": "^8.0.1",
+    "babel-preset-env": "^1.7.0",
+    "babel-register": "^6.26.0",
+    "eslint": "^8.34.0",
+    "eslint-plugin-vue": "^9.9.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.3",
+    "prettier": "^3.0.0",
+    "sass": "^1.58.3",
+    "standard-version": "^9.5.0",
+    "typescript": "^4.9.5",
+    "vite": "^4.3.9",
+    "vite-plugin-dts": "^3.2.0",
+    "vite-plugin-vue-setup-extend": "^0.4.0",
+    "vue-eslint-parser": "^9.1.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">= 7.0.0"
+  }
+}

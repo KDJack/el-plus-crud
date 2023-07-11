@@ -6,7 +6,7 @@ import ElPlusTable from './components/el-plus-table/ElPlusTable.vue'
 import defaultConf from './config'
 
 export default {
-  install: (app: App, config: { [key: string]: any }, format?: { [key: string]: Function }, globalData?: { [key: string]: Function }) => {
+  install: (app: App, config: ICRUDConfig, format?: { [key: string]: Function }, globalData?: { [key: string]: Function }) => {
     // 合并配置
     Object.assign(defaultConf, config)
     defaultConf.debug && console.log('initConfig: ', defaultConf)

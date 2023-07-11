@@ -375,7 +375,7 @@ declare interface IDownFile {
 }
 
 declare interface ICRUDConfig {
-  debug: boolean
+  debug?: boolean
   size?: 'default' | 'small' | 'large'
   storagePrefix?: string
   form?: {
@@ -392,11 +392,10 @@ declare interface ICRUDConfig {
   }
   upload?: {
     type: 'minio' | 'quniu'
-    action: string | ((data?: any) => string)
-    maxISize: number
-    maxFSize: number
+    action?: string | ((data?: any) => string)
+    maxISize?: number
+    maxFSize?: number
     minio?: {
-      action: string | ((data?: any) => string)
       getUploadUrl: (fileName?: string) => Promise<any>
       doElUpload: (fileName?: string) => Promise<any>
       getObjectAuthUrl: (fileName?: string) => Promise<any>

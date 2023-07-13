@@ -1,5 +1,5 @@
 <template>
-  <el-cascader v-if="areaList && areaList.length" class="ElPlusFormArea-panel" v-bind="attrs" v-on="onEvents" v-model="currentValue" :options="areaList" />
+  <el-cascader v-if="isInit" class="ElPlusFormArea-panel" v-bind="attrs" v-on="onEvents" v-model="currentValue" :options="areaList" />
 </template>
 <script lang="ts">
 export default {
@@ -25,6 +25,7 @@ const props = defineProps<{
 const emits = defineEmits(['update:modelValue'])
 const areaList = ref([] as any)
 const attrs = ref({} as any)
+const isInit = ref(false)
 const onEvents = ref(getEvents(props))
 const currentValue = ref(props.modelValue)
 
@@ -46,10 +47,13 @@ emits('update:modelValue', currentValue)
 
 onBeforeMount(async () => {
   attrs.value = await getAttrs(props, { props: { value: 'id', label: 'name', children: 'childs', checkStrictly: !!props.desc.checkStrictly }, clearable: true, filterable: true, ...useAttrs() })
+  console.log('attrs: ', attrs.value)
+  isInit.value = true
 })
 
 onMounted(async () => {
   areaList.value = (globalData.areaList || []) as any[]
+  console.log('areaList: ', areaList.value)
 })
 </script>
 <style lang="scss" scoped>

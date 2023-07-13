@@ -2,9 +2,7 @@ import { App } from 'vue'
 declare const _default: {
   install: (
     app: App,
-    config: {
-      [key: string]: any
-    },
+    config: ICRUDConfig,
     format?:
       | {
           [key: string]: Function

@@ -194,7 +194,7 @@ function validateUpload(rule: any, value: any, callback?: any) {
  * @param callback
  */
 function validateTextarea(rule: any, value: any, callback?: any) {
-  if (typeof value === 'undefined' || value === '' || value === null) {
+  if (typeof value === 'undefined' || value === null || value === '' || value === null) {
     callback(new Error('此项必填！'))
   } else if (!value.replace(/\n/g, '')) {
     callback(new Error('不能全是换行！'))

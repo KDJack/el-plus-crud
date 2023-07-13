@@ -2,7 +2,8 @@
   <div class="ele-form-upload-image" :class="{ 'ele-form-upload-file': desc.upType === 'file' }">
     <el-upload class="ele-image-upload" v-bind="attrs" v-on="onEvents" :fileList="currentValue || []" :class="{ 'over-limit': currentValue?.length >= attrs.limit, 'upload-disabled': attrs.disabled }">
       <div class="upload-panel-icon">
-        <SvgIcon :name="desc.icon || 'ele-Plus'" :style="{ fontSize: desc.fontSize || '14px', color: desc.color || '#C0C4CC' }" />
+        <i v-if="desc.icon" :class="desc.icon" :style="{ fontSize: desc.fontSize || '14px', color: desc.color || '#C0C4CC' }"></i>
+        <el-icon v-else :style="{ fontSize: desc.fontSize || '14px', color: desc.color || '#C0C4CC' }"><Plus /></el-icon>
         <div class="el-upload__text2" v-if="desc.upType === 'file' && desc.text2">
           {{ desc.text2 }}
         </div>
@@ -34,6 +35,7 @@ export default {
 import { ref, computed, useAttrs, onBeforeMount, watch, inject } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
 import { ElMessage, UploadUserFile } from 'element-plus'
+import { Plus } from '@element-plus/icons-vue'
 
 import * as fileTypes from '../data/file'
 
@@ -81,7 +83,9 @@ const previewList = computed(() =>
 
 onBeforeMount(async () => {
   // // 如果没有配置，则抛出一个警告
-  // if (defaultConf.upload?.action)
+  if (!defaultConf.upload?.action) {
+    console.warn('缺少文件上传配置,无法使用upload组件~')
+  }
   attrs.value = await getAttrs(props, {
     drag: true,
     listType: props.desc.upType === 'file' ? 'text' : 'picture-card',

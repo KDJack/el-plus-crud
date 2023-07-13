@@ -2,6 +2,7 @@ import { App } from 'vue'
 import components from './components-list'
 import ElPlusForm from './components/el-plus-form/ElPlusForm.vue'
 import ElPlusFormDialog from './components/el-plus-form/ElPlusFormDialog.vue'
+import ElPlusFormGroup from './components/el-plus-form/ElPlusFormGroup.vue'
 import ElPlusTable from './components/el-plus-table/ElPlusTable.vue'
 import defaultConf from './config'
 
@@ -21,6 +22,7 @@ export default {
     // 循环注册表单组件
     components.unshift(ElPlusForm)
     components.unshift(ElPlusFormDialog)
+    components.unshift(ElPlusFormGroup)
 
     // 注册列表组件
     components.push(ElPlusTable)

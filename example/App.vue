@@ -1,7 +1,7 @@
 <template>
   <el-config-provider :locale="zhCn">
     <div class="layout-padding">
-      <ElPlusTable ref="listTableRef" :tableConfig="tableConfig"></ElPlusTable>
+      <ElPlusFormGroup v-model="formData" :formGroup="formGroupConfig" />
     </div>
   </el-config-provider>
 </template>
@@ -9,69 +9,53 @@
 <script setup lang="ts" name="systemUser">
 import { reactive, ref, onMounted } from 'vue'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
+import { ElMessage } from 'element-plus'
 
-const listTableRef = ref()
-
-const deptOptions = reactive([] as any[])
-const tableConfig = ref({
-  fetch: () => {},
-  tbName: 'systemUserList',
-  column: [
-    { prop: 'username', label: '账号' },
-    { prop: 'nickname', label: '名称' },
-    { prop: 'phone', label: '联系电话' },
-    { prop: 'deptName', label: '所属部门' },
-    { prop: 'remark', label: '备注' },
-    { prop: 'createTime', label: '创建时间' },
-    { prop: 'createBy', label: '创建人' },
+let formData = reactive({
+  name: 'xiaoha'
+} as any)
+const formGroupConfig = ref({
+  column: 2,
+  requestFn: () => {},
+  beforeRequest: (data: any) => {
+    return data
+  },
+  success: (formBack: IFormBack) => {
+    ElMessage.success('保存成功~')
+    // 表单回调
+    formBack.callback && formBack.callback()
+  },
+  group: [
     {
-      label: '操作',
-      fixed: 'right',
-      type: 'btns',
-      btns: [
-        { label: '查看详情', on: {} },
-        { label: '编辑', on: {} },
-        {
-          label: '删除',
-          confirm: '确定要删除?',
-          btnType: 'danger',
-          on: {}
-        }
-      ]
-    }
-  ],
-  queryMap: {},
-  toolbar: {
-    // 功能按钮列表
-    btns: [
-      {
-        label: '新增人员',
-        type: 'add',
-        on: {}
-      }
-    ],
-    formConfig: {
-      beforeRequest: (data: any) => {
-        if (data.deptId) {
-          data.deptId = data.deptId[data.deptId.length - 1]
-        }
-        return data
-      },
+      title: '基本信息',
       formDesc: {
-        nickname: { type: 'input', label: '输入查询', placeholder: '人员名称' },
-        deptId: { type: 'cascader', label: '所属部门', options: deptOptions, attrs: { props: { value: 'id', label: 'name', children: 'children', checkStrictly: true } } },
-        enabled: {
-          type: 'select',
-          label: '状态',
-          options: [
-            { label: '已禁用', value: 0 },
-            { label: '已启用', value: 1 }
-          ]
-        }
-      }
+        name: { type: 'input', label: '名称', require: true, attrs: { maxlength: 30 } },
+        contactsName: { type: 'input', label: '联系人', require: true, attrs: { maxlength: 20 } },
+        contactsPhone: { type: 'input', label: '联系电话', rules: 'phone', require: true }
+      } as IFormDesc
+    },
+    {
+      title: '地址信息',
+      formDesc: {
+        // _area: { type: 'area', label: '所在地区', require: true },
+        address: { type: 'input', label: '详细地址', require: true, attrs: { maxlength: 50 } }
+      } as IFormDesc
+    },
+    // {
+    //   title: '文件上传',
+    //   formDesc: {
+    //     businessLicense: { type: 'upload', label: '营业执照', require: true, colspan: 2 },
+    //     appendix: { type: 'upload', upType: 'file', label: '附件', multiple: true, require: true, colspan: 2 }
+    //   } as IFormDesc
+    // },
+    {
+      title: '备注信息',
+      formDesc: {
+        remark: { type: 'textarea', label: '备注', colspan: 2, require: true }
+      } as IFormDesc
     }
-  }
-})
+  ]
+} as IFormGroupConfig)
 
 onMounted(async () => {
   // 初始化部门列表

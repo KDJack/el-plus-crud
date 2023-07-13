@@ -97,7 +97,7 @@ function handelPreview(file: IOssInfo) {
       width: 100%;
       height: 28px;
       line-height: 28px;
-      padding-left: 10px;
+      padding: 0 10px;
       background: #f5f7fa;
       margin-bottom: 10px;
       cursor: pointer;

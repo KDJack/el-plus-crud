@@ -9,7 +9,7 @@ declare interface IFormDesc {
  * 表单项描述
  */
 declare interface IFormDescItem {
-  type: string
+  type?: string
   field?: string
   label?: string | Function
   prop?: string | Function
@@ -87,11 +87,9 @@ declare interface IBtnBack {
 declare interface IFormConfig {
   // 表单描述对象
   formDesc: IFormDesc
-  // 表单里面item的顺序
-  order?: Array<string>
   // 表单的列数，默认是1
   column?: number
-  // 请求地址
+  // 提交前执行
   beforeRequest?: Function
   // 请求地址
   requestFn?: Function
@@ -112,6 +110,35 @@ declare interface IFormBack {
   response?: any
   formData?: { [key: string]: any }
   callback: Function
+}
+
+/**
+ * group表单配置
+ */
+declare interface IFormGroupConfig {
+  // 表单的列数，默认是1
+  column?: number
+  // 提交前执行
+  beforeRequest?: Function
+  // 请求地址
+  requestFn?: Function
+  // 更新的函数
+  updateFn?: Function
+  // 请求成功时
+  success?: Function
+  // 成功时的提醒文本
+  successTip?: string
+  // 列表的ref
+  tableRef?: any
+  // 分组配置信息
+  group: Array<{
+    // 小标题
+    title?: string
+    // 表单的列数，默认是1
+    column?: number
+    // 表单描述对象
+    formDesc: IFormDesc
+  }>
 }
 
 /************************************列表************************************ */
@@ -312,7 +339,7 @@ declare interface IOssInfo {
 }
 
 /************************************表单详情************************************ */
-declare interface IFInfoGroupItem {
+declare interface IFormGroupItem {
   title?: string
   // 表单描述对象
   formDesc: IFormDesc

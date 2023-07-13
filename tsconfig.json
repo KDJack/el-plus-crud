@@ -63,6 +63,16 @@
     "forceConsistentCasingInFileNames": true /* Disallow inconsistently-cased references to the same file. */,
     "suppressImplicitAnyIndexErrors": true
   },
-  "include": ["types/*.d.ts", "lib/**/*.ts", "lib/**/*.vue", "lib/**/*.tsx", "lib/**/*.d.ts", "lib/views/home/activeInfo/.vue.ts", "lib/components/el-plus-form/components/index.ts"], // **Represents any directory, and * represents any file. Indicates that all files in the src directory will be compiled
+  "include": [
+    // list
+    "types/*.d.ts",
+    "lib/**/*.ts",
+    "lib/**/*.vue",
+    "lib/**/*.tsx",
+    "lib/**/*.d.ts",
+    "lib/views/home/activeInfo/.vue.ts",
+    "lib/components/el-plus-form/components/index.ts",
+    "example/**/*.vue"
+  ], // **Represents any directory, and * represents any file. Indicates that all files in the src directory will be compiled
   "exclude": ["node_modules", "dist"] // Indicates the file directory that does not need to be compiled
 }

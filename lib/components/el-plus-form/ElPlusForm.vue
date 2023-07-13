@@ -230,7 +230,7 @@ const computedRules = computed(() => {
             case 'select':
             case 'password':
             case 'textarea':
-              rules = props.formDesc[field].type
+              rules = props.formDesc[field].type || ''
               break
             case 'cascader':
             case 'tselect':
@@ -527,6 +527,7 @@ const handleSubmitForm = async () => {
       const isPass = await (tempAttr.beforeValidate as Function)(postData)
       if (isPass === false) return
     }
+    console.log('aaaaaaaaaaaaaa')
 
     await validateForm()
     for (const field in postData) {

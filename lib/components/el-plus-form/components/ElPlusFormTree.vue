@@ -1,5 +1,5 @@
 <template>
-  <el-tree ref="treeRef" v-if="isInit" :class="props.desc.class" :style="props.desc.style" v-bind="attrs" :default-checked-keys="currentValue" :loading="props.loading" node-key="id" :data="props.desc.options" v-on="onEvents" class="el-plus-form-tree" @check-change="handelCheckChange" />
+  <el-tree ref="treeRef" v-if="isInit" :class="desc.class" :style="desc.style" v-bind="attrs" :default-checked-keys="currentValue" :loading="loading" node-key="id" :data="options" v-on="onEvents" class="el-plus-form-tree" @check-change="handelCheckChange" />
 </template>
 <script lang="ts">
 export default {
@@ -10,8 +10,11 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { ref, useAttrs, onBeforeMount, watch } from 'vue'
+import { isEqual } from 'lodash'
+import { ref, reactive, useAttrs, onBeforeMount, watch, inject } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
+
+const globalData = inject('globalData') as any
 
 const props = defineProps<{
   modelValue?: string
@@ -23,6 +26,7 @@ const props = defineProps<{
 const emits = defineEmits(['update:modelValue'])
 const currentValue = ref(props.modelValue?.split(',') || [])
 
+const options = reactive([] as any[])
 const isInit = ref(false)
 const attrs = ref({} as any)
 const onEvents = ref(getEvents(props))
@@ -37,6 +41,25 @@ onBeforeMount(async () => {
 function handelCheckChange() {
   emits('update:modelValue', [...treeRef.value!.getCheckedKeys(!(props.desc.isPId ?? true))].join(','))
 }
+
+watch(
+  () => props.desc.options,
+  async (data) => {
+    if (typeof data === 'string') {
+      // 从全局数据中获取options
+      options.splice(0, options.length, ...(globalData[data] || []))
+    } else if (typeof data === 'function') {
+      options.splice(0, options.length, ...(await data(props.formData)))
+    } else if (Array.isArray(data)) {
+      if (data && options && !isEqual(data, options)) {
+        options.splice(0, options.length, ...data)
+      }
+    } else {
+      options.splice(0, options.length)
+    }
+  },
+  { immediate: true }
+)
 
 watch(
   () => props.modelValue,

@@ -83,7 +83,7 @@ const previewList = computed(() =>
 
 onBeforeMount(async () => {
   // // 如果没有配置，则抛出一个警告
-  if (!defaultConf.upload?.action) {
+  if (!defaultConf.upload || (!defaultConf.upload.action && !defaultConf.upload.minio?.getObjectAuthUrl)) {
     console.warn('缺少文件上传配置,无法使用upload组件~')
   }
   attrs.value = await getAttrs(props, {

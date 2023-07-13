@@ -47,13 +47,11 @@ emits('update:modelValue', currentValue)
 
 onBeforeMount(async () => {
   attrs.value = await getAttrs(props, { props: { value: 'id', label: 'name', children: 'childs', checkStrictly: !!props.desc.checkStrictly }, clearable: true, filterable: true, ...useAttrs() })
-  console.log('attrs: ', attrs.value)
   isInit.value = true
 })
 
 onMounted(async () => {
   areaList.value = (globalData.areaList || []) as any[]
-  console.log('areaList: ', areaList.value)
 })
 </script>
 <style lang="scss" scoped>

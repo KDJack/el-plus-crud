@@ -2,7 +2,7 @@
   "name": "el-plus-crud",
   "description": "采用Vue3 + TS，封装的element-plus数据驱动表单、列表组件",
   "author": "K.D.Jack",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "license": "MIT",
   "private": false,
   "main": "dist/el-plus-crud.mjs",
@@ -15,7 +15,7 @@
     "lint-fix": "eslint --fix --ext .js --ext .jsx --ext .vue lib/",
     "preview": "vite preview",
     "release": "standard-version",
-    "prepare": "npx husky install && npx husky add .husky/pre-commit \"npx lint-staged\"",
+    "prepare": "rimraf .husky && npx husky install && npx husky add .husky/pre-commit \"npx lint-staged\"",
     "pub": "yarn build && yarn release && yarn publish"
   },
   "keywords": [

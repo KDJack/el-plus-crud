@@ -7,7 +7,7 @@
           <el-col v-for="(formItem, y) in formList" :key="index + '-' + y + '-' + formItem.field" :xs="24" :sm="24" :md="formItem.colspan && formItem.colspan >= column ? 24 : column >= 2 ? 12 : 24" :lg="formItem.colspan && formItem.colspan >= column ? 24 : Math.floor((24 / column) * (formItem.colspan || 1))" :xl="formItem.colspan && formItem.colspan >= column ? 24 : Math.floor((24 / column) * (formItem.colspan || 1))">
             <div v-if="formItem._vif" class="el-plus-form-column-panel" :style="{ 'justify-content': isTable ? 'flex-end' : 'flex-start' }">
               <el-form-item style="min-height: 40px" :label="showLabel && formItem.showLabel !== false ? formItem._label : null" :label-width="formItem.labelWidth || labelWidth || (isDialog ? '100px' : '120px')" :prop="formItem.field" :style="{ width: formItem._attrs?.width || formItem.width || (isTable ? '150px' : '100%') }">
-                <component style="min-width: 80px; width: 100%" :is="formItem._type" :formData="props.modelValue" :disabled="formItem._disabled ?? disabled ?? false" :readonly="readonly ?? false" v-bind="formItem._attrs" :desc="formItem" :ref="setComponentRef" :field="formItem.field" v-model="props.modelValue[formItem.field || '']" :isTable="isTable" @validateThis="() => handelValidateThis(formItem.field || '')" />
+                <component style="min-width: 80px; width: 100%" :is="formItem._type" :formData="props.modelValue" :disabled="formItem._disabled ?? disabled ?? false" :readonly="readonly ?? false" v-bind="formItem._attrs" :desc="formItem" :ref="setComponentRef" :field="formItem.field" v-model="props.modelValue[formItem.field || '']" :isTable="isTable" @validateThis="() => handelValidateThis(formItem.field || '')"></component>
                 <div class="el-plus-form-tip" v-if="formItem._tip" v-html="formItem._tip" />
               </el-form-item>
             </div>
@@ -527,8 +527,6 @@ const handleSubmitForm = async () => {
       const isPass = await (tempAttr.beforeValidate as Function)(postData)
       if (isPass === false) return
     }
-    console.log('aaaaaaaaaaaaaa')
-
     await validateForm()
     for (const field in postData) {
       // 去除下划线开头的参数

@@ -16,6 +16,7 @@ import ElPlusFormInput from './components/el-plus-form/components/ElPlusFormInpu
 import ElPlusFormLink from './components/el-plus-form/components/ElPlusFormLink.vue'
 import ElPlusFormNbinput from './components/el-plus-form/components/ElPlusFormNbinput.vue'
 import ElPlusFormNumber from './components/el-plus-form/components/ElPlusFormNumber.vue'
+import ElPlusFormPassword from './components/el-plus-form/components/ElPlusFormPassword.vue'
 import ElPlusFormQuickInput from './components/el-plus-form/components/ElPlusFormQuickInput.vue'
 import ElPlusFormRadio from './components/el-plus-form/components/ElPlusFormRadio.vue'
 import ElPlusFormRate from './components/el-plus-form/components/ElPlusFormRate.vue'
@@ -50,6 +51,7 @@ export default [
   ElPlusFormLink,
   ElPlusFormNbinput,
   ElPlusFormNumber,
+  ElPlusFormPassword,
   ElPlusFormQuickInput,
   ElPlusFormRadio,
   ElPlusFormRate,

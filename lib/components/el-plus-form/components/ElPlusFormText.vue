@@ -93,7 +93,7 @@ watch(
 }
 
 .ele-form-text-click {
-  color: #1890ff;
+  color: var(--el-color-primary);
   cursor: pointer;
 }
 </style>

@@ -107,7 +107,7 @@ function handelPreview(file: IOssInfo) {
 
       &:hover {
         background: #e7e8eb;
-        color: #1890ff;
+        color: var(--el-color-primary);
       }
 
       .file-name {

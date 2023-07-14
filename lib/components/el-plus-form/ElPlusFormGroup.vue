@@ -92,7 +92,7 @@ function setComponentRef(el: any, key: string) {
       height: 16px;
       left: 0;
       top: 1px;
-      background-color: #1890ff;
+      background-color: var(--el-color-primary);
     }
   }
 }

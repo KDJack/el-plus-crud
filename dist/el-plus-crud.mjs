@@ -6611,7 +6611,7 @@ const Uy = (N, s) => {
     };
   }
 });
-const Gy = /* @__PURE__ */ Fe(Wy, [["__scopeId", "data-v-6ce69554"]]), Zy = /* @__PURE__ */ oe({
+const Gy = /* @__PURE__ */ Fe(Wy, [["__scopeId", "data-v-6ce69554"]]), Zy = { style: { width: "100%", display: "flex" } }, Hy = /* @__PURE__ */ oe({
   __name: "columnItem",
   props: {
     modelValue: {},
@@ -6676,7 +6676,7 @@ const Gy = /* @__PURE__ */ Fe(Wy, [["__scopeId", "data-v-6ce69554"]]), Zy = /* @
               ]),
               _: 1
             }, 8, ["content"])) : ce("", !0),
-            Ue("div", null, [
+            Ue("div", Zy, [
               h.vshow === void 0 || h.vshow ? (m(), Z(zs("el-plus-form-" + h.desc.type), ee({ key: 0 }, h, {
                 isTable: !0,
                 formData: (S = s.scope) == null ? void 0 : S.row,
@@ -6692,18 +6692,18 @@ const Gy = /* @__PURE__ */ Fe(Wy, [["__scopeId", "data-v-6ce69554"]]), Zy = /* @
     };
   }
 });
-const Hy = /* @__PURE__ */ Fe(Zy, [["__scopeId", "data-v-53e27808"]]), Ky = { class: "el-plus-table-content" }, qy = {
+const Ky = /* @__PURE__ */ Fe(Hy, [["__scopeId", "data-v-e78344c9"]]), qy = { class: "el-plus-table-content" }, Jy = {
   key: 0,
   class: "table-tabs-panel"
-}, Jy = { class: "el-plus-table-main" }, $y = { key: 1 }, Xy = {
+}, $y = { class: "el-plus-table-main" }, Xy = { key: 1 }, eD = {
   key: 1,
   class: "bottom-page-static-info"
-}, eD = {
+}, tD = {
   name: "ElPlusTable",
   inheritAttrs: !1,
   customOptions: {}
-}, tD = /* @__PURE__ */ oe({
-  ...eD,
+}, nD = /* @__PURE__ */ oe({
+  ...tD,
   props: {
     tableConfig: {},
     modelValue: { default: null },
@@ -6873,7 +6873,7 @@ const Hy = /* @__PURE__ */ Fe(Zy, [["__scopeId", "data-v-53e27808"]]), Ky = { cl
     }), s({ reload: Bn, tableData: F, changeSelect: De, resetSelect: Ut }), (L, re) => {
       var kn;
       const ne = V("el-icon"), we = V("el-radio-button"), st = V("el-radio-group"), dt = V("el-table-column"), lt = V("el-empty"), $e = V("el-table"), Lt = V("el-pagination"), Gt = Jj("loading");
-      return m(), Q("div", Ky, [
+      return m(), Q("div", qy, [
         de(Gy, {
           ref_key: "tableHeaderRef",
           ref: D,
@@ -6888,7 +6888,7 @@ const Hy = /* @__PURE__ */ Fe(Zy, [["__scopeId", "data-v-53e27808"]]), Ky = { cl
           isDialog: L.isDialog,
           onQuery: In
         }, null, 8, ["modelValue", "tbName", "column", "size", "isShowRefresh", "loading", "toolbar", "isDialog"]),
-        L.tableConfig.tabConf ? (m(), Q("div", qy, [
+        L.tableConfig.tabConf ? (m(), Q("div", Jy, [
           de(st, {
             modelValue: d.value,
             "onUpdate:modelValue": re[1] || (re[1] = (pe) => d.value = pe),
@@ -6924,7 +6924,7 @@ const Hy = /* @__PURE__ */ Fe(Zy, [["__scopeId", "data-v-53e27808"]]), Ky = { cl
             _: 1
           }, 8, ["modelValue"])
         ])) : ce("", !0),
-        $j((m(), Q("div", Jy, [
+        $j((m(), Q("div", $y, [
           L.isDIYMain ? Je(L.$slots, "main", {
             key: 0,
             tableData: F
@@ -6981,7 +6981,7 @@ const Hy = /* @__PURE__ */ Fe(Zy, [["__scopeId", "data-v-53e27808"]]), Ky = { cl
                       }, Oe(We.label), 7)
                     ]),
                     default: G((We) => [
-                      We.$index >= 0 ? (m(), Z(Hy, {
+                      We.$index >= 0 ? (m(), Z(Ky, {
                         key: 0,
                         field: pe.prop,
                         desc: pe,
@@ -7004,7 +7004,7 @@ const Hy = /* @__PURE__ */ Fe(Zy, [["__scopeId", "data-v-53e27808"]]), Ky = { cl
                 L.isEmptyImg ? (m(), Z(lt, {
                   key: 0,
                   description: L.nullText
-                }, null, 8, ["description"])) : (m(), Q("span", $y, Oe(L.nullText), 1))
+                }, null, 8, ["description"])) : (m(), Q("span", Xy, Oe(L.nullText), 1))
               ]),
               key: "0"
             } : void 0,
@@ -7034,7 +7034,7 @@ const Hy = /* @__PURE__ */ Fe(Zy, [["__scopeId", "data-v-53e27808"]]), Ky = { cl
         ])), [
           [Gt, A.value]
         ]),
-        L.isPager || L.tableConfig.statistic ? (m(), Q("div", Xy, [
+        L.isPager || L.tableConfig.statistic ? (m(), Q("div", eD, [
           de(Lt, {
             class: "page-info",
             small: "",
@@ -7083,13 +7083,13 @@ const _l = {
       }
     }
   }
-}, rD = {
+}, uD = {
   install: (N, s, r, i) => {
-    Object.assign(_l, s), _l.debug && console.log("initConfig: ", _l), N.provide("format", r), N.provide("globalData", i), N.provide("defaultConf", _l), Xn.unshift(Su), Xn.unshift(vy), Xn.unshift(Ey), Xn.push(tD), _l.debug && console.log("components: ", Xn), Xn.map((z) => {
+    Object.assign(_l, s), _l.debug && console.log("initConfig: ", _l), N.provide("format", r), N.provide("globalData", i), N.provide("defaultConf", _l), Xn.unshift(Su), Xn.unshift(vy), Xn.unshift(Ey), Xn.push(nD), _l.debug && console.log("components: ", Xn), Xn.map((z) => {
       N.component(z.name, z);
     });
   }
 };
 export {
-  rD as default
+  uD as default
 };

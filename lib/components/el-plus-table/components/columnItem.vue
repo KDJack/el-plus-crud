@@ -6,7 +6,7 @@
           <el-icon style="color: #f56c6c; font-size: 26px; padding: 0px 8px 0 0"><WarningFilled /></el-icon>
         </template>
       </el-popover>
-      <div>
+      <div style="width: 100%; display: flex">
         <component v-if="item.vshow === undefined || item.vshow" v-bind="item" :isTable="true" :formData="props.scope?.row" :size="item.size || size" :rowIndex="rowIndex" v-model="props.scope.row[item.field]" :is="'el-plus-form-' + item.desc.type"> </component>
       </div>
     </template>

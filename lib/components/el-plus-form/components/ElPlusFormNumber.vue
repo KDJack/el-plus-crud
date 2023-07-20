@@ -54,7 +54,13 @@ function handelBlur() {
   if (!isDoChange.value) {
     if (!currentValue.value) {
       nextTick(() => {
-        currentValue.value = props.desc.required ? numBindAttr.value.min : ''
+        currentValue.value = props.desc?.required ? numBindAttr.value.min : 0
+        if (!props.desc?.required) {
+          // 查看了源码，这里需要二次赋不一样的值，这里才会真正重新渲染
+          nextTick(() => {
+            currentValue.value = null
+          })
+        }
       })
     } else {
       handelValChange(currentValue.value, 0)

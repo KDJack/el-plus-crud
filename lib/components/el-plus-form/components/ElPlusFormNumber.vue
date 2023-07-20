@@ -54,7 +54,7 @@ function handelBlur() {
   if (!isDoChange.value) {
     if (!currentValue.value) {
       nextTick(() => {
-        currentValue.value = numBindAttr.value.min ?? 0
+        currentValue.value = props.desc.required ? numBindAttr.value.min : ''
       })
     } else {
       handelValChange(currentValue.value, 0)

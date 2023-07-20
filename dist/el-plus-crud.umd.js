@@ -5305,7 +5305,12 @@ function print() { __p += __j.call(arguments, '') }
             (m.value
               ? A(m.value, 0)
               : n.nextTick(() => {
-                  m.value = D.value.min ?? 0
+                  var E, B
+                  ;(m.value = (E = o.desc) != null && E.required ? D.value.min : 0),
+                    ((B = o.desc) != null && B.required) ||
+                      n.nextTick(() => {
+                        m.value = null
+                      })
                 })),
             n.nextTick(() => {
               u('validateThis')
@@ -5346,7 +5351,7 @@ function print() { __p += __j.call(arguments, '') }
       }
     }),
     Sm = '',
-    Io = Ye(nc, [['__scopeId', 'data-v-9e51e72b']]),
+    Io = Ye(nc, [['__scopeId', 'data-v-798814cd']]),
     rc = Object.freeze(Object.defineProperty({ __proto__: null, default: Io }, Symbol.toStringTag, { value: 'Module' })),
     lc = { name: 'ElPlusFormPassword', inheritAttrs: !1, typeName: 'password', customOptions: {} },
     To = n.defineComponent({

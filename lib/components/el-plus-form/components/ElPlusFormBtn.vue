@@ -77,6 +77,12 @@ const onEvents = computed(() => {
 })
 
 const btnShowText = computed(() => {
+  if (props.desc.btnLabel) {
+    if (typeof props.desc.btnLabel === 'function') {
+      return props.desc.btnLabel(props.formData)
+    }
+    return props.desc.btnLabel
+  }
   if (props.desc.label) {
     if (typeof props.desc.label === 'function') {
       return props.desc.label(props.formData)

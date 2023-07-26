@@ -68,6 +68,7 @@ const handelItem = (prop: string, item: any, i: number) => {
   Object.assign(tempCell.desc, item)
   if (item.type === 'btn') {
     tempCell.desc.btnType = item.btnType || 'primary'
+    tempCell.desc.btnLabel = item.btnLabel || item.label
     tempCell.desc.plain = item.plain || true
     tempCell.desc.text = true
   }

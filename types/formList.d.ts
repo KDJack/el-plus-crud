@@ -416,6 +416,10 @@ declare interface ICRUDConfig {
         controlsPosition: 'right' | ''
       }
     }
+    linkUser: {
+      getUserList: IFetch<any>
+      deptListKey: string
+    }
   }
   upload?: {
     type: 'minio' | 'quniu'
@@ -426,11 +430,6 @@ declare interface ICRUDConfig {
       getUploadUrl: (fileName?: string) => Promise<any>
       doElUpload: (fileName?: string) => Promise<any>
       getObjectAuthUrl: (fileName?: string) => Promise<any>
-    }
-  }
-  userList?: {
-    minio?: {
-      getUserList: IFetch<any>
     }
   }
   token?: string | ((data?: any) => string)

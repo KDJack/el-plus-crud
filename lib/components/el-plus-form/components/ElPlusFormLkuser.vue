@@ -140,7 +140,7 @@ const multipleTableRef = ref()
 const tableData = computed(() => {
   const tempList = [] as ILinkItem[]
   // 遍历组织架构数据
-  let tempData = cloneDeep(globalData.deptOptionsList)
+  let tempData = cloneDeep(globalData[defaultConf.form?.linkUser.deptListKey || ''])
   if (deptTreeIndex.value && deptTreeIndex.value.length > 0) {
     deptTreeIndex.value.map((item) => {
       tempData = tempData[item].children || []
@@ -225,7 +225,7 @@ function handelSelectChange(val: any) {
  */
 async function selectRemote(nickname: string) {
   if (nickname.length > 0) {
-    return ((await defaultConf.userList?.minio?.getUserList({ nickname, current: 1, size: 10, enabled: 1 })) as any).records?.map((item: any) => {
+    return ((await defaultConf.form?.linkUser.getUserList({ nickname, current: 1, size: 10, enabled: 1 })) as any).records?.map((item: any) => {
       return { value: item.userId, label: item.nickname }
     })
   }
@@ -238,7 +238,7 @@ async function selectRemote(nickname: string) {
  */
 async function goInto(item: ILinkItem, index: number) {
   // 查询机构用户
-  tableUserData.value = (await defaultConf.userList?.minio?.getUserList({ deptId: item.value, size: 999 })).records as any[]
+  tableUserData.value = (await defaultConf.form?.linkUser.getUserList({ deptId: item.value, size: 999 })).records as any[]
   deptTreeIndex.value.push(index)
   deptTreeItems.value.push(item)
 }
@@ -249,7 +249,7 @@ async function goInto(item: ILinkItem, index: number) {
  */
 async function goIndex(index: number) {
   // 查询机构用户
-  tableUserData.value = index >= 0 ? ((await defaultConf.userList?.minio?.getUserList({ deptId: deptTreeItems.value[index].value, size: 999 })).records as any[]) : []
+  tableUserData.value = index >= 0 ? ((await defaultConf.form?.linkUser.getUserList({ deptId: deptTreeItems.value[index].value, size: 999 })).records as any[]) : []
   deptTreeIndex.value.splice(index + 1)
   deptTreeItems.value.splice(index + 1)
 }

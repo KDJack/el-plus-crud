@@ -428,5 +428,10 @@ declare interface ICRUDConfig {
       getObjectAuthUrl: (fileName?: string) => Promise<any>
     }
   }
+  userList?: {
+    minio?: {
+      getUserList: IFetch<any>
+    }
+  }
   token?: string | ((data?: any) => string)
 }

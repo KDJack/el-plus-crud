@@ -14,6 +14,7 @@ import ElPlusFormFile from './components/el-plus-form/components/ElPlusFormFile.
 import ElPlusFormImage from './components/el-plus-form/components/ElPlusFormImage.vue'
 import ElPlusFormInput from './components/el-plus-form/components/ElPlusFormInput.vue'
 import ElPlusFormLink from './components/el-plus-form/components/ElPlusFormLink.vue'
+import ElPlusFormLkuser from './components/el-plus-form/components/ElPlusFormLkuser.vue'
 import ElPlusFormNbinput from './components/el-plus-form/components/ElPlusFormNbinput.vue'
 import ElPlusFormNumber from './components/el-plus-form/components/ElPlusFormNumber.vue'
 import ElPlusFormPassword from './components/el-plus-form/components/ElPlusFormPassword.vue'
@@ -49,6 +50,7 @@ export default [
   ElPlusFormImage,
   ElPlusFormInput,
   ElPlusFormLink,
+  ElPlusFormLkuser,
   ElPlusFormNbinput,
   ElPlusFormNumber,
   ElPlusFormPassword,

@@ -2,7 +2,7 @@
   <div class="el-plus-form-group">
     <template v-for="(group, i) in getGroupFowmLayout" :key="i">
       <div class="title-line" v-if="group.title">{{ group.title }}</div>
-      <ElPlusForm v-model="formData" v-bind="group.formProps" :ref="(el) => setComponentRef(el, 'form' + i)"> </ElPlusForm>
+      <ElPlusForm v-model="formData" v-bind="group.formProps" :ref="(el) => setComponentRef(el, 'form' + i)" @reset="handleReset"> </ElPlusForm>
     </template>
   </div>
 </template>
@@ -69,6 +69,13 @@ function setComponentRef(el: any, key: string) {
     formRefsKeys.push(key)
     formRefs.value.push(el)
   }
+}
+
+//重置
+const handleReset = () => {
+  formRefs.value.map((item, index, arr) => {
+    index === arr.length - 1 ? '' : item.clearValid()
+  })
 }
 </script>
 <style lang="scss">

@@ -1,11 +1,8 @@
 <template>
   <div class="ElPlusFormStatus-panel">
-    <i v-if="currentValue === 0" class="status-danger" />
-    <i v-else-if="currentValue === 1" class="status-success" />
-    <i v-else-if="currentValue === 2" class="status-warning" />
-    <i v-else-if="currentValue === 3" class="status-info" />
-    <div :class="desc.class" :style="desc.style" v-bind="attrs" v-on="onEvents">
-      {{ attrs.formatedValue || currentValue }}
+    <i :style="Sstyle" />
+    <div :class="desc.class" :style="desc.style">
+      {{ statusFormat.l }}
     </div>
   </div>
 </template>
@@ -18,8 +15,10 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { ref, useAttrs, onBeforeMount } from 'vue'
-import { getAttrs, getEvents } from '../mixins'
+import { ref, onMounted, computed } from 'vue'
+
+//状态
+const statusIcon = ['#909399', '#e6a23c', '#67c23a', '#000000', '#f56c6c']
 
 const props = defineProps<{
   modelValue?: string | number | '' | null
@@ -32,11 +31,16 @@ const emits = defineEmits(['update:modelValue'])
 const currentValue = ref(props.modelValue)
 emits('update:modelValue', currentValue)
 
-const attrs = ref({} as any)
-const onEvents = ref(getEvents(props))
+const statusFormat = ref({} as any)
+const Sstyle = computed(() => {
+  return {
+    background: statusIcon[props.desc.attrs.find((item: any) => item.v == currentValue.value).c] || props.desc.attrs.find((item: any) => item.v == currentValue.value).c || '#909399'
+  }
+})
 
-onBeforeMount(async () => {
-  attrs.value = await getAttrs(props, { ...useAttrs() })
+onMounted(() => {
+  //找出对应状态字段和颜色
+  statusFormat.value.l = props.desc.attrs.find((item: any) => item.v == currentValue.value).l
 })
 </script>
 <style lang="scss" scoped>
@@ -50,18 +54,6 @@ onBeforeMount(async () => {
     min-height: 10px;
     border-radius: 50%;
     margin-right: 5px;
-  }
-  .status-danger {
-    background: #f56c6c;
-  }
-  .status-success {
-    background: #67c23a;
-  }
-  .status-warning {
-    background: #e6a23c;
-  }
-  .status-info {
-    background: #909399;
   }
 }
 </style>

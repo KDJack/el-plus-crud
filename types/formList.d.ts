@@ -416,6 +416,10 @@ declare interface ICRUDConfig {
         controlsPosition: 'right' | ''
       }
     }
+    linkUser: {
+      getUserList: IFetch<any>
+      deptListKey: string
+    }
   }
   upload?: {
     type: 'minio' | 'quniu'

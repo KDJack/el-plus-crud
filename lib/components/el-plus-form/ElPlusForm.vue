@@ -637,7 +637,7 @@ const reset = () => {
  * 清空校验
  */
 const clearValid = () => {
-  refElPlusForm.value?.clearValidate()
+  refElPlusForm.value?.resetFields()
 }
 
 /**

@@ -12,6 +12,9 @@ declare const _default: import('vue').DefineComponent<
       type: import('vue').PropType<string>
       required: true
     }
+    showText: {
+      type: import('vue').PropType<boolean>
+    }
   },
   {},
   unknown,
@@ -35,6 +38,9 @@ declare const _default: import('vue').DefineComponent<
       size: {
         type: import('vue').PropType<string>
         required: true
+      }
+      showText: {
+        type: import('vue').PropType<boolean>
       }
     }>
   >,

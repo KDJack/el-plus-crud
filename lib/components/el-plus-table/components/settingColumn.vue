@@ -1,6 +1,8 @@
 <template>
   <div class="el-plus-table-edit-column">
-    <el-button :plain="true" type="primary" icon="ele-Setting" @click="showSettingDialog" :size="size" title="编辑显示列" circle />
+    <el-button v-if="showText" type="primary" @click="showSettingDialog" :size="size" plain>编辑显示列</el-button>
+    <el-button v-else type="primary" icon="ele-Setting" @click="showSettingDialog" :size="size" title="编辑显示列" plain circle />
+
     <!-- 编辑列 -->
     <el-dialog title="编辑显示列" v-model="showSettingColumn" width="40%">
       <template #default>
@@ -34,6 +36,7 @@ const props = defineProps<{
   column: Array<IColumnItem>
   tbName: string
   size: string
+  showText?: boolean
 }>()
 
 const showSettingColumn = ref(false)

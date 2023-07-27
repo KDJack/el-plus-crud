@@ -74,7 +74,7 @@ const handelItem = (prop: string, item: any, i: number) => {
   }
   if (item.type) {
     if (item.type === 'text') {
-      tempCell.desc.default = '-'
+      tempCell.desc.default = item.default || '-'
     }
     if (item.type === 'tag') {
       // tempCell.size = tempCell.size || 'small '

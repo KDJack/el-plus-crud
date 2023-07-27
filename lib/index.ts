@@ -9,7 +9,7 @@ import defaultConf from './config'
 export default {
   install: (app: App, config: ICRUDConfig, format?: { [key: string]: Function }, globalData?: { [key: string]: Function }) => {
     // 合并配置
-    Object.assign(defaultConf, config)
+    deepMerge(defaultConf, config)
     defaultConf.debug && console.log('initConfig: ', defaultConf)
 
     // 这里注入format对象
@@ -33,4 +33,19 @@ export default {
       app.component(component.name, component)
     })
   }
+}
+
+/**
+ * 深度合并对象
+ * @param obj1
+ * @param obj2
+ * @returns
+ */
+function deepMerge(obj1: any, obj2: any) {
+  let key
+  for (key in obj2) {
+    // 如果target(也就是obj1[key])存在，且是对象的话再去调用deepMerge，否则就是obj1[key]里面没这个对象，需要与obj2[key]合并
+    obj1[key] = obj1[key] && obj1[key].toString() === '[object Object]' ? deepMerge(obj1[key], obj2[key]) : (obj1[key] = obj2[key])
+  }
+  return obj1
 }

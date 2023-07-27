@@ -53,7 +53,7 @@ const onEvents = computed(() => {
     }
     tempOn.click = () => {
       // 显示详情
-      showInfo(linkId, linkType, linkLabel)
+      showInfo(linkId, linkType, linkLabel, props.formData)
     }
   }
   return tempOn
@@ -69,7 +69,7 @@ watch(
   () => props.modelValue,
   async () => {
     if (!props.desc.format) {
-      formatValue.value = props.modelValue === '' ? '—' : props.modelValue ?? '—'
+      formatValue.value = props.modelValue === '' ? props.desc.default ?? '—' : props.modelValue ?? props.desc.default ?? '—'
     } else {
       if (typeof props.desc.format === 'function') {
         // 如果有方法类型的判断，则需要启用动态监测

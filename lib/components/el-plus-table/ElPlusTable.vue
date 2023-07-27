@@ -6,7 +6,7 @@
         {{ item[tableConfig.showSelectNameKey || 'name'] }}
       </el-tag>
     </div> -->
-    <EleTabletHeader ref="tableHeaderRef" v-model="toolFormData" :tbName="props.tableConfig.tbName" :column="props.tableConfig.column" :size="size" :isShowRefresh="isShowRefresh" :loading="loading" :toolbar="tableConfig.toolbar" :isDialog="isDialog" @query="handelTopQuery" />
+    <EleTabletHeader ref="tableHeaderRef" v-if="Object.keys(tableConfig?.toolbar || {}).length || tableConfig.tbName" v-model="toolFormData" :tbName="tableConfig.tbName" :column="tableConfig.column" :size="size" :isShowRefresh="isShowRefresh" :loading="loading" :toolbar="tableConfig.toolbar" :isDialog="isDialog" @query="handelTopQuery" />
 
     <!-- 中部的Tabs -->
     <div class="table-tabs-panel" v-if="tableConfig.tabConf">
@@ -38,7 +38,7 @@
         <template v-if="useSlots().firstColumn">
           <slot name="firstColumn" />
         </template>
-        <template v-for="(item, i) in headerColumns" :key="item.label + i">
+        <template v-for="(item, i) in headerColumns" :key="item.prop + item.label + i">
           <!-- 二级表头 -->
           <template v-if="item.children && item.children.length > 0">
             <!-- <el-table-column :prop="item.label" :label="item.label" header-align="center">

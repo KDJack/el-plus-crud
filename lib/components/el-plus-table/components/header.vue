@@ -1,25 +1,35 @@
 <template>
-  <div v-if="props.toolbar" class="el-plus-table-header-info">
-    <el-form :inline="true" class="el-plus-table-header-form" :style="{ justifyContent: !props.toolbar.formConfig && props.toolbar.btnRight ? 'flex-end' : 'space-between' }">
-      <div v-if="props.toolbar.formConfig" class="el-plus-table-form-items">
-        <ElPlusForm ref="elPlusFormRef" v-bind="formConfig" v-model="props.modelValue" labelWidth="1" :requestFn="handelQueryData" :showBtns="false" :isTable="true">
-          <template #row>
-            <div class="table-header-form-btns">
-              <ElPlusFormBtn type="primary" icon="ele-Search" :loading="loading" :desc="{ label: '查询', on: { click: handelSearch }, size }" />
-              <ElPlusFormBtn :desc="{ label: '重置', on: { click: handelReset }, size }" />
-              <ElPlusFormBtn type="primary" v-if="props.toolbar.export" :desc="{ label: '导出Excel', size, mask: true, on: { click: handelDownload } }" />
-              <ElPlusTableSettingColumn v-if="tbName" :tbName="tbName" :column="column || []" :size="size" />
-              <ElPlusFormBtn v-for="(item, i) in headerBtns" :key="i" :desc="item" :loading="loading" />
-            </div>
-          </template>
-        </ElPlusForm>
-      </div>
-      <div v-else class="el-plus-table-header-btns" :style="{ 'min-width': isMobile() ? '100%' : headerBtns && headerBtns.length > 0 ? headerBtns.length * 110 + 'px' : '10px' }">
-        <div class="el-plus-table-header-btn">
-          <ElPlusFormBtn v-for="(item, i) in headerBtns" :key="i" :desc="item" :loading="loading" />
+  <div class="el-plus-table-header-info">
+    <template v-if="props.toolbar">
+      <el-form :inline="true" class="el-plus-table-header-form" :style="{ justifyContent: !props.toolbar.formConfig && props.toolbar.btnRight ? 'flex-end' : 'space-between' }">
+        <div v-if="props.toolbar.formConfig" class="el-plus-table-form-items">
+          <ElPlusForm ref="elPlusFormRef" v-bind="formConfig" v-model="props.modelValue" labelWidth="1" :requestFn="handelQueryData" :showBtns="false" :isTable="true">
+            <template #row>
+              <div class="table-header-form-btns">
+                <ElPlusFormBtn type="primary" icon="ele-Search" :loading="loading" :desc="{ label: '查询', on: { click: handelSearch }, size }" />
+                <ElPlusFormBtn :desc="{ label: '重置', on: { click: handelReset }, size }" />
+                <ElPlusFormBtn type="primary" v-if="props.toolbar.export" :desc="{ label: '导出Excel', size, mask: true, on: { click: handelDownload } }" />
+                <ElPlusTableSettingColumn v-if="tbName" :tbName="tbName" :column="column || []" :size="size" />
+                <ElPlusFormBtn v-for="(item, i) in headerBtns" :key="i" :desc="item" :loading="loading" />
+              </div>
+            </template>
+          </ElPlusForm>
+        </div>
+        <div v-else class="el-plus-table-header-btns" :style="{ 'min-width': isMobile() ? '100%' : headerBtns && headerBtns.length > 0 ? headerBtns.length * 110 + 'px' : '10px' }">
+          <div class="el-plus-table-header-btn">
+            <ElPlusFormBtn v-for="(item, i) in headerBtns" :key="i" :desc="item" :loading="loading" />
+          </div>
+        </div>
+      </el-form>
+    </template>
+    <!-- 如果这里有tbname, 则需要显示设置列按钮 -->
+    <template v-else-if="!!tbName">
+      <div class="el-plus-table-header-form">
+        <div class="table-header-form-btns" style="margin-bottom: 16px">
+          <ElPlusTableSettingColumn v-if="tbName" :tbName="tbName" :column="column || []" :size="size" :showText="true" />
         </div>
       </div>
-    </el-form>
+    </template>
   </div>
 </template>
 <script lang="ts" setup>

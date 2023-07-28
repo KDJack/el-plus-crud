@@ -1,6 +1,6 @@
 <template>
   <div class="el-plus-table-header-info">
-    <template v-if="props.toolbar">
+    <template v-if="props.toolbar && Object.keys(props.toolbar || {}).length">
       <el-form :inline="true" class="el-plus-table-header-form" :style="{ justifyContent: !props.toolbar.formConfig && props.toolbar.btnRight ? 'flex-end' : 'space-between' }">
         <div v-if="props.toolbar.formConfig" class="el-plus-table-form-items">
           <ElPlusForm ref="elPlusFormRef" v-bind="formConfig" v-model="props.modelValue" labelWidth="1" :requestFn="handelQueryData" :showBtns="false" :isTable="true">

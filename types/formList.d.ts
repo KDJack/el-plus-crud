@@ -178,6 +178,8 @@ declare interface IColumnItem {
   showOverflowTooltip?: boolean
   content?: any
   hstyle?: any
+  required?: boolean
+  noHide?: boolean
 }
 
 /**

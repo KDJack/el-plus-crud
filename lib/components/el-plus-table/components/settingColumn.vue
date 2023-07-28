@@ -11,7 +11,7 @@
         </div>
         <el-checkbox-group v-model="localColumn" @change="changeSelect" style="padding: 0 10px; flex-wrap: wrap; display: flex">
           <template v-for="item in props.column" :key="item.label">
-            <el-checkbox v-if="item._vif" :label="item.label">
+            <el-checkbox v-if="item._vif" :label="item.label" :disabled="item.required || item.noHide || false">
               {{ item.label }}
             </el-checkbox>
           </template>
@@ -85,6 +85,9 @@ function selectAll() {
   localColumn.value = [] as Array<String>
   if (checkAll.value) {
     localColumn.value = props.column.map((item: any) => item.label)
+  } else {
+    // 这里要屏蔽掉禁止勾选的项
+    localColumn.value = props.column.filter((item) => item.required || item.noHide).map((item: any) => item.label)
   }
   isIndeterminate.value = false
 }
@@ -130,7 +133,7 @@ function initLocalCheckList(init?: Boolean) {
     } else {
       item._vif = true
     }
-    if (item._vif && tempList.indexOf(item.label) < 0) {
+    if (item._vif && (item.required || item.noHide || tempList.indexOf(item.label) < 0)) {
       localColumn.value.push(item.label)
     }
   })

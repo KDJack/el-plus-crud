@@ -681,16 +681,12 @@ watch(
 watch(
   () => props.modelValue,
   (data, oldData) => {
-    if (isOpenListen.value && data) {
+    if (isOpenListen.value && data && JSON.stringify(data) !== JSON.stringify(oldData)) {
       // 检查联动
-      initFormAttrs()
-      nextTick(() => {
-        setTimeout(() => {
-          if (!oldFormData) {
-            oldFormData = cloneDeep(props.modelValue)
-          }
-        }, 100)
-      })
+      if (JSON.stringify(props.modelValue) !== JSON.stringify(oldFormData)) {
+        oldFormData = cloneDeep(props.modelValue)
+        initFormAttrs()
+      }
     }
   },
   { deep: true }
@@ -701,16 +697,7 @@ onMounted(async () => {
   if (!isOpenListen.value) {
     initFormAttrs()
   }
-  nextTick(() => {
-    setTimeout(() => {
-      clearValid()
-      setTimeout(() => {
-        if (!oldFormData) {
-          oldFormData = cloneDeep(props.modelValue)
-        }
-      }, 100)
-    }, 100)
-  })
+  clearValid()
 })
 
 // 暴露对外方法

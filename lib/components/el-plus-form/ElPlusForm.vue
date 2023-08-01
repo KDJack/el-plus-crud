@@ -182,6 +182,8 @@ const innerIsLoading = ref(false)
 let oldFormData = null as any
 
 const size = computed(() => props.size || defaultConf.size)
+// 组件名称列表
+const compTypeList = [...typeList, ...(defaultConf.form?.comList || [])]
 
 // 整体的布局方式
 const formLayout = computed(() => ({ display: 'flex', flexDirection: props.isTable ? 'row' : 'column' })) as any
@@ -231,6 +233,7 @@ const computedRules = computed(() => {
             case 'select':
             case 'password':
             case 'textarea':
+            case 'editor':
               rules = props.formDesc[field].type || ''
               break
             case 'cascader':
@@ -290,7 +293,7 @@ const initFormAttrs = throttle(() => {
         const formItem = props.formDesc[field]
         if (formItem && formItem.type) {
           // 设置 _type
-          formItem._type = typeList.includes(formItem.type.toLowerCase()) ? 'el-plus-form-' + formItem.type : formItem.type
+          formItem._type = compTypeList.includes(formItem.type.toLowerCase()) ? 'el-plus-form-' + formItem.type : formItem.type
           // 触发 v-if 显示 / 隐藏 设置_vif
           formItem._vif = handelKeyValue(formItem, 'vif', field, !formItem.isBlank ?? true)
           // 触发 disabled 禁用 / 启用 设置_disabled
@@ -680,11 +683,11 @@ watch(
 // 深度监听data改变
 watch(
   () => props.modelValue,
-  (data, oldData) => {
-    if (isOpenListen.value && data && JSON.stringify(data) !== JSON.stringify(oldData)) {
+  (data) => {
+    if (!oldFormData || (isOpenListen.value && data && JSON.stringify(data) !== JSON.stringify(oldFormData))) {
       // 检查联动
-      if (JSON.stringify(props.modelValue) !== JSON.stringify(oldFormData)) {
-        oldFormData = cloneDeep(props.modelValue)
+      if (JSON.stringify(data) !== JSON.stringify(oldFormData)) {
+        oldFormData = cloneDeep(data)
         initFormAttrs()
       }
     }

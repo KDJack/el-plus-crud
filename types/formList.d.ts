@@ -418,10 +418,12 @@ declare interface ICRUDConfig {
         controlsPosition: 'right' | ''
       }
     }
-    linkUser: {
+    linkUser?: {
       getUserList: IFetch<any>
       deptListKey: string
     }
+    // 用户自定义form组件的名称,使用这个，全局注册的名字为el-plus-form-xxx，form中就可以使用xxx进行引入
+    comList?: string[]
   }
   upload?: {
     type: 'minio' | 'quniu'

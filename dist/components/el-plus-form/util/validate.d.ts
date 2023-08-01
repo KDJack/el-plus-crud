@@ -156,6 +156,14 @@ export declare const textarea: {
   validator: typeof validateTextarea
 }[]
 /**
+ * 富文本编辑器
+ */
+export declare const editor: {
+  required: boolean
+  trigger: string
+  validator: typeof validateEditor
+}[]
+/**
  * 正整数校验
  * @param rule
  * @param value
@@ -204,6 +212,13 @@ declare function validateUpload(rule: any, value: any, callback?: any): void
  * @param callback
  */
 declare function validateTextarea(rule: any, value: any, callback?: any): void
+/**
+ * 富文本编辑器
+ * @param rule
+ * @param value
+ * @param callback
+ */
+declare function validateEditor(rule: any, value: any, callback?: any): void
 /**
  * 小数校验规则
  * @param rule

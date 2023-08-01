@@ -12,7 +12,8 @@ export default {
         precision: 0,
         controlsPosition: 'right'
       }
-    }
+    },
+    comList: [] as string[]
   },
   upload: {
     type: 'minio',
@@ -21,9 +22,9 @@ export default {
     maxFSize: 1024 * 1024 * 20,
     minio: {
       action: '',
-      getUploadUrl: () => {},
-      doElUpload: () => {},
-      getObjectAuthUrl: () => {}
+      getUploadUrl: () => new Promise(() => {}),
+      doElUpload: () => new Promise(() => {}),
+      getObjectAuthUrl: () => new Promise(() => {})
     }
   }
 } as ICRUDConfig

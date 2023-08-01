@@ -97,6 +97,11 @@ export const upload = [{ required: true, trigger: 'change', validator: validateU
 export const textarea = [{ required: true, trigger: 'change', validator: validateTextarea }]
 
 /**
+ * 富文本编辑器
+ */
+export const editor = [{ required: true, trigger: 'change', validator: validateEditor }]
+
+/**
  * 正整数校验
  * @param rule
  * @param value
@@ -194,6 +199,23 @@ function validateUpload(rule: any, value: any, callback?: any) {
  * @param callback
  */
 function validateTextarea(rule: any, value: any, callback?: any) {
+  if (typeof value === 'undefined' || value === null || value === '' || value === null) {
+    callback(new Error('此项必填！'))
+  } else if (!value.replace(/\n/g, '')) {
+    callback(new Error('不能全是换行！'))
+  } else if (typeof value === 'string' && value.replace(/\n/g, '').match(/^[ ]*$/)) {
+    callback(new Error('不能全是空格!'))
+  } else {
+    callback()
+  }
+}
+/**
+ * 富文本编辑器
+ * @param rule
+ * @param value
+ * @param callback
+ */
+function validateEditor(rule: any, value: any, callback?: any) {
   if (typeof value === 'undefined' || value === null || value === '' || value === null) {
     callback(new Error('此项必填！'))
   } else if (!value.replace(/\n/g, '')) {

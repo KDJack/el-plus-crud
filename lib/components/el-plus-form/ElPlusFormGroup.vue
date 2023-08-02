@@ -2,7 +2,11 @@
   <div class="el-plus-form-group">
     <template v-for="(group, i) in getGroupFowmLayout" :key="i">
       <div class="title-line" v-if="group.title">{{ group.title }}</div>
-      <ElPlusForm v-model="formData" v-bind="group.formProps" :ref="(el) => setComponentRef(el, 'form' + i)" @reset="handleReset"> </ElPlusForm>
+      <ElPlusForm v-model="formData" v-bind="group.formProps" :ref="(el) => setComponentRef(el, 'form' + i)" @reset="handleReset">
+        <template v-if="useSlots()['default' + i]">
+          <slot :name="'default' + i"> </slot>
+        </template>
+      </ElPlusForm>
     </template>
   </div>
 </template>
@@ -15,7 +19,7 @@ export default {
 </script>
 <script lang="ts" setup>
 import { cloneDeep } from 'lodash'
-import { computed, reactive, ref } from 'vue'
+import { computed, reactive, ref, useSlots } from 'vue'
 import ElPlusForm, { IFormProps } from './ElPlusForm.vue'
 
 const emits = defineEmits(['update:show', 'update:modelValue', 'before-validate', 'before-request', 'request-success', 'request-error', 'request-end', 'request'])

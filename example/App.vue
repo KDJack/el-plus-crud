@@ -1,7 +1,11 @@
 <template>
   <el-config-provider :locale="zhCn">
     <div class="layout-padding">
-      <ElPlusFormGroup v-model="formData" :formGroup="formGroupConfig" />
+      <ElPlusFormGroup v-model="formData" :formGroup="formGroupConfig">
+        <template #default0>default0插槽</template>
+        <template #default1>default1插槽</template>
+        <template #default2>default2插槽</template>
+      </ElPlusFormGroup>
     </div>
   </el-config-provider>
 </template>

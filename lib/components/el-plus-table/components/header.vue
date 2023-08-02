@@ -9,7 +9,7 @@
                 <ElPlusFormBtn type="primary" icon="ele-Search" :loading="loading" :desc="{ label: '查询', on: { click: handelSearch }, size }" />
                 <ElPlusFormBtn :desc="{ label: '重置', on: { click: handelReset }, size }" />
                 <ElPlusFormBtn type="primary" v-if="props.toolbar.export" :desc="{ label: '导出Excel', size, mask: true, on: { click: handelDownload } }" />
-                <ElPlusTableSettingColumn v-if="tbName" :tbName="tbName" :column="column || []" :size="size" />
+                <ElPlusTableSettingColumn ref="settingColumnRef" v-if="tbName" :tbName="tbName" :column="column || []" :size="size" />
                 <ElPlusFormBtn v-for="(item, i) in headerBtns" :key="i" :desc="item" :loading="loading" />
               </div>
             </template>
@@ -26,7 +26,7 @@
     <template v-else-if="!!tbName">
       <div class="el-plus-table-header-form">
         <div class="table-header-form-btns" style="margin-bottom: 16px">
-          <ElPlusTableSettingColumn v-if="tbName" :tbName="tbName" :column="column || []" :size="size" :showText="true" />
+          <ElPlusTableSettingColumn ref="settingColumnRef" v-if="tbName" :tbName="tbName" :column="column || []" :size="size" :showText="true" />
         </div>
       </div>
     </template>
@@ -56,6 +56,8 @@ const props = withDefaults(
 )
 
 const elPlusFormRef = ref()
+const settingColumnRef = ref()
+
 const headerBtns = computed(() => {
   const btns = [] as any[]
   if (props.toolbar && props.toolbar.btns) {
@@ -156,9 +158,32 @@ function handelReset() {
   })
 }
 
+/**
+ * 初始化列
+ */
+function initCol() {
+  if (props.tbName) {
+    settingColumnRef.value?.initCol()
+  } else {
+    // 没有下一层，这里需要在这一层级初始化一下
+    props.column?.map((item: any) => {
+      // 这里初始化一下vif
+      if (item.vif !== undefined && item.vif !== null) {
+        if (typeof item.vif === 'function') {
+          item._vif = item.vif(item)
+        } else {
+          item._vif = !!item.vif
+        }
+      } else {
+        item._vif = true
+      }
+    })
+  }
+}
+
 onMounted(() => {})
 
-defineExpose({ getData: () => elPlusFormRef.value?.getData() })
+defineExpose({ getData: () => elPlusFormRef.value?.getData(), initCol })
 </script>
 <style lang="scss">
 .el-plus-table-header-info {

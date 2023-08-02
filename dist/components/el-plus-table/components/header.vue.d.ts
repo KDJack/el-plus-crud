@@ -1,3 +1,7 @@
+/**
+ * 初始化列
+ */
+declare function initCol(): void
 declare const _default: import('vue').DefineComponent<
   {
     loading: {
@@ -45,6 +49,7 @@ declare const _default: import('vue').DefineComponent<
   },
   {
     getData: () => any
+    initCol: typeof initCol
   },
   unknown,
   {},

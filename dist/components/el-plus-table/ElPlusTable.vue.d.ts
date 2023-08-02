@@ -63,6 +63,7 @@ declare const _default: __VLS_WithTemplateSlots<
       tableData: any[]
       changeSelect: (itemList: any[], isSelect?: boolean) => void
       resetSelect: () => void
+      initCol: () => void
     },
     unknown,
     {},

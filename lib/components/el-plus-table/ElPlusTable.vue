@@ -579,6 +579,13 @@ function handelTopQuery() {
   reload()
 }
 
+/**
+ * 初始化列
+ */
+function initCol() {
+  tableHeaderRef.value?.initCol()
+}
+
 // 监听父类数据变更
 watch(
   () => props.modelValue,
@@ -610,7 +617,7 @@ onMounted(() => {
   reload()
 })
 
-defineExpose({ reload, tableData, changeSelect, resetSelect })
+defineExpose({ reload, tableData, changeSelect, resetSelect, initCol })
 </script>
 <style lang="scss">
 .el-plus-table-content {

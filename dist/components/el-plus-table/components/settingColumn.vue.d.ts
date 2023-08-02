@@ -1,3 +1,8 @@
+/**
+ * 初始化选择列
+ * @param init
+ */
+declare function initLocalCheckList(init?: Boolean): void
 declare const _default: import('vue').DefineComponent<
   {
     column: {
@@ -16,7 +21,9 @@ declare const _default: import('vue').DefineComponent<
       type: import('vue').PropType<boolean>
     }
   },
-  {},
+  {
+    initCol: typeof initLocalCheckList
+  },
   unknown,
   {},
   {},

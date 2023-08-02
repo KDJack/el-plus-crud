@@ -159,6 +159,8 @@ onMounted(() => {
     initLocalCheckList(true)
   }
 })
+
+defineExpose({ initCol: initLocalCheckList })
 </script>
 <style lang="scss" scoped>
 .el-plus-table-edit-column {

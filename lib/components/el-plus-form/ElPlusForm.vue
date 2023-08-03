@@ -263,7 +263,7 @@ const attrMapToTableList = computed(() => {
     let rowItemList = [] as Array<IFormDescItem>
     let tempCount = 0
     tempData.map((item) => {
-      if (item._vif || item.isBlank) {
+      if (item._vif) {
         rowItemList.push(item)
         tempCount++
         if (item.colspan) {
@@ -334,6 +334,9 @@ const initFormAttrs = throttle(() => {
               // console.log('未知的格式化类型:', formItem.format)
             }
           }
+        } else if (formItem && formItem.isBlank) {
+          // 触发 v-if 显示 / 隐藏 设置_vif
+          formItem._vif = handelKeyValue(formItem, 'vif', '', true)
         }
       }
     })

@@ -41,7 +41,7 @@
         <template v-for="(item, i) in headerColumns" :key="item.prop + item.label + i">
           <!-- 二级表头 -->
           <template v-if="item.children && item.children.length > 0">
-            <!-- <el-table-column :prop="item.label" :label="item.label" header-align="center">
+            <el-table-column v-if="columnShowList[i]?.some((t: boolean) => t)" :prop="item.label" :label="item.label" header-align="center">
               <template v-for="(item2, j) in item.children" :key="item2.label + i + j">
                 <el-table-column :prop="item2.prop" v-if="columnShowList[i][j]" v-bind="item2">
                   <template #header>
@@ -55,7 +55,7 @@
                   </template>
                 </el-table-column>
               </template>
-            </el-table-column> -->
+            </el-table-column>
           </template>
           <!-- 单级表头 -->
           <template v-else>
@@ -208,23 +208,7 @@ const treeProps = (props.tableConfig?.explan?.treeProps || { children: 'children
 
 // 列的显示
 const columnShowList = computed(() => {
-  return props.tableConfig.column.map((item) => {
-    if (props.tableConfig.tbName) {
-      return item._vif && item.scShow
-    } else {
-      // 这里初始化一下vif
-      if (item.vif !== undefined && item.vif !== null) {
-        if (typeof item.vif === 'function') {
-          item._vif = item.vif(item)
-        } else {
-          item._vif = !!item.vif
-        }
-      } else {
-        item._vif = true
-      }
-      return item._vif
-    }
-  })
+  return handelVIfList(handelListColumn(props.tableConfig.column, props.isDialog ? 'auto' : props.colMinWidth))
 })
 
 // 合计行数据
@@ -257,6 +241,33 @@ const summaryList = computed(() => {
   }
   return tempList
 })
+
+/**
+ * 处理列表的vif
+ * @param list
+ */
+function handelVIfList(list: any[]): any[] {
+  return list.map((item) => {
+    if (item.children) {
+      return handelVIfList(item.children)
+    }
+    if (props.tableConfig.tbName) {
+      return item._vif && item.scShow
+    } else {
+      // 这里初始化一下vif
+      if (item.vif !== undefined && item.vif !== null) {
+        if (typeof item.vif === 'function') {
+          item._vif = item.vif(item)
+        } else {
+          item._vif = !!item.vif
+        }
+      } else {
+        item._vif = true
+      }
+      return item._vif
+    }
+  })
+}
 
 /**
  * Tab切换
@@ -608,9 +619,7 @@ watch(
     // 遍历以及选中当前页面数据
     refreshTableSelect()
   },
-  {
-    deep: true
-  }
+  { deep: true }
 )
 
 onMounted(() => {
@@ -690,9 +699,16 @@ defineExpose({ reload, tableData, changeSelect, resetSelect, initCol })
     max-height: 100%;
     display: flex;
     flex-direction: column;
-    .el-table .cell {
-      display: flex;
-      align-items: center;
+    .el-table {
+      .cell {
+        display: flex;
+      }
+      .is-center {
+        .cell {
+          align-items: center;
+          justify-content: center;
+        }
+      }
     }
   }
 

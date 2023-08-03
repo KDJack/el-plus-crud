@@ -161,6 +161,7 @@ declare const _default: __VLS_WithTemplateSlots<
   {
     main?(_: { tableData: any[] }): any
     firstColumn?(_: {}): any
+    default?(_: {}): any
     bottom?(_: {}): any
   }
 >

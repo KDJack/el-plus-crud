@@ -2,7 +2,7 @@
   <div class="el-plus-form-group">
     <template v-for="(group, i) in getGroupFowmLayout" :key="i">
       <div class="title-line" v-if="group.title">{{ group.title }}</div>
-      <ElPlusForm v-model="formData" v-bind="group.formProps" :ref="(el) => setComponentRef(el, 'form' + i)" @reset="handleReset">
+      <ElPlusForm v-model="currentValue" v-bind="group.formProps" :ref="(el) => setComponentRef(el, 'form' + i)" @reset="handleReset">
         <template v-if="useSlots()['default' + i]">
           <slot :name="'default' + i"> </slot>
         </template>
@@ -19,7 +19,7 @@ export default {
 </script>
 <script lang="ts" setup>
 import { cloneDeep } from 'lodash'
-import { computed, reactive, ref, useSlots } from 'vue'
+import { computed, ref, useSlots } from 'vue'
 import ElPlusForm, { IFormProps } from './ElPlusForm.vue'
 
 const emits = defineEmits(['update:show', 'update:modelValue', 'before-validate', 'before-request', 'request-success', 'request-error', 'request-end', 'request'])
@@ -33,7 +33,14 @@ const props = defineProps<{
 
 const formRefs = ref([] as any[])
 const formRefsKeys = [] as string[]
-let formData = reactive({} as any)
+
+// 重新定义当前值
+const currentValue = computed({
+  get: () => props.modelValue,
+  set(val: any) {
+    emits('update:modelValue', val)
+  }
+})
 
 /**
  * 获取布局，且初始化
@@ -59,8 +66,7 @@ const getGroupFowmLayout = computed(() => {
   props.formGroup.group.map((groupItem, i) => {
     formConfigList.push({
       title: groupItem.title,
-      column: groupItem.column || column,
-      formProps: Object.assign({}, i === props.formGroup.group.length - 1 ? tempFormConfig : { showBtns: false }, groupItem || {}) as IFormProps
+      formProps: Object.assign({ column: groupItem.column || column }, i === props.formGroup.group.length - 1 ? tempFormConfig : { showBtns: false }, groupItem || {}) as IFormProps
     })
   })
   return formConfigList

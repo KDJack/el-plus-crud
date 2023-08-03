@@ -155,6 +155,7 @@ declare const _default: __VLS_WithTemplateSlots<
       clearValid: () => void
       clear: () => void
       changeValidImg: () => void
+      refresh: () => void
     },
     unknown,
     {},

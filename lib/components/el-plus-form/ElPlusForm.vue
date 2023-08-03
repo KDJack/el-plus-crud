@@ -678,6 +678,19 @@ function handelValidateThis(field: string) {
   })
 }
 
+/**
+ * 刷新表单
+ */
+function refresh() {
+  console.log('refresh***************************')
+  // 重新刷新表单
+  initFormAttrs()
+  // 重置校验
+  nextTick(() => {
+    clearValid()
+  })
+}
+
 // 监听Desc改变
 watch(
   () => props.formDesc,
@@ -713,7 +726,7 @@ onMounted(async () => {
 })
 
 // 暴露对外方法
-defineExpose({ submit: handleSubmitForm, getData: getFormData, validate: validateForm, reset, clearValid, clear, changeValidImg })
+defineExpose({ submit: handleSubmitForm, getData: getFormData, validate: validateForm, reset, clearValid, clear, changeValidImg, refresh })
 </script>
 <style lang="scss">
 .el-plus-form-panel {

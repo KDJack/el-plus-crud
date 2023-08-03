@@ -1,5 +1,5 @@
 <template>
-  <el-dialog class="el-plus-form-dialog" v-model="currentShow" :title="props.title" v-bind="dialogAttrs" destroy-on-close>
+  <el-dialog class="el-plus-form-dialog" v-model="currentShow" :title="props.title" v-bind="dialogAttrs" @closed="handelClosed">
     <!-- title 插槽 -->
     <template #header>
       <slot name="header" />
@@ -22,7 +22,7 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { ref, computed, useAttrs, nextTick } from 'vue'
+import { ref, computed, useAttrs } from 'vue'
 import ElPlusForm from './ElPlusForm.vue'
 import { ElMessage } from 'element-plus'
 
@@ -47,14 +47,6 @@ const currentValue = computed({
 // 是否显示弹框
 const currentShow = computed({
   get() {
-    // 打开时，清空一下校验
-    if (props.show) {
-      nextTick(() => {
-        setTimeout(() => {
-          refElPlusDialogForm.value?.clearValid()
-        }, 10)
-      })
-    }
     return props.show
   },
   set(val: boolean) {
@@ -99,7 +91,12 @@ function open() {
  */
 function close() {
   emits('update:show', false)
-  // 这里清空一下表单
+}
+
+/**
+ * 处理弹框关闭
+ */
+function handelClosed() {
   refElPlusDialogForm.value?.clear()
 }
 

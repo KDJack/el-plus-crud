@@ -475,6 +475,12 @@ const handelValToForm = (desc: IFormDescItem, field: string, val: any) => {
       result.startTime = elPlusFormFormat.time(result.startTime, 3)
       result.endTime = elPlusFormFormat.time(result.endTime, 3)
     }
+  } else if (desc.type === 'datetimerange') {
+    if (val && val.length === 2) {
+      // 处理一下时间戳
+      result.startTime = elPlusFormFormat.time(val[0], 3)
+      result.endTime = elPlusFormFormat.time(val[1], 3)
+    }
   } else if (desc.type === 'linkuser') {
     const [userIds, deptIds, userNames, deptNames] = val
     result.userIds = userIds

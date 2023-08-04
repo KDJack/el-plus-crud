@@ -199,7 +199,7 @@ const computedFormAttrs = computed(() => {
     rules: computedRules,
     labelPosition: isMobile() ? 'top' : 'right',
     style: {
-      width: props.maxWidth || props.isTable ? '100%' : props.isDialog ? '80%' : '1000px',
+      width: props.maxWidth || (props.isTable ? '100%' : props.isDialog ? '80%' : '1000px'),
       paddingRight: props.isTable ? '0' : '20px'
     }
   }

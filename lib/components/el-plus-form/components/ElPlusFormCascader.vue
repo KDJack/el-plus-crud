@@ -1,5 +1,5 @@
 <template>
-  <el-cascader class="ElPlusFormCascader-panel" v-bind="attrs" v-on="onEvents" :options="options" v-model="currentValue" />
+  <el-cascader v-if="isInit" class="ElPlusFormCascader-panel" v-bind="attrs" v-on="onEvents" :options="options" v-model="currentValue" />
 </template>
 <script lang="ts">
 export default {
@@ -24,15 +24,17 @@ const props = defineProps<{
 }>()
 
 const emits = defineEmits(['update:modelValue'])
-const currentValue = ref(typeof props.modelValue === 'string' ? [props.modelValue] : props.modelValue)
+const currentValue = ref(props.modelValue)
 emits('update:modelValue', currentValue)
 
+const isInit = ref(false)
 const attrs = ref({} as any)
 const onEvents = ref(getEvents(props))
 const options = reactive([] as any[])
 
 onBeforeMount(async () => {
   attrs.value = await getAttrs(props, { clearable: true, props: { value: 'value', label: 'label', children: 'children', checkStrictly: !!props.desc.checkStrictly }, ...useAttrs() })
+  isInit.value = true
 })
 
 //监听options数据

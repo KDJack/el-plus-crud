@@ -649,7 +649,7 @@ const reset = () => {
  * 清空校验
  */
 const clearValid = () => {
-  refElPlusForm.value?.resetFields()
+  refElPlusForm.value?.clearValidate()
 }
 
 /**
@@ -659,12 +659,14 @@ const clear = () => {
   // 这里进行数据清空
   if (props.modelValue) {
     Object.keys(props.modelValue).map((key) => {
-      props.modelValue[key] = (props.formDesc && props.formDesc[key] && props.formDesc[key].default) ?? null
+      props.modelValue[key] = null
     })
   }
   // 重置校验
   nextTick(() => {
-    clearValid()
+    setTimeout(() => {
+      clearValid()
+    }, 10)
   })
 }
 
@@ -722,7 +724,9 @@ onMounted(async () => {
   if (!isOpenListen.value) {
     initFormAttrs()
   }
-  clearValid()
+  nextTick(() => {
+    clearValid()
+  })
 })
 
 // 暴露对外方法

@@ -4,7 +4,7 @@
     <template #header>
       <slot name="header" />
     </template>
-    <ElPlusForm ref="refElPlusDialogForm" style="padding: 20px" :isDialog="true" v-model="currentValue" v-bind="attrs" :success="dialogSuccess" @cancel="close">
+    <ElPlusForm ref="refElPlusDialogForm" style="padding: 20px" :isDialog="true" v-model="currentValue" v-bind="attrs" :success="dialogSuccess" @cancel="currentShow = false">
       <template #top>
         <slot name="top" />
       </template>
@@ -50,7 +50,7 @@ const currentShow = computed({
     return props.show
   },
   set(val: boolean) {
-    val ? open() : close()
+    emits('update:show', val)
   }
 })
 const refElPlusDialogForm = ref(null as any)
@@ -77,20 +77,6 @@ function dialogSuccess(formBack: IFormBack) {
       }, 200)
     }
   }
-}
-
-/**
- * 打开弹框
- */
-function open() {
-  emits('update:show', true)
-}
-
-/**
- * 关闭弹框
- */
-function close() {
-  emits('update:show', false)
 }
 
 /**

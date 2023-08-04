@@ -30,8 +30,8 @@ declare const _default: __VLS_WithTemplateSlots<
       }
     },
     {
-      open: () => void
-      close: () => void
+      open: typeof open
+      close: typeof close
     },
     unknown,
     {},

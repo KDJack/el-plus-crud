@@ -36,6 +36,6 @@ const attrs = ref({} as any)
 const onEvents = ref(getEvents(props))
 
 onBeforeMount(async () => {
-  attrs.value = await getAttrs(props, { autocomplete: 'new-password', maxlength: defaultConf.form?.leng.input, ...useAttrs() })
+  attrs.value = await getAttrs(props, { autocomplete: 'new-password', maxlength: defaultConf.form?.leng?.input || 0, ...useAttrs() })
 })
 </script>

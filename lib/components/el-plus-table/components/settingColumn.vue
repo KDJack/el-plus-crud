@@ -133,7 +133,7 @@ function initLocalCheckList(init?: Boolean) {
     } else {
       item._vif = true
     }
-    if (item._vif && (item.required || item.noHide || tempList.indexOf(item.label) < 0)) {
+    if (tempList.indexOf(item.label) < 0 || item.required || item.noHide) {
       localColumn.value.push(item.label)
     }
   })

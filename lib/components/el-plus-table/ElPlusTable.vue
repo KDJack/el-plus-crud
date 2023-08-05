@@ -273,11 +273,17 @@ function handelVIfList(list: any[]): any[] {
  * Tab切换
  * @param val
  */
-function handelTabChange(val: string | number | boolean) {
+async function handelTabChange(val: string | number | boolean) {
   // 这里直接重新查询
   reload(true)
-  // 通知父类
-  emits('tabChange', val)
+
+  // 通知父类 第二个参数是回调
+  await emits('tabChange', val, initCol)
+
+  // 这里触发下initCol
+  nextTick(() => {
+    initCol()
+  })
 }
 
 /**

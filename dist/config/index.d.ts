@@ -1,2 +1,2 @@
-declare const _default: ICRUDConfig
-export default _default
+declare const _default: ICRUDConfig;
+export default _default;

@@ -35,7 +35,7 @@ const currentValue = ref()
 emits('update:modelValue', currentValue)
 
 onBeforeMount(async () => {
-  attrs.value = await getAttrs(props, { autocomplete: 'new-password', maxlength: defaultConf.form?.leng.input, clearable: true, ...useAttrs() })
+  attrs.value = await getAttrs(props, { autocomplete: 'new-password', maxlength: defaultConf.form?.leng?.input || 0, clearable: true, ...useAttrs() })
 })
 
 watch(

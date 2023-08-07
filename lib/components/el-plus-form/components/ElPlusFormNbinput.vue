@@ -1,5 +1,5 @@
 <template>
-  <el-input :class="desc.class" :style="desc.style" :clearable="attrs.clearable ?? true" type="number" v-bind="attrs" v-on="onEvents" v-model="currentValue">
+  <el-input v-if="isInit" :class="desc.class" :style="desc.style" :clearable="attrs.clearable ?? true" type="number" v-bind="attrs" v-on="onEvents" v-model="currentValue">
     <template v-for="(item, key, index) of slots" #[key] :key="index">
       <slot :name="key" />
     </template>
@@ -32,10 +32,12 @@ emits('update:modelValue', currentValue)
 
 const slots = ref(Object.assign({}, useSlots(), props.desc.slots))
 const attrs = ref({} as any)
+const isInit = ref(false)
 const onEvents = ref(getEvents(props))
 
 onBeforeMount(async () => {
   attrs.value = await getAttrs(props, { ...useAttrs() })
+  isInit.value = true
 })
 </script>
 <style lang="scss">

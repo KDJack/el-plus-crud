@@ -1,5 +1,5 @@
 <template>
-  <el-input :class="desc.class" :style="desc.style" type="textarea" v-bind="attrs" v-model="currentValue" v-on="onEvents"> </el-input>
+  <el-input v-if="isInit" :class="desc.class" :style="desc.style" type="textarea" v-bind="attrs" v-model="currentValue" v-on="onEvents"> </el-input>
   <div class="el-plus-form-quick-input">
     <el-tag v-for="(option, index) in options" :key="index" type="info" @click="changeTip(option.label)">{{ option.label }}</el-tag>
   </div>
@@ -30,6 +30,7 @@ const props = defineProps<{
 
 const emits = defineEmits(['update:modelValue', 'validateThis'])
 const attrs = ref({} as any)
+const isInit = ref(false)
 const onEvents = ref(getEvents(props))
 const options = reactive([] as any[])
 const currentValue = ref(props.modelValue)
@@ -37,6 +38,7 @@ emits('update:modelValue', currentValue)
 
 onBeforeMount(async () => {
   attrs.value = await getAttrs(props, { maxlength: defaultConf.form?.leng.textare, showWordLimit: true, rows: 3, ...useAttrs() })
+  isInit.value = true
 })
 
 /**

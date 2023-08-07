@@ -1,5 +1,5 @@
 <template>
-  <el-input style="display: flex" v-bind="attrs" v-on="onEvents" v-model="currentValue">
+  <el-input v-if="isInit" style="display: flex" v-bind="attrs" v-on="onEvents" v-model="currentValue">
     <template v-for="(item, key, index) of slots" #[key] :key="index">
       <slot :name="key" />
     </template>
@@ -29,6 +29,7 @@ const props = defineProps<{
 const emits = defineEmits(['update:modelValue', 'validateThis'])
 const slots = ref(Object.assign({}, useSlots(), props.desc.slots))
 const attrs = ref({} as any)
+const isInit = ref(false)
 const onEvents = ref(getEvents(props))
 
 const currentValue = ref()
@@ -36,6 +37,7 @@ emits('update:modelValue', currentValue)
 
 onBeforeMount(async () => {
   attrs.value = await getAttrs(props, { autocomplete: 'new-password', maxlength: defaultConf.form?.leng?.input || 0, clearable: true, ...useAttrs() })
+  isInit.value = true
 })
 
 watch(

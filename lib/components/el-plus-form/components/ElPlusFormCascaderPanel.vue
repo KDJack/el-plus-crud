@@ -1,5 +1,5 @@
 <template>
-  <el-cascader-panel class="ElPlusFormCascaderPanel-panel" v-bind="attrs" v-on="onEvents" :options="props.desc.options" v-model="currentValue">
+  <el-cascader-panel v-if="isInit" class="ElPlusFormCascaderPanel-panel" v-bind="attrs" v-on="onEvents" :options="props.desc.options" v-model="currentValue">
     <!-- 非作用域插槽 -->
     <template v-for="(item, key, index) in slots" #[key]="data" :key="index">
       <slot :name="key" :data="data" />
@@ -31,6 +31,7 @@ emits('update:modelValue', currentValue)
 
 const slots = ref(Object.assign({}, useSlots(), props.desc.slots))
 const attrs = ref({} as any)
+const isInit = ref(false)
 const onEvents = ref(getEvents(props))
 
 onBeforeMount(async () => {
@@ -42,6 +43,7 @@ onBeforeMount(async () => {
     },
     ...useAttrs()
   })
+  isInit.value = true
 })
 </script>
 <style lang="scss" scoped>

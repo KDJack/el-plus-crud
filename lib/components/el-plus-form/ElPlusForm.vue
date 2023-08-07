@@ -684,7 +684,6 @@ function handelValidateThis(field: string) {
  * 刷新表单
  */
 function refresh() {
-  console.log('refresh***************************')
   // 重新刷新表单
   initFormAttrs()
   // 重置校验

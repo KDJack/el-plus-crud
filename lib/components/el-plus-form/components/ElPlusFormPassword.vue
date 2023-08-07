@@ -1,5 +1,5 @@
 <template>
-  <el-input :class="desc.class" :show-password="true" v-bind="attrs" v-on="onEvents" v-model="currentValue">
+  <el-input v-if="isInit" :class="desc.class" :show-password="true" v-bind="attrs" v-on="onEvents" v-model="currentValue">
     <!-- 组件内部插槽 -->
     <template v-for="(item, key, index) in slots" #[key]="data" :key="index">
       <slot :name="key" :data="data" />
@@ -33,9 +33,11 @@ emits('update:modelValue', currentValue)
 
 const slots = ref(Object.assign({}, useSlots(), props.desc.slots))
 const attrs = ref({} as any)
+const isInit = ref(false)
 const onEvents = ref(getEvents(props))
 
 onBeforeMount(async () => {
   attrs.value = await getAttrs(props, { autocomplete: 'new-password', maxlength: defaultConf.form?.leng?.input || 0, ...useAttrs() })
+  isInit.value = true
 })
 </script>

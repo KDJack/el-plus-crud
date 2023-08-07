@@ -1,5 +1,5 @@
 <template>
-  <el-input :class="desc.class" :style="desc.style" type="textarea" v-bind="attrs" v-model="currentValue" v-on="onEvents"> </el-input>
+  <el-input v-if="isInit" :class="desc.class" :style="desc.style" type="textarea" v-bind="attrs" v-model="currentValue" v-on="onEvents"> </el-input>
 </template>
 <script lang="ts">
 export default {
@@ -24,6 +24,7 @@ const props = defineProps<{
 }>()
 const emits = defineEmits(['update:modelValue', 'validateThis'])
 const attrs = ref({} as any)
+const isInit = ref(false)
 const onEvents = ref(getEvents(props))
 
 const currentValue = ref(props.modelValue)
@@ -31,6 +32,7 @@ emits('update:modelValue', currentValue)
 
 onBeforeMount(async () => {
   attrs.value = await getAttrs(props, { maxlength: defaultConf.form?.leng.textare, showWordLimit: true, rows: 3, ...useAttrs() })
+  isInit.value = true
 })
 
 watch(

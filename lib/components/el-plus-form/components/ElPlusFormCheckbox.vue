@@ -1,5 +1,5 @@
 <template>
-  <el-checkbox-group class="ElPlusFormCheckbox-panel" v-bind="attrs" v-on="onEvents" v-model="currentValue">
+  <el-checkbox-group v-if="isInit" class="ElPlusFormCheckbox-panel" v-bind="attrs" v-on="onEvents" v-model="currentValue">
     <el-checkbox v-for="option of desc.options" :key="option.value" :label="option.value" v-bind="option.attrs">
       {{ option.text }}
     </el-checkbox>
@@ -29,10 +29,12 @@ const currentValue = ref(props.modelValue)
 emits('update:modelValue', currentValue)
 
 const attrs = ref({} as any)
+const isInit = ref(false)
 const onEvents = ref(getEvents(props))
 
 onBeforeMount(async () => {
   attrs.value = await getAttrs(props, { ...useAttrs() })
+  isInit.value = true
 })
 </script>
 <style lang="scss" scoped>

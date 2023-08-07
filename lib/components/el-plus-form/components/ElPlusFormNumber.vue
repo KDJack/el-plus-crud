@@ -1,5 +1,5 @@
 <template>
-  <el-input-number class="ElPlusFormNumber-panel" v-bind="attrs" v-on="onEvents" v-model="currentValue" @focus="handelFocus" @blur="handelBlur" onkeypress="return( /[\d\.]/.test(String.fromCharCode(event.keyCode)))" />
+  <el-input-number v-if="isInit" class="ElPlusFormNumber-panel" v-bind="attrs" v-on="onEvents" v-model="currentValue" @focus="handelFocus" @blur="handelBlur" onkeypress="return( /[\d\.]/.test(String.fromCharCode(event.keyCode)))" />
 </template>
 <script lang="ts">
 export default {
@@ -29,6 +29,7 @@ const emits = defineEmits(['update:modelValue', 'validateThis'])
 const currentValue = ref(props.modelValue)
 emits('update:modelValue', currentValue)
 const attrs = ref({} as any)
+const isInit = ref(false)
 const onEvents = ref(getEvents(props))
 
 const isDoChange = ref(false)
@@ -37,6 +38,7 @@ onBeforeMount(async () => {
   attrs.value = await getAttrs(props, { ...defaultConf.form?.leng.nbinput, ...useAttrs() })
   delete attrs.value.min
   delete attrs.value.max
+  isInit.value = true
 })
 
 /**

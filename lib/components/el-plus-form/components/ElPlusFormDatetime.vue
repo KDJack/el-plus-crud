@@ -1,5 +1,5 @@
 <template>
-  <el-date-picker class="ElPlusFormDatetime-panel" v-bind="attrs" v-on="onEvents" type="datetime" v-model="currentValue" />
+  <el-date-picker v-if="isInit" class="ElPlusFormDatetime-panel" v-bind="attrs" v-on="onEvents" type="datetime" v-model="currentValue" />
 </template>
 <script lang="ts">
 export default {
@@ -23,12 +23,14 @@ const props = defineProps<{
 const emits = defineEmits(['update:modelValue'])
 const currentValue = ref(props.modelValue)
 const attrs = ref({} as any)
+const isInit = ref(false)
 const onEvents = ref(getEvents(props))
 
 emits('update:modelValue', currentValue)
 
 onBeforeMount(async () => {
   attrs.value = await getAttrs(props, { valueFormat: 'YYYY-MM-DD HH:mm:ss', ...useAttrs() })
+  isInit.value = true
 })
 </script>
 <style lang="scss" scoped>

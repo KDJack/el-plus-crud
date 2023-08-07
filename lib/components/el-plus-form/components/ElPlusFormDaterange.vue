@@ -1,5 +1,5 @@
 <template>
-  <el-date-picker class="el-plusF-form-daterange-panel" v-bind="attrs" v-on="onEvents" v-model="currentValue">
+  <el-date-picker v-if="isInit" class="el-plusF-form-daterange-panel" v-bind="attrs" v-on="onEvents" v-model="currentValue">
     <!-- 非作用域插槽 -->
     <template v-for="(item, key, index) in slots" #[key]="data" :key="index">
       <slot :name="key" :data="data" />
@@ -28,6 +28,7 @@ const props = defineProps<{
 const emits = defineEmits(['update:modelValue'])
 const currentValue = ref(props.modelValue)
 const slots = ref(Object.assign({}, useSlots(), props.desc.slots))
+const isInit = ref(false)
 const attrs = ref({} as any)
 const onEvents = ref(getEvents(props))
 
@@ -35,6 +36,7 @@ emits('update:modelValue', currentValue)
 
 onBeforeMount(async () => {
   attrs.value = await getAttrs(props, { type: 'daterange', format: 'YYYY-MM-DD', valueFormat: 'x', editable: false, ...useAttrs() })
+  isInit.value = true
 })
 </script>
 <style lang="scss" scoped>

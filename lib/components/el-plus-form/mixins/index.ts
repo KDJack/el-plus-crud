@@ -74,6 +74,7 @@ function getPlaceholder(desc: { [key: string]: any }) {
     case 'number':
     case 'validCode':
     case 'tag':
+    case 'textarea':
       return { placeholder: desc?.placeholder || '请输入' + desc?._label }
     case 'switch':
       return {}
@@ -85,7 +86,8 @@ function getPlaceholder(desc: { [key: string]: any }) {
     case 'data':
     case 'datetime':
     case 'datas':
-      return { placeholder: '选择日期' }
+    case 'date':
+      return { placeholder: '请选择日期' }
     case 'daterange':
     case 'datetimerange':
     case 'timerange':
@@ -95,9 +97,9 @@ function getPlaceholder(desc: { [key: string]: any }) {
         endPlaceholder: '结束日期'
       }
     case 'dates':
-      return { placeholder: '选择一个或多个日期' }
+      return { placeholder: '请选择一个或多个日期' }
     case 'month':
-      return { placeholder: '选择月' }
+      return { placeholder: '请选择月' }
     case 'time':
     case 'timsPicker':
       return { placeholder: '请选择时间' }

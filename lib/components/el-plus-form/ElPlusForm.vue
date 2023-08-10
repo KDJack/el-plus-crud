@@ -325,15 +325,15 @@ const initFormAttrs = throttle(() => {
             props.modelValue[field] = formItem.defaultItem.value
           }
           // 这里格式化一下数据
-          if (formItem.format) {
-            if (typeof formItem.format === 'string') {
-              props.modelValue[field] = elPlusFormFormat[formItem.format](props.modelValue[field], props.modelValue)
-            } else if (typeof formItem.format === 'function') {
-              props.modelValue[field] = (formItem as any).format(props.modelValue[field], props.modelValue)
-            } else {
-              // console.log('未知的格式化类型:', formItem.format)
-            }
-          }
+          // if (formItem.format) {
+          // if (typeof formItem.format === 'string') {
+          //   props.modelValue[field] = elPlusFormFormat[formItem.format](props.modelValue[field], props.modelValue)
+          // } else if (typeof formItem.format === 'function') {
+          //   props.modelValue[field] = (formItem as any).format(props.modelValue[field], props.modelValue)
+          // } else {
+          //   // console.log('未知的格式化类型:', formItem.format)
+          // }
+          // }
         } else if (formItem && formItem.isBlank) {
           // 触发 v-if 显示 / 隐藏 设置_vif
           formItem._vif = handelKeyValue(formItem, 'vif', '', true)

@@ -198,6 +198,8 @@ declare interface IExportConfig {
   isAuth?: Boolean
   // 是否需要拼接查询条件
   noQuery?: Boolean
+  // 导出文件的后缀
+  suffix?: string
 }
 
 /**

@@ -2,7 +2,7 @@
   <template v-if="props.desc.confirm">
     <el-popconfirm @confirm="onEvents.click" :title="props.desc.confirm">
       <template #reference>
-        <el-button :loading="localLoading" :size="props.desc.size || 'small'" v-bind="attrs">
+        <el-button :loading="localLoading" :size="props.desc.size || 'small'" v-bind="attrs" :disabled="disabled">
           <template #default v-if="!!desc.label">
             {{ btnShowText }}
           </template>
@@ -11,7 +11,7 @@
     </el-popconfirm>
   </template>
 
-  <el-button v-else :loading="localLoading" :size="props.desc.size || 'small'" v-bind="attrs" v-on="onEvents" :style="{ pointerEvents: desc.isTag ? 'none' : 'all' }">
+  <el-button v-else :loading="localLoading" :size="props.desc.size || 'small'" v-bind="attrs" v-on="onEvents" :disabled="disabled" :style="{ pointerEvents: desc.isTag ? 'none' : 'all' }">
     <template #default v-if="!!props.desc.label">
       {{ btnShowText }}
     </template>
@@ -35,6 +35,7 @@ const props = defineProps<{
   loading?: boolean
   desc: { [key: string]: any }
   formData?: { [key: string]: any }
+  disabled?: boolean
 }>()
 
 const localLoading = ref(props.loading ?? false)

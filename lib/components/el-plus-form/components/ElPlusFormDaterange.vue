@@ -1,5 +1,5 @@
 <template>
-  <el-date-picker v-if="isInit" class="el-plusF-form-daterange-panel" v-bind="attrs" v-on="onEvents" v-model="currentValue">
+  <el-date-picker v-if="isInit" class="el-plusF-form-daterange-panel" v-bind="attrs" v-on="onEvents" v-model="currentValue" :disabled="disabled">
     <!-- 非作用域插槽 -->
     <template v-for="(item, key, index) in slots" #[key]="data" :key="index">
       <slot :name="key" :data="data" />
@@ -23,6 +23,7 @@ const props = defineProps<{
   field: string
   desc: { [key: string]: any }
   formData: { [key: string]: any }
+  disabled?: boolean
 }>()
 
 const emits = defineEmits(['update:modelValue'])

@@ -1,5 +1,5 @@
 <template>
-  <el-cascader v-if="isInit" class="ElPlusFormCascader-panel" v-bind="attrs" v-on="onEvents" :options="options" v-model="currentValue" />
+  <el-cascader v-if="isInit" class="ElPlusFormCascader-panel" v-bind="attrs" v-on="onEvents" :options="options" :disabled="disabled" v-model="currentValue" />
 </template>
 <script lang="ts">
 export default {
@@ -21,6 +21,7 @@ const props = defineProps<{
   field: string
   desc: { [key: string]: any }
   formData: { [key: string]: any }
+  disabled?: boolean
 }>()
 
 const emits = defineEmits(['update:modelValue'])

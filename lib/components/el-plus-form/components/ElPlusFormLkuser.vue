@@ -1,6 +1,6 @@
 <template>
   <div class="el-plus-form-link-user">
-    <el-select ref="selectRef" style="width: 100%" :class="desc.class" :style="desc.style" v-bind="topAttrs" :teleported="false" :loading="loading" :modelValue="values" @visible-change="handelVisibleChange" @clear="handelClear">
+    <el-select ref="selectRef" style="width: 100%" :class="desc.class" :style="desc.style" v-bind="topAttrs" :teleported="false" :disabled="disabled" :loading="loading" :modelValue="values" @visible-change="handelVisibleChange" @clear="handelClear">
       <el-option v-for="option in options" :key="option.value" v-bind="option" />
     </el-select>
     <!-- 弹框 -->
@@ -91,6 +91,7 @@ const props = defineProps<{
   loading?: boolean
   desc: { [key: string]: any }
   formData: { [key: string]: any }
+  disabled?: boolean
 }>()
 
 const onEvents = ref(getEvents(props))

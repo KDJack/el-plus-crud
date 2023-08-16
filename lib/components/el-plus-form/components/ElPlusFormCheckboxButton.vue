@@ -1,5 +1,5 @@
 <template>
-  <el-checkbox-group v-if="isInit" class="ElPlusFormCheckboxButton-panel" v-bind="attrs" v-on="onEvents" v-model="currentValue">
+  <el-checkbox-group v-if="isInit" class="ElPlusFormCheckboxButton-panel" v-bind="attrs" v-on="onEvents" v-model="currentValue" :disabled="disabled">
     <el-checkbox-button v-for="option of desc.options" :key="option.value" :label="option.value" v-bind="option.attrs">
       {{ option.text }}
     </el-checkbox-button>
@@ -22,6 +22,7 @@ const props = defineProps<{
   field: string
   desc: { [key: string]: any }
   formData: { [key: string]: any }
+  disabled?: boolean
 }>()
 
 const emits = defineEmits(['update:modelValue'])

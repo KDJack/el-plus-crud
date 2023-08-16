@@ -1,5 +1,5 @@
 <template>
-  <el-input v-if="isInit" :class="desc.class" :style="desc.style" type="textarea" v-bind="attrs" v-model="currentValue" v-on="onEvents"> </el-input>
+  <el-input v-if="isInit" :class="desc.class" :style="desc.style" type="textarea" v-bind="attrs" v-model="currentValue" v-on="onEvents" :disabled="disabled"> </el-input>
   <div class="el-plus-form-quick-input">
     <el-tag v-for="(option, index) in options" :key="index" type="info" @click="changeTip(option.label)">{{ option.label }}</el-tag>
   </div>
@@ -26,6 +26,7 @@ const props = defineProps<{
   loading?: boolean
   desc: { [key: string]: any }
   formData: { [key: string]: any }
+  disabled?: boolean
 }>()
 
 const emits = defineEmits(['update:modelValue', 'validateThis'])
@@ -47,6 +48,7 @@ onBeforeMount(async () => {
  * 选中
  */
 function changeTip(text: any) {
+  if (props.disabled) return false
   currentValue.value = text
   emits('validateThis')
 }

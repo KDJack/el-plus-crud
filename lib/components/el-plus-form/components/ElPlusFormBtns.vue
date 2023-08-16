@@ -1,10 +1,10 @@
 <template>
   <div class="el-plus-form-btn-group" :style="{ 'justify-content': getAlignItems }">
     <template v-for="(item, i) in localBtnList" :key="i + (item.label || item.title || '')">
-      <ElPlusFormBtn type="primary" :field="field" :desc="item || {}" :formData="formData" :plain="(item && item.plain) ?? desc.plain ?? true" :text="desc.text" :rowIndex="rowIndex" />
+      <ElPlusFormBtn type="primary" :field="field" :desc="item || {}" :formData="formData" :plain="(item && item.plain) ?? desc.plain ?? true" :disabled="disabled" :text="desc.text" :rowIndex="rowIndex" />
     </template>
     <template v-if="limitList && limitList.length > 0">
-      <el-dropdown class="group-menu-btn" :size="desc.size || 'small'">
+      <el-dropdown class="group-menu-btn" :size="desc.size || 'small'" :disabled="disabled">
         <el-button type="primary" :size="desc.size || 'small'" :plain="desc.plain ?? true"> 更多<i class="ele-ArrowDown el-icon--right" /> </el-button>
         <template #dropdown>
           <el-dropdown-menu>
@@ -35,6 +35,7 @@ const props = defineProps<{
   rowIndex?: number
   desc: { [key: string]: any }
   formData: { [key: string]: any }
+  disabled?: boolean
 }>()
 
 const localBtnList = ref([] as any[])

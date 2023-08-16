@@ -1,6 +1,6 @@
 <template>
   <div class="el-plus-form-switch">
-    <el-switch v-if="isInit" v-bind="attrs" v-on="onEvents" v-model="currentValue" />
+    <el-switch v-if="isInit" v-bind="attrs" v-on="onEvents" :disabled="disabled" v-model="currentValue" />
   </div>
 </template>
 <script lang="ts">
@@ -21,6 +21,7 @@ const props = defineProps<{
   loading?: boolean
   desc: { [key: string]: any }
   formData: { [key: string]: any }
+  disabled?: boolean
 }>()
 const emits = defineEmits(['update:modelValue'])
 

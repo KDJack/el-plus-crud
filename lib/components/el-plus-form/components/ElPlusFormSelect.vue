@@ -1,5 +1,5 @@
 <template>
-  <el-select v-if="isInit" class="el-plus-form-select" :class="desc.class" :style="desc.style" v-bind="attrs" v-model="currentValue" :loading="loading" v-on="onEvents">
+  <el-select v-if="isInit" class="el-plus-form-select" :class="desc.class" :style="desc.style" v-bind="attrs" v-model="currentValue" :loading="loading" v-on="onEvents" :disabled="disabled">
     <el-option v-for="option in options" :key="option.value || option.v" v-bind="option">
       <div class="el-plus-form-select-options">
         <span>{{ option.label || option.l }}</span>
@@ -32,6 +32,7 @@ const props = defineProps<{
   desc: { [key: string]: any }
   formData: { [key: string]: any }
   rowIndex?: number
+  disabled?: boolean
 }>()
 const emits = defineEmits(['update:modelValue'])
 

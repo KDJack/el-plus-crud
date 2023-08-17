@@ -7038,7 +7038,7 @@ const ND = (d, i) => {
         let Y = Object.assign({}, (B = N.value) == null ? void 0 : B.getData(), ((Z = s.toolbar.export) == null ? void 0 : Z.data) || {});
         for (let U in Y)
           (Y[U] === void 0 || Y[U] === null || Y[U] === "") && delete Y[U];
-        if (s.toolbar.export.fetch ? ce = await s.toolbar.export.fetch(Y) : !s.toolbar.export.noQuery && De === "get" && (ce += (ce.indexOf("?") >= 0 ? "&" : "?") + ND(Y)), J.open(De, ce, !0), J.responseType = "blob", s.toolbar.export.isAuth !== !1 && y.token) {
+        if (s.toolbar.export.fetch ? ce = await s.toolbar.export.fetch(Y) : !s.toolbar.export.noQuery && De === "get" && (ce += (ce.indexOf("?") >= 0 ? "&" : "?") + ND(Y)), s.toolbar.export.beforeRequest && typeof s.toolbar.export.beforeRequest == "function" && (Y = s.toolbar.export.beforeRequest(Y)), J.open(De, ce, !0), J.responseType = "blob", s.toolbar.export.isAuth !== !1 && y.token) {
           let U = y.token;
           typeof y.token == "function" && (U = y.token()), J.setRequestHeader("Authorization", "" + U);
         }
@@ -7162,7 +7162,7 @@ const ND = (d, i) => {
     };
   }
 });
-const hD = /* @__PURE__ */ Ze(mD, [["__scopeId", "data-v-29ba58c2"]]), vD = { style: { width: "100%", display: "flex" } }, wD = /* @__PURE__ */ fe({
+const hD = /* @__PURE__ */ Ze(mD, [["__scopeId", "data-v-9dd8f202"]]), vD = { style: { width: "100%", display: "flex" } }, wD = /* @__PURE__ */ fe({
   __name: "columnItem",
   props: {
     modelValue: {},

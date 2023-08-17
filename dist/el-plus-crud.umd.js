@@ -7442,7 +7442,7 @@ function print() { __p += __j.call(arguments, '') }
             const Me = a.toolbar.export.method || 'get'
             let Y = Object.assign({}, (S = N.value) == null ? void 0 : S.getData(), ((v = a.toolbar.export) == null ? void 0 : v.data) || {})
             for (let V in Y) (Y[V] === void 0 || Y[V] === null || Y[V] === '') && delete Y[V]
-            if ((a.toolbar.export.fetch ? (ne = await a.toolbar.export.fetch(Y)) : !a.toolbar.export.noQuery && Me === 'get' && (ne += (ne.indexOf('?') >= 0 ? '&' : '?') + $f(Y)), W.open(Me, ne, !0), (W.responseType = 'blob'), a.toolbar.export.isAuth !== !1 && y.token)) {
+            if ((a.toolbar.export.fetch ? (ne = await a.toolbar.export.fetch(Y)) : !a.toolbar.export.noQuery && Me === 'get' && (ne += (ne.indexOf('?') >= 0 ? '&' : '?') + $f(Y)), a.toolbar.export.beforeRequest && typeof a.toolbar.export.beforeRequest == 'function' && (Y = a.toolbar.export.beforeRequest(Y)), W.open(Me, ne, !0), (W.responseType = 'blob'), a.toolbar.export.isAuth !== !1 && y.token)) {
               let V = y.token
               typeof y.token == 'function' && (V = y.token()), W.setRequestHeader('Authorization', '' + V)
             }
@@ -7569,7 +7569,7 @@ function print() { __p += __j.call(arguments, '') }
     }),
     Ey = '',
     Ty = '',
-    od = Ie(rd, [['__scopeId', 'data-v-29ba58c2']]),
+    od = Ie(rd, [['__scopeId', 'data-v-9dd8f202']]),
     sd = { style: { width: '100%', display: 'flex' } },
     ad = n.defineComponent({
       __name: 'columnItem',

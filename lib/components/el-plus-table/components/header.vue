@@ -116,6 +116,9 @@ async function handelDownload({ callBack }: IBtnBack) {
         url += (url.indexOf('?') >= 0 ? '&' : '?') + mapToUrlStr(postData)
       }
     }
+    if (props.toolbar.export.beforeRequest && typeof props.toolbar.export.beforeRequest === 'function') {
+      postData = props.toolbar.export.beforeRequest(postData)
+    }
     xhr.open(method, url, true)
     // 转换流
     xhr.responseType = 'blob'

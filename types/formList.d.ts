@@ -202,6 +202,8 @@ declare interface IExportConfig {
   suffix?: string
   // 请求类型
   method?: 'get' | 'post'
+  // 请求数据处理
+  beforeRequest?: Function
 }
 
 /**

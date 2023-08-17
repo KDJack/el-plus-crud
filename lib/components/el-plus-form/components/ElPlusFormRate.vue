@@ -10,18 +10,18 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { ref, useAttrs, onBeforeMount } from 'vue'
+import { ref, watch, useAttrs, onBeforeMount } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
 
+const emits = defineEmits(['update:modelValue', 'validateThis'])
 const props = defineProps<{
-  modelValue?: string | number | '' | null
+  modelValue?: number | null
   field: string
   desc: { [key: string]: any }
   formData: { [key: string]: any }
   disabled?: boolean
 }>()
 
-const emits = defineEmits(['update:modelValue'])
 const currentValue = ref(props.modelValue)
 emits('update:modelValue', currentValue)
 
@@ -31,6 +31,21 @@ const onEvents = ref(getEvents(props))
 onBeforeMount(async () => {
   attrs.value = await getAttrs(props, { ...useAttrs() })
 })
+
+watch(
+  () => props.modelValue,
+  (data: number | null | undefined) => {
+    currentValue.value = data
+  },
+  { immediate: true }
+)
+
+watch(
+  () => currentValue.value,
+  () => {
+    emits('validateThis')
+  }
+)
 </script>
 <style lang="scss" scoped>
 .ElPlusFormRate-panel {

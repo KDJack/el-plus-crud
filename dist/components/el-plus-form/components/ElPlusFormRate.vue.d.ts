@@ -1,7 +1,7 @@
 declare const _default: import('vue').DefineComponent<
   {
     modelValue: {
-      type: import('vue').PropType<string | number | null>
+      type: import('vue').PropType<number | null>
     }
     field: {
       type: import('vue').PropType<string>
@@ -29,13 +29,13 @@ declare const _default: import('vue').DefineComponent<
   {},
   import('vue').ComponentOptionsMixin,
   import('vue').ComponentOptionsMixin,
-  'update:modelValue'[],
-  'update:modelValue',
+  ('validateThis' | 'update:modelValue')[],
+  'validateThis' | 'update:modelValue',
   import('vue').VNodeProps & import('vue').AllowedComponentProps & import('vue').ComponentCustomProps,
   Readonly<
     import('vue').ExtractPropTypes<{
       modelValue: {
-        type: import('vue').PropType<string | number | null>
+        type: import('vue').PropType<number | null>
       }
       field: {
         type: import('vue').PropType<string>
@@ -58,6 +58,7 @@ declare const _default: import('vue').DefineComponent<
       }
     }>
   > & {
+    onValidateThis?: ((...args: any[]) => any) | undefined
     'onUpdate:modelValue'?: ((...args: any[]) => any) | undefined
   },
   {},

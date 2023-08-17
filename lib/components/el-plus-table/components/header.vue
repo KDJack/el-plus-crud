@@ -101,14 +101,22 @@ async function handelDownload({ callBack }: IBtnBack) {
     // 创建请求
     const xhr = new XMLHttpRequest()
     let url = props.toolbar.export.url || ''
-    if (props.toolbar.export.fetch) {
-      url = (await props.toolbar.export.fetch(Object.assign({}, elPlusFormRef.value?.getData(), props.toolbar.export?.data || {}))) as string
-    } else {
-      if (!props.toolbar.export.noQuery) {
-        url += (url.indexOf('?') >= 0 ? '&' : '?') + mapToUrlStr(Object.assign({}, elPlusFormRef.value?.getData(), props.toolbar.export?.data || {}))
+    const method = props.toolbar.export.method || 'get'
+    let postData = Object.assign({}, elPlusFormRef.value?.getData(), props.toolbar.export?.data || {})
+    // 处理为空的请求数据
+    for (let key in postData) {
+      if (postData[key] === undefined || postData[key] === null || postData[key] === '') {
+        delete postData[key]
       }
     }
-    xhr.open('get', url, true)
+    if (props.toolbar.export.fetch) {
+      url = (await props.toolbar.export.fetch(postData)) as string
+    } else {
+      if (!props.toolbar.export.noQuery && method === 'get') {
+        url += (url.indexOf('?') >= 0 ? '&' : '?') + mapToUrlStr(postData)
+      }
+    }
+    xhr.open(method, url, true)
     // 转换流
     xhr.responseType = 'blob'
     // 是否授权
@@ -137,7 +145,13 @@ async function handelDownload({ callBack }: IBtnBack) {
         callBack && callBack()
       }, 1000)
     }
-    xhr.send()
+    if (method === 'post') {
+      // 必须在xhr.send()前设置
+      xhr.setRequestHeader('content-type', 'application/json; charset=UTF-8')
+      xhr.send(JSON.stringify(postData))
+    } else {
+      xhr.send()
+    }
   }
 }
 

@@ -200,6 +200,8 @@ declare interface IExportConfig {
   noQuery?: Boolean
   // 导出文件的后缀
   suffix?: string
+  // 请求类型
+  method?: 'get' | 'post'
 }
 
 /**

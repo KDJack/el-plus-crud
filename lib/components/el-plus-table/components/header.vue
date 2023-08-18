@@ -245,6 +245,9 @@ defineExpose({ getData: () => elPlusFormRef.value?.getData(), initCol })
         display: flex;
         align-items: center;
         margin-right: 10px;
+        & > * {
+          margin-bottom: 16px;
+        }
       }
     }
   }

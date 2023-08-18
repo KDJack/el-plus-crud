@@ -8,6 +8,8 @@
         </template>
       </ElPlusForm>
     </template>
+    <!-- 默认的插槽 -->
+    <slot name="default"> </slot>
   </div>
 </template>
 <script lang="ts">

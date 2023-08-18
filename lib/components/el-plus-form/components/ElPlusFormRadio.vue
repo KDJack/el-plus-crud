@@ -1,6 +1,6 @@
 <template>
-  <el-radio-group class="ElPlusFormRadio-panel" v-bind="attrs" v-on="onEvents" v-model="currentValue" :disabled="disabled">
-    <el-radio v-for="option of attrs.options" :key="option.value" :label="option.value">
+  <el-radio-group v-if="isInit" class="ElPlusFormRadio-panel" v-bind="attrs" v-on="onEvents" v-model="currentValue" :disabled="disabled">
+    <el-radio v-for="option of options" :key="option.value" :label="option.value">
       {{ option.l || option.label }}
     </el-radio>
   </el-radio-group>
@@ -14,8 +14,11 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { ref, useAttrs, onBeforeMount } from 'vue'
+import { ref, reactive, useAttrs, watch, onBeforeMount, inject } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
+import { isEqual } from 'lodash'
+
+const globalData = inject('globalData') as any
 
 const props = defineProps<{
   modelValue?: string | number | '' | null
@@ -29,12 +32,34 @@ const emits = defineEmits(['update:modelValue'])
 const currentValue = ref(props.modelValue)
 emits('update:modelValue', currentValue)
 
+const options = reactive([] as any[])
+const isInit = ref(false)
 const attrs = ref({} as any)
 const onEvents = ref(getEvents(props))
 
 onBeforeMount(async () => {
   attrs.value = await getAttrs(props, { ...useAttrs() })
+  isInit.value = true
 })
+
+watch(
+  () => props.desc.options,
+  async (data) => {
+    if (typeof data === 'string') {
+      // 从全局数据中获取options
+      options.splice(0, options.length, ...(globalData[data] || []))
+    } else if (typeof data === 'function') {
+      options.splice(0, options.length, ...(await data(props.formData)))
+    } else if (Array.isArray(data)) {
+      if (data && options && !isEqual(data, options)) {
+        options.splice(0, options.length, ...data)
+      }
+    } else {
+      options.splice(0, options.length)
+    }
+  },
+  { immediate: true }
+)
 </script>
 <style lang="scss" scoped>
 .ElPlusFormRadio-panel {

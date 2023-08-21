@@ -10,14 +10,20 @@
                 <ElPlusFormBtn :desc="{ label: '重置', on: { click: handelReset }, size }" />
                 <ElPlusTableSettingColumn ref="settingColumnRef" v-if="tbName" :tbName="tbName" :column="column || []" :size="size" />
                 <ElPlusFormBtn type="primary" v-if="props.toolbar.export" :desc="{ label: '导出Excel', size, mask: true, on: { click: handelDownload } }" />
-                <ElPlusFormBtn v-for="(item, i) in headerBtns" :key="i" :desc="item" :loading="loading" />
+                <template v-for="(item, i) in headerBtns" :key="i">
+                  <ElPlusFormUpbtn v-if="item.elType === 'upload'" :desc="item" :loading="loading" />
+                  <ElPlusFormBtn v-else :desc="item" :loading="loading" />
+                </template>
               </div>
             </template>
           </ElPlusForm>
         </div>
         <div v-else class="el-plus-table-header-btns" :style="{ 'min-width': isMobile() ? '100%' : headerBtns && headerBtns.length > 0 ? headerBtns.length * 110 + 'px' : '10px' }">
           <div class="el-plus-table-header-btn">
-            <ElPlusFormBtn v-for="(item, i) in headerBtns" :key="i" :desc="item" :loading="loading" />
+            <template v-for="(item, i) in headerBtns" :key="i">
+              <ElPlusFormUpbtn v-if="item.elType === 'upload'" :desc="item" :loading="loading" />
+              <ElPlusFormBtn v-else :desc="item" :loading="loading" />
+            </template>
           </div>
         </div>
       </el-form>
@@ -36,6 +42,7 @@
 import { ref, computed, onMounted, nextTick, inject } from 'vue'
 import ElPlusTableSettingColumn from './settingColumn.vue'
 import ElPlusFormBtn from '../../el-plus-form/components/ElPlusFormBtn.vue'
+import ElPlusFormUpbtn from '../../el-plus-form/components/ElPlusFormUpbtn.vue'
 import { isMobile, handelBtnType, mapToUrlStr } from '../util'
 
 const defaultConf = inject('defaultConf') as ICRUDConfig

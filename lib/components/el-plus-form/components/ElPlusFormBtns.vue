@@ -1,7 +1,12 @@
 <template>
   <div class="el-plus-form-btn-group" :style="{ 'justify-content': getAlignItems }">
     <template v-for="(item, i) in localBtnList" :key="i + (item.label || item.title || '')">
-      <ElPlusFormBtn type="primary" :field="field" :desc="item || {}" :formData="formData" :plain="(item && item.plain) ?? desc.plain ?? true" :disabled="disabled" :text="desc.text" :rowIndex="rowIndex" />
+      <template v-if="item.elType === 'upload'">
+        <ElPlusFormUpbtn type="primary" :field="field" :desc="item || {}" :formData="formData" :plain="(item && item.plain) ?? desc.plain ?? true" :disabled="disabled" :text="desc.text" :rowIndex="rowIndex" />
+      </template>
+      <template v-else>
+        <ElPlusFormBtn type="primary" :field="field" :desc="item || {}" :formData="formData" :plain="(item && item.plain) ?? desc.plain ?? true" :disabled="disabled" :text="desc.text" :rowIndex="rowIndex" />
+      </template>
     </template>
     <template v-if="limitList && limitList.length > 0">
       <el-dropdown class="group-menu-btn" :size="desc.size || 'small'" :disabled="disabled">
@@ -28,6 +33,7 @@ export default {
 <script lang="ts" setup>
 import { ref, computed, watch, onMounted } from 'vue'
 import ElPlusFormBtn from './ElPlusFormBtn.vue'
+import ElPlusFormUpbtn from './ElPlusFormUpbtn.vue'
 import { ElMessageBox } from 'element-plus'
 
 const props = defineProps<{

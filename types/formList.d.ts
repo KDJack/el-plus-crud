@@ -79,6 +79,7 @@ declare interface IBtnBack {
   callBack?: Function
   field: string
   rowIndex: number
+  files?: Array<any>
 }
 
 /**

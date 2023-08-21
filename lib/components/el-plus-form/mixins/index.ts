@@ -1,10 +1,10 @@
 export interface IMixinsProps {
   modelValue?: any
-  field: string
+  field?: string
   rowIndex?: number
   loading?: boolean
   desc: { [key: string]: any }
-  formData: { [key: string]: any }
+  formData?: { [key: string]: any }
   isMobile?: boolean
   defineEmits?: any
 }

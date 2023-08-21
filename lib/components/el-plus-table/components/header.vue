@@ -11,8 +11,10 @@
                 <ElPlusTableSettingColumn ref="settingColumnRef" v-if="tbName" :tbName="tbName" :column="column || []" :size="size" />
                 <ElPlusFormBtn type="primary" v-if="props.toolbar.export" :desc="{ label: '导出Excel', size, mask: true, on: { click: handelDownload } }" />
                 <template v-for="(item, i) in headerBtns" :key="i">
-                  <ElPlusFormUpbtn v-if="item.elType === 'upload'" :desc="item" :loading="loading" />
-                  <ElPlusFormBtn v-else :desc="item" :loading="loading" />
+                  <template v-if="getVIf(item)">
+                    <ElPlusFormUpbtn v-if="item.elType === 'upload'" :desc="item" :loading="loading" />
+                    <ElPlusFormBtn v-else :desc="item" :loading="loading" />
+                  </template>
                 </template>
               </div>
             </template>
@@ -180,6 +182,20 @@ function handelReset() {
   nextTick(() => {
     elPlusFormRef.value.submit()
   })
+}
+
+/**
+ * 获取vif
+ * @param item
+ */
+function getVIf(item: any) {
+  if (item.vif) {
+    if (typeof item.vif === 'function') {
+      return item.vif(item)
+    }
+    return !!item.vif
+  }
+  return true
 }
 
 /**

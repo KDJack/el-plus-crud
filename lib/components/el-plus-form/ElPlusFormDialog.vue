@@ -73,7 +73,7 @@ function dialogSuccess(formBack: IFormBack) {
       props.tableRef.reload()
       close()
       setTimeout(() => {
-        formBack.callback()
+        formBack.callBack()
       }, 200)
     }
   }

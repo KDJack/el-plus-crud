@@ -1,6 +1,6 @@
 <template>
   <div class="el-button el-plus-form-up-btn">
-    <el-upload class="upload-demo" style="display: flex" v-bind="attrs" :disabled="disabled" v-model="currentValue">
+    <el-upload class="upload-demo" style="display: flex" v-bind="attrs" :disabled="isLoading || disabled" v-model="currentValue">
       <el-button type="primary" :icon="Upload" :loading="isLoading"> {{ btnShowText }}</el-button>
       <template #file>
         <div></div>
@@ -17,7 +17,7 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { ref, computed, onBeforeMount, useAttrs } from 'vue'
+import { ref, computed, onBeforeMount, useAttrs, watch } from 'vue'
 import { Upload } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox, UploadRawFile } from 'element-plus'
 import { getAttrs } from '../mixins'
@@ -31,7 +31,7 @@ const props = defineProps<{
   disabled?: boolean
 }>()
 
-const isLoading = ref(false)
+const isLoading = ref(!!props.loading)
 const currentValue = ref([] as any[])
 const attrs = ref({} as any)
 const isInit = ref(false)
@@ -110,6 +110,14 @@ function handelBeforeUpload(file: UploadRawFile) {
   })
 }
 
+watch(
+  () => props.loading,
+  (data) => {
+    isLoading.value = data
+  },
+  { immediate: true }
+)
+
 onBeforeMount(async () => {
   attrs.value = await getAttrs(props, { ...uploadAttr, ...useAttrs() })
   attrs.value.onSuccess = (response: any) => {
@@ -124,7 +132,6 @@ onBeforeMount(async () => {
       } as IBtnBack)
     }
   }
-  console.log('attrs: ', attrs.value)
   isInit.value = true
 })
 </script>

@@ -27,7 +27,7 @@ const formGroupConfig = ref({
   success: (formBack: IFormBack) => {
     ElMessage.success('保存成功~')
     // 表单回调
-    formBack.callback && formBack.callback()
+    formBack.callBack && formBack.callBack()
   },
   group: [
     {

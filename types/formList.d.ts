@@ -110,7 +110,7 @@ declare interface IFormConfig {
 declare interface IFormBack {
   response?: any
   formData?: { [key: string]: any }
-  callback: Function
+  callBack: Function
 }
 
 /**

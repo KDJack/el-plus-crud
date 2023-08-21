@@ -581,7 +581,11 @@ const handleSubmitForm = async () => {
         }
         nextTick(() => {
           if (tempAttr.success && typeof tempAttr.success === 'function') {
-            tempAttr.success({ response, formData: props.modelValue, callback: () => (innerIsLoading.value = false) } as IFormBack)
+            tempAttr.success({
+              response,
+              formData: props.modelValue,
+              callBack: () => (innerIsLoading.value = false)
+            } as IFormBack)
           }
         })
       } catch (error) {

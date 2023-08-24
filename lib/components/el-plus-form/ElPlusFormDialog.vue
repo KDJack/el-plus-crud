@@ -71,7 +71,7 @@ function dialogSuccess(formBack: IFormBack) {
     if (props.tableRef) {
       ElMessage.success(props.successTip)
       props.tableRef.reload()
-      close()
+      currentShow.value = false
       setTimeout(() => {
         formBack.callBack()
       }, 200)
@@ -85,6 +85,4 @@ function dialogSuccess(formBack: IFormBack) {
 function handelClosed() {
   refElPlusDialogForm.value?.clear()
 }
-
-defineExpose({ open, close })
 </script>

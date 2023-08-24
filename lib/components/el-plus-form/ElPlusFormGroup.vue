@@ -84,11 +84,31 @@ function setComponentRef(el: any, key: string) {
 }
 
 //重置
-const handleReset = () => {
+function handleReset() {
   formRefs.value.map((item, index, arr) => {
     index === arr.length - 1 ? '' : item.clearValid()
   })
 }
+
+/**
+ * 校验
+ */
+async function validate() {
+  return await Promise.all(formRefs.value.map((tempRef) => tempRef.validate()))
+}
+
+/**
+ * 获取数据
+ */
+function getData() {
+  const tempData = {} as any
+  formRefs.value.map((tempRef) => {
+    Object.assign(tempData, tempRef.getData())
+  })
+  return tempData
+}
+
+defineExpose({ validate, getData })
 </script>
 <style lang="scss">
 .el-plus-form-group {

@@ -1,7 +1,7 @@
 <template>
   <el-checkbox-group v-if="isInit" class="ElPlusFormCheckbox-panel" v-bind="attrs" v-on="onEvents" v-model="currentValue" :disabled="disabled">
-    <el-checkbox v-for="option of desc.options" :key="option.value" :label="option.value" v-bind="option.attrs">
-      {{ option.text }}
+    <el-checkbox v-for="option of options" :key="option.value" :label="option.value" v-bind="option.attrs">
+      {{ option.text || option.label }}
     </el-checkbox>
   </el-checkbox-group>
 </template>
@@ -14,11 +14,14 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { ref, useAttrs, onBeforeMount } from 'vue'
+import { ref, reactive, watch, useAttrs, onBeforeMount, inject } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
+import { isEqual } from 'lodash'
+
+const globalData = inject('globalData') as any
 
 const props = defineProps<{
-  modelValue?: string | number | '' | null
+  modelValue?: Array<string | number> | string | number | null
   field: string
   desc: { [key: string]: any }
   formData: { [key: string]: any }
@@ -26,17 +29,45 @@ const props = defineProps<{
 }>()
 
 const emits = defineEmits(['update:modelValue'])
-const currentValue = ref(props.modelValue)
+const currentValue = ref(Array.isArray(props.modelValue) ? props.modelValue : [props.modelValue])
 emits('update:modelValue', currentValue)
 
-const attrs = ref({} as any)
+const options = reactive([] as any[])
 const isInit = ref(false)
+const attrs = ref({} as any)
 const onEvents = ref(getEvents(props))
 
 onBeforeMount(async () => {
   attrs.value = await getAttrs(props, { ...useAttrs() })
   isInit.value = true
 })
+
+watch(
+  () => props.desc.options,
+  async (data) => {
+    if (typeof data === 'string') {
+      // 从全局数据中获取options
+      options.splice(0, options.length, ...(globalData[data] || []))
+    } else if (typeof data === 'function') {
+      options.splice(0, options.length, ...(await data(props.formData)))
+    } else if (Array.isArray(data)) {
+      if (data && options && !isEqual(data, options)) {
+        options.splice(0, options.length, ...data)
+      }
+    } else {
+      options.splice(0, options.length)
+    }
+  },
+  { immediate: true }
+)
+
+watch(
+  () => props.modelValue,
+  (data: Array<string | number> | string | number | null | undefined) => {
+    currentValue.value = Array.isArray(data) ? data : [data]
+  },
+  { immediate: true }
+)
 </script>
 <style lang="scss" scoped>
 .ElPlusFormCheckbox-panel {

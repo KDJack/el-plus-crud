@@ -1,6 +1,6 @@
 <template>
   <div class="el-plus-form-switch">
-    <el-switch v-if="isInit" v-bind="attrs" v-on="onEvents" :disabled="disabled" v-model="currentValue" />
+    <el-switch v-if="isInit" v-bind="attrs" v-on="onEvents" :disabled="disabled" :loading="props.loading || localLoading" v-model="currentValue" :before-change="handelBeforeChange" />
   </div>
 </template>
 <script lang="ts">
@@ -14,7 +14,9 @@ export default {
 <script lang="ts" setup>
 import { ref, useAttrs, onBeforeMount } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
+import { ElMessageBox } from 'element-plus'
 
+const emits = defineEmits(['update:modelValue'])
 const props = defineProps<{
   modelValue?: number | null
   field: string
@@ -23,7 +25,8 @@ const props = defineProps<{
   formData: { [key: string]: any }
   disabled?: boolean
 }>()
-const emits = defineEmits(['update:modelValue'])
+
+const localLoading = ref(false)
 
 const currentValue = ref(props.modelValue)
 emits('update:modelValue', currentValue)
@@ -31,6 +34,33 @@ emits('update:modelValue', currentValue)
 const isInit = ref(false)
 const attrs = ref({} as any)
 const onEvents = ref(getEvents(props))
+
+function handelBeforeChange() {
+  if (props.desc?.confirm) {
+    localLoading.value = true
+    let confirm = props.desc?.confirm
+    if (typeof confirm === 'function') {
+      confirm = confirm(currentValue.value, props.formData)
+    }
+    return new Promise((resolve, reject) => {
+      ElMessageBox({
+        title: '提示',
+        message: confirm || '',
+        showCancelButton: true,
+        confirmButtonText: '确定',
+        cancelButtonText: '取消'
+      })
+        .then(() => resolve(true))
+        .catch(() => reject())
+        .finally(() => {
+          setTimeout(() => {
+            localLoading.value = false
+          }, 200)
+        })
+    })
+  }
+  return true
+}
 
 onBeforeMount(async () => {
   attrs.value = await getAttrs(props, { activeValue: 1, inactiveValue: 0, clearable: true, ...useAttrs() })

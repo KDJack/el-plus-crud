@@ -90,6 +90,7 @@ const styles = computed(() => {
   display: flex;
   // justify-content: center;
   flex-wrap: wrap;
+  margin-bottom: 10px;
 
   .no-img-tip {
     color: #999999;
@@ -98,6 +99,9 @@ const styles = computed(() => {
   .el-image {
     margin-left: 10px;
     margin-bottom: 10px;
+  }
+  .el-image:first-child {
+    margin-left: 0px;
   }
 }
 

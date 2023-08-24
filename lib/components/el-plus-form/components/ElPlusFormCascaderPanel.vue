@@ -1,10 +1,5 @@
 <template>
-  <el-cascader-panel v-if="isInit" class="ElPlusFormCascaderPanel-panel" v-bind="attrs" v-on="onEvents" :options="props.desc.options" :disabled="disabled" v-model="currentValue">
-    <!-- 非作用域插槽 -->
-    <template v-for="(item, key, index) in slots" #[key]="data" :key="index">
-      <slot :name="key" :data="data" />
-    </template>
-  </el-cascader-panel>
+  <el-cascader-panel v-if="isInit" class="ElPlusFormCascaderPanel-panel" v-bind="attrs" v-on="onEvents" :options="options" :disabled="disabled" v-model="currentValue"> </el-cascader-panel>
 </template>
 <script lang="ts">
 export default {
@@ -15,11 +10,14 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { ref, useAttrs, useSlots, onBeforeMount } from 'vue'
+import { ref, reactive, useAttrs, watch, onBeforeMount, inject } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
+import { isEqual } from 'lodash'
+
+const globalData = inject('globalData') as any
 
 const props = defineProps<{
-  modelValue?: string | number | '' | null
+  modelValue?: Array<string> | string | null
   field: string
   desc: { [key: string]: any }
   formData: { [key: string]: any }
@@ -27,13 +25,13 @@ const props = defineProps<{
 }>()
 
 const emits = defineEmits(['update:modelValue'])
-const currentValue = ref(props.modelValue)
+const currentValue = ref(Array.isArray(props.modelValue) ? props.modelValue : [props.modelValue])
 emits('update:modelValue', currentValue)
 
-const slots = ref(Object.assign({}, useSlots(), props.desc.slots))
 const attrs = ref({} as any)
 const isInit = ref(false)
 const onEvents = ref(getEvents(props))
+const options = reactive([] as any[])
 
 onBeforeMount(async () => {
   attrs.value = await getAttrs(props, {
@@ -46,6 +44,25 @@ onBeforeMount(async () => {
   })
   isInit.value = true
 })
+
+//监听options数据
+watch(
+  () => props.desc.options,
+  async (data) => {
+    if (typeof data === 'string') {
+      options.splice(0, options.length, ...(globalData[data] || []))
+    } else if (typeof data === 'function') {
+      options.splice(0, options.length, ...(await data(props.formData)))
+    } else if (Array.isArray(data)) {
+      if (data && options && !isEqual(data, options)) {
+        options.splice(0, options.length, ...data)
+      }
+    } else {
+      options.splice(0, options.length)
+    }
+  },
+  { immediate: true }
+)
 </script>
 <style lang="scss" scoped>
 .ElPlusFormCascaderPanel-panel {

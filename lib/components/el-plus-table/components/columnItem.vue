@@ -177,6 +177,13 @@ onMounted(() => {})
     overflow: hidden;
     white-space: nowrap;
   }
+  :deep(.ele-form-image) {
+    margin-bottom: 0;
+    .el-image {
+      margin-left: 0;
+      margin-bottom: 0;
+    }
+  }
 }
 
 .el-plus-table-column-row {

@@ -271,6 +271,14 @@ function handelVIfList(list: any[]): any[] {
       } else {
         item._vif = true
       }
+      // 这里最终处理一下auth权限问题
+      if (item.auth) {
+        if (!defaultConf.auth) {
+          console.warn('使用auth属性，请在crud注册时传入auth校验方法~')
+        } else {
+          item._vif = defaultConf.auth(item.auth)
+        }
+      }
       return item._vif
     }
   })

@@ -334,6 +334,14 @@ const initFormAttrs = throttle(() => {
           //   // console.log('未知的格式化类型:', formItem.format)
           // }
           // }
+          // 这里最终处理一下auth权限问题
+          if (formItem.auth) {
+            if (!defaultConf.auth) {
+              console.warn('使用auth属性，请在crud注册时传入auth校验方法~')
+            } else {
+              formItem._vif = defaultConf.auth(formItem.auth)
+            }
+          }
         } else if (formItem && formItem.isBlank) {
           // 触发 v-if 显示 / 隐藏 设置_vif
           formItem._vif = handelKeyValue(formItem, 'vif', '', true)

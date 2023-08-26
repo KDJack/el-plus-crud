@@ -58,6 +58,8 @@ declare interface IFormDescItem {
   // 其他属性
   // 级联下拉是否只选中最后一级
   checkStrictly?: boolean
+  // 权限
+  auth?: string
 }
 
 /**
@@ -444,4 +446,6 @@ declare interface ICRUDConfig {
     }
   }
   token?: string | ((data?: any) => string)
+  // 按钮权限方法
+  auth?: (data?: any) => boolean
 }

@@ -29,9 +29,9 @@
         <slot name="main" :tableData="tableData"></slot>
       </template>
       <!-- 这里开始是表格内容  -->
-      <el-table ref="elPlusTableRef" v-else style="width: 100%" height="100%" :maxHeight="tableConfig.maxHeight || 'auto'" v-bind="tableConfig.tableAttr" :data="tableData" :row-key="rowKey" lazy :load="loadExpandData" :size="size" :row-class-name="initRowClassName" @select="handelTableSelect" @select-all="handelTableSelectAll" @expand-change="handelTableExpandChange" :treeProps="treeProps">
+      <el-table ref="elPlusTableRef" v-else style="width: 100%" height="100%" :maxHeight="tableConfig.maxHeight || 'auto'" v-bind="tableConfig.tableAttr" :class="{ 'big-h-bar': tableConfig?.tableAttr?.bigHBar, 'big-v-bar': tableConfig.tableAttr?.bigVBar }" :data="tableData" :row-key="rowKey" lazy :load="loadExpandData" :size="size" :row-class-name="initRowClassName" @select="handelTableSelect" @select-all="handelTableSelectAll" @expand-change="handelTableExpandChange" :treeProps="treeProps">
         <!-- 复选框 -->
-        <el-table-column v-if="type === 'selection'" type="selection" width="55px" :selectable="(row: any, index: number) => tableConfig?.tableAttr?.selectable(row, index) ?? true" header-align="center" align="center" />
+        <el-table-column v-if="type === 'selection'" type="selection" width="55px" :selectable="selectable" header-align="center" align="center" />
         <!-- 下标 -->
         <el-table-column v-if="isIndex" type="index" width="60" label="序号" />
         <!-- 首列 -->
@@ -170,6 +170,13 @@ const getTabLabel = computed(() => (item: ITableTabItem) => {
   return ''
 })
 
+const selectable = computed(() => (row: any, index: number) => {
+  if (typeof props.tableConfig?.tableAttr?.selectable === 'function') {
+    return props.tableConfig?.tableAttr?.selectable(row, index)
+  }
+  return true
+})
+
 const tableHeaderRef = ref()
 
 // 加载
@@ -263,6 +270,14 @@ function handelVIfList(list: any[]): any[] {
         }
       } else {
         item._vif = true
+      }
+      // 这里最终处理一下auth权限问题
+      if (item.auth) {
+        if (!defaultConf.auth) {
+          console.warn('使用auth属性，请在crud注册时传入auth校验方法~')
+        } else {
+          item._vif = defaultConf.auth(item.auth)
+        }
       }
       return item._vif
     }
@@ -713,6 +728,23 @@ defineExpose({ reload, tableData, changeSelect, resetSelect, initCol })
         .cell {
           align-items: center;
           justify-content: center;
+        }
+      }
+    }
+    .big-h-bar {
+      .el-scrollbar {
+        .is-horizontal {
+          height: 12px !important;
+        }
+        .el-table__body {
+          padding-bottom: 16px;
+        }
+      }
+    }
+    .big-v-bar {
+      .el-scrollbar {
+        .is-vertical {
+          width: 12px !important;
         }
       }
     }

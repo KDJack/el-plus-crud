@@ -35,13 +35,16 @@ const isInit = ref(false)
 const attrs = ref({} as any)
 const onEvents = ref(getEvents(props))
 
+/**
+ * 这里处理开关提示
+ */
 function handelBeforeChange() {
-  if (props.desc?.confirm) {
+  let confirm = props.desc?.confirm
+  if (typeof confirm === 'function') {
+    confirm = confirm(currentValue.value, props.formData)
+  }
+  if (confirm) {
     localLoading.value = true
-    let confirm = props.desc?.confirm
-    if (typeof confirm === 'function') {
-      confirm = confirm(currentValue.value, props.formData)
-    }
     return new Promise((resolve, reject) => {
       ElMessageBox({
         title: '提示',

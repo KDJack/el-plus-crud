@@ -465,36 +465,40 @@ const handelValToForm = (desc: IFormDescItem, field: string, val: any) => {
     if (desc.checkStrictly) {
       result[field] = sid || zid || cid || pid || null
     } else {
-      result.provinceId = pid || -1
-      result.cityId = cid || -1
-      result.zoneId = zid || -1
-      result.streetId = sid || -1
+      result[desc.propPrefix ? desc.propPrefix + 'ProvinceId' : 'provinceId'] = pid || -1
+      result[desc.propPrefix ? desc.propPrefix + 'CityId' : 'cityId'] = cid || -1
+      result[desc.propPrefix ? desc.propPrefix + 'ZoneId' : 'zoneId'] = zid || -1
+      result[desc.propPrefix ? desc.propPrefix + 'StreetId' : 'streetId'] = sid || -1
     }
   } else if (desc.type === 'daterange') {
     if (val && val.length === 2) {
-      result.startTime = val[0]
+      const startTimeKey = desc.propPrefix ? desc.propPrefix + 'StartTime' : 'startTime'
+      const endTimeKey = desc.propPrefix ? desc.propPrefix + 'EndTime' : 'endTime'
+      result[startTimeKey] = val[0]
       if (typeof val[1] === 'string') {
-        result.endTime = new Date(val[1]).getTime()
+        result[endTimeKey] = new Date(val[1]).getTime()
       } else {
-        result.endTime = val[1]
+        result[endTimeKey] = val[1]
       }
-      result.endTime = result.endTime + (24 * 60 * 60 - 1) * 1000
+      result[endTimeKey] = result[endTimeKey] + (24 * 60 * 60 - 1) * 1000
       // 再处理一下时间戳
-      result.startTime = elPlusFormFormat.time(result.startTime, 3)
-      result.endTime = elPlusFormFormat.time(result.endTime, 3)
+      result[startTimeKey] = elPlusFormFormat.time(result[startTimeKey], 3)
+      result[endTimeKey] = elPlusFormFormat.time(result[endTimeKey], 3)
     }
   } else if (desc.type === 'datetimerange') {
     if (val && val.length === 2) {
+      const startTimeKey = desc.propPrefix ? desc.propPrefix + 'StartTime' : 'startTime'
+      const endTimeKey = desc.propPrefix ? desc.propPrefix + 'EndTime' : 'endTime'
       // 处理一下时间戳
-      result.startTime = elPlusFormFormat.time(val[0], 3)
-      result.endTime = elPlusFormFormat.time(val[1], 3)
+      result[startTimeKey] = elPlusFormFormat.time(val[0], 3)
+      result[endTimeKey] = elPlusFormFormat.time(val[1], 3)
     }
   } else if (desc.type === 'linkuser') {
     const [userIds, deptIds, userNames, deptNames] = val
-    result.userIds = userIds
-    result.deptIds = deptIds
-    result.userNames = userNames
-    result.deptNames = deptNames
+    result[desc.propPrefix ? desc.propPrefix + 'UserIds' : 'userIds'] = userIds
+    result[desc.propPrefix ? desc.propPrefix + 'DeptIds' : 'deptIds'] = deptIds
+    result[desc.propPrefix ? desc.propPrefix + 'UserNames' : 'userNames'] = userNames
+    result[desc.propPrefix ? desc.propPrefix + 'DeptNames' : 'deptNames'] = deptNames
   } else {
     // 这里处理下通用表单的数据类型
     switch (desc.type) {

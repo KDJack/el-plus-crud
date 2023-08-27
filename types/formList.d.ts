@@ -60,6 +60,8 @@ declare interface IFormDescItem {
   checkStrictly?: boolean
   // 权限
   auth?: string
+  // key的前缀-方便同一个表单中，存在多个daterange等组件
+  propPrefix?: string
 }
 
 /**

@@ -171,7 +171,7 @@ function validateInputNotAllBlank(rule: any, value: any, callback?: any) {
  * @param callback
  */
 function validateSelect(rule: any, value: any, callback?: any) {
-  if (value === null || typeof value === 'undefined' || value === '' || value.length <= 0) {
+  if (value === null || typeof value === 'undefined' || value === '' || value.length <= 0 || value[0] == null) {
     callback(new Error('请选择！'))
   } else {
     callback()

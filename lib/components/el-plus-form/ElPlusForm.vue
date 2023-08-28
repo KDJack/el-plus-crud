@@ -240,6 +240,8 @@ const computedRules = computed(() => {
             case 'tselect':
             case 'linkuser':
             case 'radio':
+            case 'checkbox':
+            case 'daterange':
               rules = 'select'
               break
           }
@@ -415,6 +417,7 @@ const handelKeyValue = (formItem: IFormDescItem, key: string, field: string, def
 
 // 验证表单
 const validateForm = () => {
+  console.log('props.modelValue: ', JSON.parse(JSON.stringify(props.modelValue)))
   return new Promise((resolve: any, reject: any) => {
     if (computedRules.value) {
       // 当传递了验证规则

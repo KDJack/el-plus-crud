@@ -1,8 +1,8 @@
 <template>
   <div class="ElPlusFormStatus-panel">
-    <i :style="Sstyle" />
+    <i :style="iconStyle" />
     <div :class="desc.class" :style="desc.style">
-      {{ statusFormat.l }}
+      {{ formatValue }}
     </div>
   </div>
 </template>
@@ -15,10 +15,11 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { ref, onMounted, computed } from 'vue'
+import { isEqual } from 'lodash'
+import { ref, reactive, watch, computed, inject } from 'vue'
 
-//状态
-const statusIcon = ['#909399', '#e6a23c', '#67c23a', '#000000', '#f56c6c']
+const globalData = inject('globalData') as any
+const format = inject('format') as any
 
 const props = defineProps<{
   modelValue?: string | number | '' | null
@@ -31,17 +32,52 @@ const emits = defineEmits(['update:modelValue'])
 const currentValue = ref(props.modelValue)
 emits('update:modelValue', currentValue)
 
-const statusFormat = ref({} as any)
-const Sstyle = computed(() => {
-  return {
-    background: statusIcon[props.desc.attrs.find((item: any) => item.v == currentValue.value).c] || props.desc.attrs.find((item: any) => item.v == currentValue.value).c || '#909399'
-  }
+const options = reactive([] as any[])
+const formatValue = ref('' as any)
+
+// icon 样式
+const iconStyle = computed(() => {
+  const optionsItem = options.find((item: any) => (item.value || item.v) == currentValue.value) || {}
+  return { background: optionsItem.c || optionsItem.color || '#909399' }
 })
 
-onMounted(() => {
-  //找出对应状态字段和颜色
-  statusFormat.value.l = props.desc.attrs.find((item: any) => item.v == currentValue.value).l
-})
+watch(
+  () => props.desc.options,
+  async (data) => {
+    if (typeof data === 'string') {
+      // 从全局数据中获取options
+      options.splice(0, options.length, ...(globalData[data] || []))
+    } else if (typeof data === 'function') {
+      options.splice(0, options.length, ...(await data(props.formData)))
+    } else if (Array.isArray(data)) {
+      if (data && options && !isEqual(data, options)) {
+        options.splice(0, options.length, ...data)
+      }
+    } else {
+      options.splice(0, options.length)
+    }
+  },
+  { immediate: true }
+)
+
+watch(
+  () => props.modelValue,
+  async () => {
+    if (!props.desc.format) {
+      formatValue.value = props.modelValue === '' ? props.desc.default ?? '—' : props.modelValue ?? props.desc.default ?? '—'
+    } else {
+      if (typeof props.desc.format === 'function') {
+        // 如果有方法类型的判断，则需要启用动态监测
+        formatValue.value = await props.desc.format(props.modelValue, props.formData, props.field)
+      } else if (typeof props.desc.format === 'string') {
+        formatValue.value = format[props.desc.format] ? format[props.desc.format](props.modelValue, props.formData, props.field) : '--'
+      } else {
+        formatValue.value = props.modelValue || '—'
+      }
+    }
+  },
+  { immediate: true }
+)
 </script>
 <style lang="scss" scoped>
 .ElPlusFormStatus-panel {

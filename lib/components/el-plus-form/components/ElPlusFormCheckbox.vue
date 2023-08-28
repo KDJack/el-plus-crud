@@ -1,4 +1,5 @@
 <template>
+  {{ currentValue }}
   <el-checkbox-group v-if="isInit" class="ElPlusFormCheckbox-panel" v-bind="attrs" v-on="onEvents" v-model="currentValue" :disabled="disabled">
     <el-checkbox v-for="option of options" :key="option.value" :label="option.value" v-bind="option.attrs">
       {{ option.text || option.label }}
@@ -29,7 +30,7 @@ const props = defineProps<{
 }>()
 
 const emits = defineEmits(['update:modelValue'])
-const currentValue = ref(Array.isArray(props.modelValue) ? props.modelValue : [props.modelValue])
+const currentValue = ref([] as any)
 emits('update:modelValue', currentValue)
 
 const options = reactive([] as any[])
@@ -64,7 +65,11 @@ watch(
 watch(
   () => props.modelValue,
   (data: Array<string | number> | string | number | null | undefined) => {
-    currentValue.value = Array.isArray(data) ? data : [data]
+    if (data) {
+      currentValue.value = Array.isArray(data) ? data : [data]
+    } else {
+      currentValue.value = []
+    }
   },
   { immediate: true }
 )

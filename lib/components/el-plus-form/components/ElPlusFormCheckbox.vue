@@ -1,5 +1,4 @@
 <template>
-  {{ currentValue }}
   <el-checkbox-group v-if="isInit" class="ElPlusFormCheckbox-panel" v-bind="attrs" v-on="onEvents" v-model="currentValue" :disabled="disabled">
     <el-checkbox v-for="option of options" :key="option.value" :label="option.value" v-bind="option.attrs">
       {{ option.text || option.label }}

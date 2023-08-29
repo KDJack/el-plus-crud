@@ -54,6 +54,10 @@ const getGroupFowmLayout = computed(() => {
     column?: number
     formProps?: IFormProps
   }>
+
+  // 这里首先遍历一遍vif
+  const tempGroupList = props.formGroup.group.filter((item) => getVIf.value(item.vif))
+
   const tempFormConfig = cloneDeep(props.formGroup) as any
   const column = props.formGroup.column || 1
   // 移除无用
@@ -61,17 +65,37 @@ const getGroupFowmLayout = computed(() => {
   delete tempFormConfig.column
 
   // 表单校验
-  tempFormConfig.beforeValidate = async (formData: any) => {
+  tempFormConfig.beforeValidate = async () => {
     return await Promise.all(formRefs.value.map((tempRef) => tempRef.validate()))
   }
+
+  tempFormConfig.groupFormDesc = {} as IFormDesc
+  tempGroupList.map((item) => {
+    Object.assign(tempFormConfig.groupFormDesc, item.formDesc)
+  })
+
   // 遍历
-  props.formGroup.group.map((groupItem, i) => {
-    formConfigList.push({
-      title: groupItem.title,
-      formProps: Object.assign({ column: groupItem.column || column }, i === props.formGroup.group.length - 1 ? tempFormConfig : { showBtns: false }, groupItem || {}) as IFormProps
-    })
+  tempGroupList.map((groupItem, i) => {
+    if (getVIf.value(groupItem.vif)) {
+      formConfigList.push({
+        title: groupItem.title,
+        formProps: Object.assign({ column: groupItem.column || column }, i === tempGroupList.length - 1 ? tempFormConfig : { showBtns: false }, groupItem || {}) as IFormProps
+      })
+    }
   })
   return formConfigList
+})
+
+/**
+ * 获取vif
+ */
+const getVIf = computed(() => (vif: boolean | Function | undefined) => {
+  if (typeof vif === 'function') {
+    return vif(props.modelValue)
+  } else if (typeof vif === 'boolean') {
+    return vif
+  }
+  return true
 })
 
 // 设置子组件的ref-重置form的时候需要用到

@@ -143,6 +143,8 @@ declare interface IFormGroupConfig {
     column?: number
     // 表单描述对象
     formDesc: IFormDesc
+    // 是否显示
+    vif?: boolean | ((data?: any) => boolean)
   }>
 }
 

@@ -50,6 +50,8 @@ import { cloneDeep } from 'lodash'
 export interface IFormProps {
   // 表单描述
   formDesc?: IFormDesc | null
+  // group的desc列表-主要针对group表单最后一个表单使用
+  groupFormDesc?: IFormDesc | null
   // 表单数据
   modelValue?: { [key: string]: any } | {}
   // 表单自身属性
@@ -417,7 +419,6 @@ const handelKeyValue = (formItem: IFormDescItem, key: string, field: string, def
 
 // 验证表单
 const validateForm = () => {
-  console.log('props.modelValue: ', JSON.parse(JSON.stringify(props.modelValue)))
   return new Promise((resolve: any, reject: any) => {
     if (computedRules.value) {
       // 当传递了验证规则
@@ -474,6 +475,7 @@ const handelValToForm = (desc: IFormDescItem, field: string, val: any) => {
       result[desc.propPrefix ? desc.propPrefix + 'StreetId' : 'streetId'] = sid || -1
     }
   } else if (desc.type === 'daterange') {
+    console.log('val: ', val)
     if (val && val.length === 2) {
       const startTimeKey = desc.propPrefix ? desc.propPrefix + 'StartTime' : 'startTime'
       const endTimeKey = desc.propPrefix ? desc.propPrefix + 'EndTime' : 'endTime'
@@ -521,12 +523,12 @@ const handelValToForm = (desc: IFormDescItem, field: string, val: any) => {
  */
 const getFormData = () => {
   const tempData = {} as { [key: string]: any }
-  if (props.formDesc) {
+  if (props.groupFormDesc || props.formDesc) {
     // 循环获取表单数据
     Object.keys(props.modelValue).map((key) => {
       if (['provinceId', 'cityId', 'zoneId', 'streetId'].indexOf(key) >= 0) return
-      if (props.formDesc) {
-        Object.assign(tempData, handelValToForm(props.formDesc[key], key, props.modelValue[key]))
+      if (props.groupFormDesc || props.formDesc) {
+        Object.assign(tempData, handelValToForm((props.groupFormDesc || props.formDesc || {})[key], key, props.modelValue[key]))
       }
     })
   }

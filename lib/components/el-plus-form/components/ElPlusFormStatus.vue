@@ -37,6 +37,12 @@ const formatValue = ref('' as any)
 
 // icon 样式
 const iconStyle = computed(() => {
+  if (props.desc.icolor) {
+    if (typeof props.desc.icolor === 'function') {
+      return { background: props.desc.icolor(props.formData) || '#909399' }
+    }
+    return { background: props.desc.icolor || '#909399' }
+  }
   const optionsItem = options.find((item: any) => (item.value || item.v) == currentValue.value) || {}
   return { background: optionsItem.c || optionsItem.color || '#909399' }
 })

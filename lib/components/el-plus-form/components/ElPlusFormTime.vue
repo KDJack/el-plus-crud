@@ -10,11 +10,11 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { ref, useAttrs, onBeforeMount } from 'vue'
+import { ref, useAttrs, watch, onBeforeMount } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
 
 const props = defineProps<{
-  modelValue?: Array<string> | Date | null
+  modelValue?: Array<string> | string | Date | null
   field: string
   desc: { [key: string]: any }
   formData: { [key: string]: any }
@@ -22,7 +22,7 @@ const props = defineProps<{
 }>()
 
 const emits = defineEmits(['update:modelValue'])
-const currentValue = ref(props.modelValue)
+const currentValue = ref()
 const attrs = ref({} as any)
 const isInit = ref(false)
 const onEvents = ref(getEvents(props))
@@ -30,9 +30,21 @@ const onEvents = ref(getEvents(props))
 emits('update:modelValue', currentValue)
 
 onBeforeMount(async () => {
-  attrs.value = await getAttrs(props, { ...useAttrs() })
+  attrs.value = await getAttrs(props, { editable: false, ...useAttrs() })
   isInit.value = true
 })
+
+watch(
+  () => props.modelValue,
+  (val: Array<string> | string | Date | null | undefined) => {
+    if (val) {
+      currentValue.value = Array.isArray(val) ? val.map((item) => new Date(item)) : new Date(val)
+    } else {
+      currentValue.value = attrs.value.isRange ? [] : null
+    }
+  },
+  { immediate: true }
+)
 </script>
 <style lang="scss" scoped>
 .ElPlusFormTime-panel {

@@ -243,8 +243,10 @@ const computedRules = computed(() => {
             case 'linkuser':
             case 'radio':
             case 'checkbox':
-            case 'daterange':
               rules = 'select'
+              break
+            case 'daterange':
+              rules = 'cascader'
               break
           }
           tempRules[field].push(...(validates as any)[rules])

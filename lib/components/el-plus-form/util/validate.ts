@@ -84,7 +84,7 @@ export const select = [{ required: true, trigger: 'change', validator: validateS
  * 级联选择
  * @type {[*]}
  */
-export const cascader = [{ required: true, trigger: 'change', validator: validateSelect }]
+export const cascader = [{ required: true, trigger: 'change', validator: validateCascader }]
 
 /**
  * 必须上传
@@ -171,6 +171,20 @@ function validateInputNotAllBlank(rule: any, value: any, callback?: any) {
  * @param callback
  */
 function validateSelect(rule: any, value: any, callback?: any) {
+  if (value === null || typeof value === 'undefined' || value === '') {
+    callback(new Error('请选择！'))
+  } else {
+    callback()
+  }
+}
+
+/**
+ * 数组选择
+ * @param rule
+ * @param value
+ * @param callback
+ */
+function validateCascader(rule: any, value: any, callback?: any) {
   if (value === null || typeof value === 'undefined' || value === '' || value.length <= 0 || value[0] == null) {
     callback(new Error('请选择！'))
   } else {

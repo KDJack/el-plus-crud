@@ -194,7 +194,7 @@ const tableData = reactive((props.modelValue || []) as any[])
 const haveClassRowList = reactive([])
 
 // 初始化表头
-const headerColumns = reactive(handelListColumn(props.tableConfig.column, props.isDialog ? 'auto' : props.colMinWidth))
+const headerColumns = reactive(handelListColumn(props.tableConfig?.column, props.isDialog ? 'auto' : props.colMinWidth))
 
 // 0:未加载; 1:加载中；2:加载完成
 const loadingStatus = ref(0)
@@ -215,7 +215,7 @@ const treeProps = (props.tableConfig?.explan?.treeProps || { children: 'children
 
 // 列的显示
 const columnShowList = computed(() => {
-  return handelVIfList(handelListColumn(props.tableConfig.column, props.isDialog ? 'auto' : props.colMinWidth))
+  return handelVIfList(handelListColumn(props.tableConfig?.column, props.isDialog ? 'auto' : props.colMinWidth))
 })
 
 // 合计行数据

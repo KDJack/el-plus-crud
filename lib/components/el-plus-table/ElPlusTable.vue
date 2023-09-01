@@ -181,7 +181,7 @@ const tableHeaderRef = ref()
 
 // 加载
 const loading = ref(false)
-const loadingTab = ref(!!props.tableConfig.tabConf?.fetch)
+const loadingTab = ref(!!props.tableConfig?.tabConf?.fetch)
 const listLoading = ref(false)
 const size = defaultConf.size || 'small'
 
@@ -424,8 +424,8 @@ async function getListQueryData() {
     queryMap.size = pageInfo.size
   }
   // 这里处理一下列表Tab的查询条件
-  if (props.tableConfig.tabConf && props.tableConfig.tabConf.prop) {
-    queryMap[props.tableConfig.tabConf.prop] = tableTabVal.value
+  if (props.tableConfig?.tabConf && props.tableConfig?.tabConf.prop) {
+    queryMap[props.tableConfig?.tabConf.prop] = tableTabVal.value
   }
 
   queryMap = handelQueryData(queryMap)
@@ -596,8 +596,8 @@ function refreshTableSelect() {
 async function reload(isTab: boolean = false) {
   await loadData(true)
   // 这里判断一下Tab
-  if (!isTab && props.tableConfig.tabConf && props.tableConfig.tabConf.fetch) {
-    tabStatic.value = await props.tableConfig.tabConf.fetch(Object.assign({}, await getListQueryData(), props.tableConfig.tabConf.queryMap))
+  if (!isTab && props.tableConfig?.tabConf && props.tableConfig?.tabConf.fetch) {
+    tabStatic.value = await props.tableConfig?.tabConf.fetch(Object.assign({}, await getListQueryData(), props.tableConfig?.tabConf.queryMap))
     loadingTab.value = false
   }
   return tableData

@@ -22,29 +22,17 @@ const props = defineProps<{
 }>()
 
 const emits = defineEmits(['update:modelValue'])
-const currentValue = ref()
+const currentValue = ref(Array.isArray(props.modelValue) ? props.modelValue?.map((item) => new Date(item)) || [] : props.modelValue ? new Date(props.modelValue) : null)
+emits('update:modelValue', currentValue)
+
 const attrs = ref({} as any)
 const isInit = ref(false)
 const onEvents = ref(getEvents(props))
-
-emits('update:modelValue', currentValue)
 
 onBeforeMount(async () => {
   attrs.value = await getAttrs(props, { editable: false, ...useAttrs() })
   isInit.value = true
 })
-
-watch(
-  () => props.modelValue,
-  (val: Array<string> | string | Date | null | undefined) => {
-    if (val) {
-      currentValue.value = Array.isArray(val) ? val.map((item) => new Date(item)) : new Date(val)
-    } else {
-      currentValue.value = attrs.value.isRange ? [] : null
-    }
-  },
-  { immediate: true }
-)
 </script>
 <style lang="scss" scoped>
 .ElPlusFormTime-panel {

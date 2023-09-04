@@ -50,6 +50,7 @@ export type IDescItem = {
   limit?: number
   required?: boolean | ((data?: any) => boolean)
   style?: IBaseObj | ((data?: any) => IBaseObj)
+  on?: { [key: string]: Function }
   // 内部使用属性
   _vif?: boolean
 }

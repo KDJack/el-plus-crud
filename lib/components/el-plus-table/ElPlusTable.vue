@@ -106,6 +106,7 @@ import ColumnItem from './components/columnItem.vue'
 import { handelListColumn } from './util'
 import { cloneDeep } from 'lodash'
 import { Loading } from '@element-plus/icons-vue'
+import { ICRUDConfig, ITableConfig, ITableTabItem, ITreeProps } from 'types/formList'
 
 const defaultConf = inject('defaultConf') as ICRUDConfig
 const format = inject('format') as any

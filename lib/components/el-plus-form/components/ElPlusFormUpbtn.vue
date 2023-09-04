@@ -21,6 +21,7 @@ import { ref, computed, onBeforeMount, useAttrs, watch } from 'vue'
 import { Upload } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox, UploadRawFile } from 'element-plus'
 import { getAttrs } from '../mixins'
+import { IBtnBack } from 'types/formList'
 
 const props = defineProps<{
   field?: string

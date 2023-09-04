@@ -25,9 +25,10 @@ export default {
 import { ref, computed, useAttrs } from 'vue'
 import ElPlusForm from './ElPlusForm.vue'
 import { ElMessage } from 'element-plus'
+import { IFormBack } from 'types/formList'
 
 const emits = defineEmits(['update:show', 'update:modelValue'])
-const props = withDefaults(defineProps<{ modelValue?: { [key: string]: any } | {}; show?: boolean; title?: string; tableRef?: any; success?: Function; successTip?: string }>(), {
+const props = withDefaults(defineProps<{ modelValue?: { [key: string]: any } | {}; show?: boolean; title?: string; tableRef?: any; success?: Function; successTip?: string | ((data?: any) => string) }>(), {
   title: '',
   modelValue: () => {
     return {}
@@ -69,7 +70,7 @@ function dialogSuccess(formBack: IFormBack) {
     props.success(formBack)
   } else {
     if (props.tableRef) {
-      ElMessage.success(props.successTip)
+      ElMessage.success(typeof props.successTip === 'function' ? props.successTip() : props.successTip)
       props.tableRef.reload()
       currentShow.value = false
       setTimeout(() => {

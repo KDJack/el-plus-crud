@@ -1,3 +1,5 @@
+import { ICRUDConfig } from 'types/formList'
+
 export default {
   debug: false,
   size: 'default',

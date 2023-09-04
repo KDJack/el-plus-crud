@@ -14,13 +14,14 @@
 import { reactive, ref, onMounted } from 'vue'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import { ElMessage } from 'element-plus'
+import { IFormBack, IFormDesc, IFormGroupConfig } from 'types/formList'
 
 let formData = reactive({
   name: 'xiaoha'
 } as any)
 const formGroupConfig = ref({
   column: 2,
-  requestFn: () => {},
+  // requestFn: () => {},
   beforeRequest: (data: any) => {
     return data
   },

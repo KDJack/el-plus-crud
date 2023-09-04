@@ -1,59 +1,98 @@
+// 基础类型
+export type IBaseObj = IBaseObj
+
+/**
+ * 表单回调
+ */
+export interface IFormBack {
+  response?: any
+  formData?: IBaseObj
+  callBack: Function
+}
+
+/**
+ * 按钮回调data
+ */
+export interface IBtnBack {
+  row: IBaseObj
+  callBack?: Function
+  field: string
+  rowIndex: number
+  files?: Array<any>
+}
+
+/**
+ * 通用请求
+ */
+export interface IFetch<T> {
+  // 查询数据的方法，入参和返回格式固定
+  (data?: any): Promise<T | null>
+}
+
 /**
  *  表单描述
  */
-declare interface IFormDesc {
+export interface IFormDesc {
   [key: string]: IFormDescItem
+}
+
+/**
+ * 基础的descItem
+ */
+export type IDescItem = {
+  type?: string
+  label?: string | ((data?: any) => string)
+  prop?: string | ((data?: any) => string)
+  width?: string
+  format?: string | ((data?: any) => string)
+  vif?: boolean | ((data?: any) => boolean)
+  vshow?: boolean | ((data?: any) => boolean)
+  limit?: number
+  required?: boolean | ((data?: any) => boolean)
+  style?: IBaseObj | ((data?: any) => IBaseObj)
+  // 内部使用属性
+  _vif?: boolean
 }
 
 /**
  * 表单项描述
  */
-declare interface IFormDescItem {
-  type?: string
+export interface IFormDescItem extends IDescItem {
   field?: string
-  label?: string | Function
-  prop?: string | Function
-  disabled?: boolean | Function
-  width?: string
-  format?: string | Function
+  disabled?: boolean | ((data?: any) => boolean)
   showLabel?: boolean
   labelWidth?: string | number
-  vif?: Function
-  tip?: string | Function
+  tip?: string | ((data?: any) => string)
   size?: string
   placeholder?: string
-  attrs?: { [key: string]: any } | Function
+  attrs?: IBaseObj | ((data?: any) => IBaseObj)
   options?: Array<IFormDescItemOptionItem> | IFetch<Array<IFormDescItemOptionItem>> | string
   default?: string | boolean | number
-  defaultItem?: { value: string | number; label: string; dataItem?: { [key: string]: any } }
+  defaultItem?: { value: string | number; label: string; dataItem?: IBaseObj }
   rules?: string | Array<any>
-  require?: boolean
-  required?: boolean
   valueFormat?: Function
   isBlank?: boolean
   colspan?: number
   upType?: string
   multiple?: boolean
   noTip?: boolean
-  limit?: number
   maxSize?: number
   remote?: Function
   // 如果是列表
   tableConfig?: ITableConfig
-  tableAttr?: { [key: string]: any }
-  tableEvent?: { [key: string]: any }
+  tableAttr?: IBaseObj
+  tableEvent?: IBaseObj
   // 查看详情
   linkId?: string | ((val: any, formData: any) => string)
   linkType?: string | ((val: any, formData: any) => string)
   linkLabel?: string | ((val: any, formData: any) => string)
   // 内部接口
   _type?: string
-  _vif?: boolean
   _tip?: string
   _disabled?: boolean
-  _attrs?: { [key: string]: any }
+  _attrs?: IBaseObj
   _label?: null
-  _prop?: { [key: string]: any }
+  _prop?: IBaseObj
   _options?: Array<IFormDescItemOptionItem>
   // 其他属性
   // 级联下拉是否只选中最后一级
@@ -67,7 +106,7 @@ declare interface IFormDescItem {
 /**
  * option描述
  */
-declare interface IFormDescItemOptionItem {
+export interface IFormDescItemOptionItem {
   l?: string
   v?: string | number
   label?: string
@@ -76,63 +115,43 @@ declare interface IFormDescItemOptionItem {
 }
 
 /**
- * 按钮回调data
- */
-declare interface IBtnBack {
-  row: { [key: string]: any }
-  callBack?: Function
-  field: string
-  rowIndex: number
-  files?: Array<any>
-}
-
-/**
  * 表单配置
  */
-declare interface IFormConfig {
+export interface IFormConfig {
   // 表单描述对象
   formDesc: IFormDesc
   // 表单的列数，默认是1
   column?: number
   // 提交前执行
-  beforeRequest?: Function
+  beforeRequest?: (data?: any) => any
   // 请求地址
-  requestFn?: Function
+  requestFn?: (data?: any) => Promise<T>
   // 更新的函数
-  updateFn?: Function
+  updateFn?: (data?: any) => Promise<T>
   // 请求成功时
-  success?: Function
+  success?: (data?: IFormBack) => any
   // 成功时的提醒文本
-  successTip?: string
+  successTip?: string | ((data?: any) => string)
   // 列表的ref
   tableRef?: any
 }
 
 /**
- * 表单回调
- */
-declare interface IFormBack {
-  response?: any
-  formData?: { [key: string]: any }
-  callBack: Function
-}
-
-/**
  * group表单配置
  */
-declare interface IFormGroupConfig {
+export interface IFormGroupConfig {
   // 表单的列数，默认是1
   column?: number
   // 提交前执行
-  beforeRequest?: Function
+  beforeRequest?: (data: T) => T
   // 请求地址
-  requestFn?: Function
+  requestFn?: (data?: any) => Promise<T>
   // 更新的函数
-  updateFn?: Function
+  updateFn?: (data?: any) => Promise<T>
   // 请求成功时
-  success?: Function
+  success?: (data: IFormBack) => any
   // 成功时的提醒文本
-  successTip?: string
+  successTip?: string | ((data?: any) => string)
   // 列表的ref
   tableRef?: any
   // 分组配置信息
@@ -150,49 +169,33 @@ declare interface IFormGroupConfig {
 
 /************************************列表************************************ */
 
-declare interface IFetch<T> {
-  // 查询数据的方法，入参和返回格式固定
-  (data?: any): Promise<T | null>
-}
-
 /**
  * 表格项
  */
-declare interface IColumnItem {
-  label: string | ((data?: any) => string)
-  prop?: string
-  type?: string | Array<string>
-  width?: string
+export interface IColumnItem extends IDescItem {
   minWidth?: string
-  format?: string | Array<string>
   color?: string | Array<string>
   align?: string
   headerAlign?: string
-  btns?: Array<Object>
+  btns?: Array<IColumnItem>
   isBatch?: Boolean
-  style?: Object
   fixed?: 'left' | 'right'
-  limit?: number
   count?: number
   nodes?: Array<any>
   inline?: Boolean
   text?: Boolean
   parent?: string
-  vif?: boolean | 0 | 1 | Function
-  _vif?: boolean
-  vshow?: boolean | 0 | 1 | Function
   scShow?: boolean
   showOverflowTooltip?: boolean
   content?: any
   hstyle?: any
-  required?: boolean
-  noHide?: boolean
+  noHide?: boolean | ((data?: any) => boolean)
 }
 
 /**
  * 导出项
  */
-declare interface IExportConfig {
+export interface IExportConfig {
   // 导出的URL接口地址
   url?: string
   // 查询导出URL的fetch
@@ -216,7 +219,7 @@ declare interface IExportConfig {
 /**
  * 列表工具
  */
-declare interface ITableToolbar {
+export interface ITableToolbar {
   // 列表顶部的功能按钮
   btns?: Array<any>
   // btn靠右显示, 只有当formConfig为null，可设置改属性
@@ -230,17 +233,17 @@ declare interface ITableToolbar {
 /**
  * 表单数解析
  */
-declare interface ITreeProps {
+export interface ITreeProps {
   // 子集的key字段
   children: string
   // 是否拥有子集的key
-  hasChildren?: string
+  hasChildren?: boolean
 }
 
 /**
  * 展开配置
  */
-declare interface IExpConfig {
+export interface IExpConfig {
   // 是否自动展开
   isAutoLoadData?: Boolean
   // 展开自身的查询主键的Id名称
@@ -254,7 +257,7 @@ declare interface IExpConfig {
 /**
  * 统计项
  */
-declare interface IStatisticConfig {
+export interface IStatisticConfig {
   // 数据库对应字段
   dbKeys: Array<string>
   // 需要统计的字段信息
@@ -264,12 +267,12 @@ declare interface IStatisticConfig {
 /**
  * 列表的选项卡配置
  */
-declare interface ITableTabConf {
+export interface ITableTabConf {
   prop: string
   tabs: Array<ITableTabItem>
-  attrs?: { [key: string]: any } | Function
+  attrs?: IBaseObj | Function
   // 远程拉取数量信息
-  fetch?: IFetch<PageObject<any>>
+  fetch?: IFetch<any>
   // 查询条件
   queryMap?: any
 }
@@ -277,8 +280,8 @@ declare interface ITableTabConf {
 /**
  * 列表的选项配置
  */
-declare interface ITableTabItem {
-  label: string | Function
+export interface ITableTabItem {
+  label: string | ((data?: any) => string)
   value: string | number
   key?: string
 }
@@ -286,7 +289,7 @@ declare interface ITableTabItem {
 /**
  * 尾行合计配置
  */
-declare interface ISummaryConf {
+export interface ISummaryConf {
   // 尾行合计的属性名, 多个用逗号分割
   prop: string
   // 尾行合计的显示名称, 多个用逗号分割
@@ -303,7 +306,7 @@ declare interface ISummaryConf {
 /**
  * 列表配置
  */
-declare interface ITableConfig {
+export interface ITableConfig {
   // 列表的名称，全局唯一，且固定，方便存储列表设置
   tbName?: string
   tabConf?: ITableTabConf
@@ -336,7 +339,7 @@ declare interface ITableConfig {
 /**
  * 对象存储Info
  */
-declare interface IOssInfo {
+export interface IOssInfo {
   id?: string
   name?: string
   furl?: string
@@ -354,7 +357,7 @@ declare interface IOssInfo {
 }
 
 /************************************表单详情************************************ */
-declare interface IFormGroupItem {
+export interface IFormGroupItem {
   title?: string
   // 表单描述对象
   formDesc: IFormDesc
@@ -372,7 +375,7 @@ declare interface IFormGroupItem {
 /**
  * 文件（夹）信息
  */
-declare interface IFiles {
+export interface IFiles {
   id: string
   // 是否是文件夹
   folder?: 0 | 1
@@ -387,7 +390,7 @@ declare interface IFiles {
 /**
  * 下载信息
  */
-declare interface IDownInfo {
+export interface IDownInfo {
   // 文件名
   name: string
   // 到期时间
@@ -405,7 +408,7 @@ declare interface IDownInfo {
 /**
  * 下载文件信息
  */
-declare interface IDownFile {
+export interface IDownFile {
   // 文件名
   name: string
   // 文件夹名
@@ -416,7 +419,10 @@ declare interface IDownFile {
   percent?: number
 }
 
-declare interface ICRUDConfig {
+/**
+ * 注册curd配置
+ */
+export interface ICRUDConfig {
   debug?: boolean
   size?: 'default' | 'small' | 'large'
   storagePrefix?: string

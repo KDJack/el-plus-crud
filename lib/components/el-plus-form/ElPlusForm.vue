@@ -45,6 +45,7 @@ import * as validates from './util/validate'
 import { typeList } from './components/index'
 import ElPlusFormBtn from './components/ElPlusFormBtn.vue'
 import { cloneDeep } from 'lodash'
+import { ICRUDConfig, IFormBack, IFormDescItem } from 'types/formList'
 
 // IFormProps定义
 export interface IFormProps {

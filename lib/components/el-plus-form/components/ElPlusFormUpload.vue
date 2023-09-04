@@ -47,6 +47,7 @@ import txt from '../images/icon/txt.png'
 import word from '../images/icon/word.png'
 import zip from '../images/icon/zip.png'
 import ppt from '../images/icon/ppt.png'
+import { ICRUDConfig, IOssInfo } from 'types/formList'
 
 const defaultConf = inject('defaultConf') as ICRUDConfig
 

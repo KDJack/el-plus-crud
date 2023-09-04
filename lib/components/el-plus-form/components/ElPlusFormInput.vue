@@ -16,6 +16,7 @@ export default {
 <script lang="ts" setup>
 import { ref, watch, useAttrs, useSlots, onBeforeMount, inject } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
+import { ICRUDConfig } from 'types/formList'
 
 const defaultConf = inject('defaultConf') as ICRUDConfig
 

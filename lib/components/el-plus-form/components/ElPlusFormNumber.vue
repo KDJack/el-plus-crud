@@ -13,6 +13,7 @@ export default {
 import { ref, computed, useAttrs, onBeforeMount, nextTick, inject } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
 import { ElMessage } from 'element-plus'
+import { ICRUDConfig } from 'types/formList'
 
 const defaultConf = inject('defaultConf') as ICRUDConfig
 

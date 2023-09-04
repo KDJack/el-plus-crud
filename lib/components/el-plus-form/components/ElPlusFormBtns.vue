@@ -35,6 +35,7 @@ import { ref, computed, watch, onMounted } from 'vue'
 import ElPlusFormBtn from './ElPlusFormBtn.vue'
 import ElPlusFormUpbtn from './ElPlusFormUpbtn.vue'
 import { ElMessageBox } from 'element-plus'
+import { IBtnBack } from 'types/formList'
 
 const props = defineProps<{
   field: string

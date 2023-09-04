@@ -1,4 +1,5 @@
 import { cloneDeep } from 'lodash'
+import { IColumnItem } from 'types/formList'
 
 /**
  * 获取随机字符串

@@ -5,6 +5,7 @@ import ElPlusFormDialog from './components/el-plus-form/ElPlusFormDialog.vue'
 import ElPlusFormGroup from './components/el-plus-form/ElPlusFormGroup.vue'
 import ElPlusTable from './components/el-plus-table/ElPlusTable.vue'
 import defaultConf from './config'
+import { ICRUDConfig } from './../types/formList.d'
 
 export default {
   install: (app: App, config: ICRUDConfig, format?: { [key: string]: Function }, globalData?: { [key: string]: Function }) => {

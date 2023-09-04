@@ -15,6 +15,7 @@
 import { ref, computed } from 'vue'
 import fileIcon, { imgSuffix, iconMap } from './data'
 import { cutString } from '../../../util'
+import { IOssInfo } from 'types/formList'
 
 const props = defineProps<{
   files: Array<IOssInfo>

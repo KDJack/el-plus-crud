@@ -16,6 +16,7 @@ export default {
 import { ref, useAttrs, watch, onBeforeMount, inject, reactive } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
 import { isEqual } from 'lodash'
+import { ICRUDConfig } from 'types/formList'
 
 const globalData = inject('globalData') as any
 const defaultConf = inject('defaultConf') as ICRUDConfig

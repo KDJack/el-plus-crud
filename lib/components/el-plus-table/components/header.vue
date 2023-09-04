@@ -46,6 +46,7 @@ import ElPlusTableSettingColumn from './settingColumn.vue'
 import ElPlusFormBtn from '../../el-plus-form/components/ElPlusFormBtn.vue'
 import ElPlusFormUpbtn from '../../el-plus-form/components/ElPlusFormUpbtn.vue'
 import { isMobile, handelBtnType, mapToUrlStr } from '../util'
+import { IBtnBack, ICRUDConfig, IColumnItem, ITableToolbar } from 'types/formList'
 
 const defaultConf = inject('defaultConf') as ICRUDConfig
 

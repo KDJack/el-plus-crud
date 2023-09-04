@@ -29,6 +29,7 @@
 <script lang="ts" setup>
 import { ref, onMounted, inject } from 'vue'
 import { ElMessage } from 'element-plus'
+import { ICRUDConfig, IColumnItem } from 'types/formList'
 
 const defaultConf = inject('defaultConf') as ICRUDConfig
 

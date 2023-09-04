@@ -21,6 +21,7 @@ import { ref, reactive, computed, onBeforeMount, useAttrs, watch, inject } from 
 import { ElMessage } from 'element-plus'
 import { getAttrs } from '../mixins'
 import { isEqual } from 'lodash'
+import { ICRUDConfig } from 'types/formList'
 
 const defaultConf = inject('defaultConf') as ICRUDConfig
 const globalData = inject('globalData') as any

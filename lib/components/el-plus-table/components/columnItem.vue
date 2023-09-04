@@ -15,6 +15,7 @@
 <script lang="ts" setup>
 import { ref, onMounted, computed } from 'vue'
 import { WarningFilled } from '@element-plus/icons-vue'
+import { IColumnItem } from 'types/formList'
 
 const props = defineProps<{
   modelValue?: any

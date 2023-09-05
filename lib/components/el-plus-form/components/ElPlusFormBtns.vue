@@ -35,7 +35,7 @@ import { ref, computed, watch, onMounted } from 'vue'
 import ElPlusFormBtn from './ElPlusFormBtn.vue'
 import ElPlusFormUpbtn from './ElPlusFormUpbtn.vue'
 import { ElMessageBox } from 'element-plus'
-import { IBtnBack } from 'types/formList'
+import { IBtnBack } from 'types'
 
 const props = defineProps<{
   field: string
@@ -139,3 +139,4 @@ onMounted(() => {
   }
 }
 </style>
+types

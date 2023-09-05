@@ -38,7 +38,7 @@ export default {
 import { cloneDeep } from 'lodash'
 import { ref, reactive, watch, onMounted, computed } from 'vue'
 import { getEvents } from '../mixins'
-import { IBtnBack, ITableConfig } from 'types/formList'
+import { IBtnBack, ITableConfig } from 'types'
 
 interface ILinkItem {
   label: string
@@ -281,3 +281,4 @@ onMounted(async () => {})
   }
 }
 </style>
+types

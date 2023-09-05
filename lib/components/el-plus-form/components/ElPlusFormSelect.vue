@@ -21,7 +21,7 @@ import { ref, reactive, computed, onBeforeMount, useAttrs, watch, inject } from 
 import { ElMessage } from 'element-plus'
 import { getAttrs } from '../mixins'
 import { isEqual } from 'lodash'
-import { ICRUDConfig } from 'types/formList'
+import { ICRUDConfig } from 'types'
 
 const defaultConf = inject('defaultConf') as ICRUDConfig
 const globalData = inject('globalData') as any
@@ -161,3 +161,4 @@ watch(
   white-space: break-spaces;
 }
 </style>
+types

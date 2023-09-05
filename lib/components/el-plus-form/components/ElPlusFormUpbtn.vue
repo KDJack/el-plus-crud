@@ -21,7 +21,7 @@ import { ref, computed, onBeforeMount, useAttrs, watch } from 'vue'
 import { Upload } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox, UploadRawFile } from 'element-plus'
 import { getAttrs } from '../mixins'
-import { IBtnBack } from 'types/formList'
+import { IBtnBack } from 'types'
 
 const props = defineProps<{
   field?: string
@@ -143,3 +143,4 @@ onBeforeMount(async () => {
   padding: 0;
 }
 </style>
+types

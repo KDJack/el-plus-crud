@@ -16,7 +16,7 @@ export default {
 import { ref, useAttrs, watch, onBeforeMount, inject, reactive } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
 import { isEqual } from 'lodash'
-import { ICRUDConfig } from 'types/formList'
+import { ICRUDConfig } from 'types'
 
 const globalData = inject('globalData') as any
 const defaultConf = inject('defaultConf') as ICRUDConfig
@@ -95,3 +95,4 @@ watch(
   }
 }
 </style>
+types

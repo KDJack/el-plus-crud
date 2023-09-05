@@ -29,7 +29,7 @@
 <script lang="ts" setup>
 import { ref, onMounted, inject } from 'vue'
 import { ElMessage } from 'element-plus'
-import { ICRUDConfig, IColumnItem } from 'types/formList'
+import { ICRUDConfig, IColumnItem } from 'types'
 
 const defaultConf = inject('defaultConf') as ICRUDConfig
 
@@ -177,3 +177,4 @@ defineExpose({ initCol: initLocalCheckList })
   }
 }
 </style>
+types

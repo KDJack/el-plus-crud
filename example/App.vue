@@ -14,10 +14,10 @@
 import { reactive, ref, onMounted } from 'vue'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import { ElMessage } from 'element-plus'
-import { IFormBack, IFormDesc, IFormGroupConfig } from 'types/formList'
+import { IFormBack, IFormDesc, IFormGroupConfig } from 'types'
 
 let formData = reactive({
-  name: 'xiaoha'
+  name: ''
 } as any)
 const formGroupConfig = ref({
   column: 2,
@@ -66,3 +66,4 @@ onMounted(async () => {
   // 初始化部门列表
 })
 </script>
+types

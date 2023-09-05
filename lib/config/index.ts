@@ -1,4 +1,4 @@
-import { ICRUDConfig } from 'types/formList'
+import { ICRUDConfig } from 'types'
 
 export default {
   debug: false,

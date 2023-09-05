@@ -50,7 +50,12 @@ export type IDescItem = {
   limit?: number
   required?: boolean | ((data?: any) => boolean)
   style?: IBaseObj | ((data?: any) => IBaseObj)
+  // 事件
   on?: { [key: string]: Function }
+  // 查看详情
+  linkId?: string | ((val: any, formData: any) => string)
+  linkType?: string | ((val: any, formData: any) => string)
+  linkLabel?: string | ((val: any, formData: any) => string)
   // 内部使用属性
   _vif?: boolean
 }
@@ -83,16 +88,13 @@ export interface IFormDescItem extends IDescItem {
   tableConfig?: ITableConfig
   tableAttr?: IBaseObj
   tableEvent?: IBaseObj
-  // 查看详情
-  linkId?: string | ((val: any, formData: any) => string)
-  linkType?: string | ((val: any, formData: any) => string)
-  linkLabel?: string | ((val: any, formData: any) => string)
+
   // 内部接口
   _type?: string
   _tip?: string
   _disabled?: boolean
   _attrs?: IBaseObj
-  _label?: null
+  _label?: string
   _prop?: IBaseObj
   _options?: Array<IFormDescItemOptionItem>
   // 其他属性

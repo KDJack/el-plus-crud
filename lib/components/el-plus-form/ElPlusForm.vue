@@ -45,7 +45,7 @@ import * as validates from './util/validate'
 import { typeList } from './components/index'
 import ElPlusFormBtn from './components/ElPlusFormBtn.vue'
 import { cloneDeep } from 'lodash'
-import { ICRUDConfig, IFormBack, IFormDescItem } from 'types/formList'
+import { ICRUDConfig, IFormBack, IFormDescItem } from 'types'
 
 // IFormProps定义
 export interface IFormProps {
@@ -794,3 +794,4 @@ defineExpose({ submit: handleSubmitForm, getData: getFormData, validate: validat
   }
 }
 </style>
+types

@@ -162,7 +162,7 @@ const props = withDefaults(
 const elPlusTableRef = ref()
 
 // 顶部Tab数据
-const tableTabVal = ref(props.tableConfig?.tabConf?.tabs[0].value ?? '')
+const tableTabVal = ref(props.tableConfig?.tabConf?.tabs[props.tableConfig?.tabConf?.default || 0].value ?? '')
 const tabStatic = ref({} as any)
 const getTabLabel = computed(() => (item: ITableTabItem) => {
   if (item.key) {

@@ -278,6 +278,8 @@ export interface ITableTabConf {
   fetch?: IFetch<any>
   // 查询条件
   queryMap?: any
+  // 默认选中的下标
+  default?: number
 }
 
 /**

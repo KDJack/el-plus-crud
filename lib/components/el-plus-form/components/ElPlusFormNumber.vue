@@ -121,6 +121,7 @@ function handelValChange(val: any, oldVal: any) {
       ElMessage.warning(`${props.desc?.label || ''}最少不能低于${numBindAttr.value.min}`)
       nextTick(() => {
         currentValue.value = numBindAttr.value.min
+        change && change()
       })
     } else if (val > numBindAttr.value.max) {
       ElMessage.warning(`${props.desc?.label || ''}最多不能大于${numBindAttr.value.max}`)

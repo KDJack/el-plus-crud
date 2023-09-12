@@ -38,39 +38,10 @@
         <template v-if="useSlots().firstColumn">
           <slot name="firstColumn" />
         </template>
-        <template v-for="(item, i) in headerColumns" :key="item.prop + item.label + i">
-          <!-- 二级表头 -->
-          <template v-if="item.children && item.children.length > 0">
-            <el-table-column v-if="columnShowList[i]?.some((t: boolean) => t)" :prop="item.label" :label="item.label" header-align="center">
-              <template v-for="(item2, j) in item.children" :key="item2.label + i + j">
-                <el-table-column :prop="item2.prop" v-if="columnShowList[i][j]" v-bind="item2">
-                  <template #header>
-                    <div :class="{ 'th-required': item2.required }">
-                      {{ item2.label }}
-                    </div>
-                  </template>
-                  <template #default="scope: any">
-                    <slot name="default"></slot>
-                    <ColumnItem v-if="scope.$index >= 0" :field="item2.prop" :desc="item2" :scope="scope" :size="size" v-model="scope.row[item2.prop]" />
-                  </template>
-                </el-table-column>
-              </template>
-            </el-table-column>
-          </template>
-          <!-- 单级表头 -->
-          <template v-else>
-            <el-table-column v-if="columnShowList[i]" :prop="item.prop" v-bind="item">
-              <template #header="{ column }: any">
-                <div :class="{ 'th-required': item.required }" :style="item.hstyle">
-                  {{ column.label }}
-                </div>
-              </template>
-              <template #default="scope: any">
-                <ColumnItem v-if="scope.$index >= 0" :field="item.prop" :desc="item" :scope="scope" :size="size" v-model="scope.row[item.prop]" />
-              </template>
-            </el-table-column>
-          </template>
-        </template>
+        <!-- 一级或多级列 -->
+        <ElPlusTableColumn v-for="(item, i) in headerColumns" :key="i" :item="item" :size="size"></ElPlusTableColumn>
+
+        <!-- 空 -->
         <template v-if="!loading && loadingStatus === 2" #empty>
           <el-empty v-if="isEmptyImg" :description="nullText" />
           <span v-else>{{ nullText }}</span>
@@ -102,7 +73,7 @@ export default {
 <script lang="ts" setup>
 import { ref, reactive, onMounted, computed, watch, nextTick, useSlots, inject } from 'vue'
 import EleTabletHeader from './components/header.vue'
-import ColumnItem from './components/columnItem.vue'
+import ElPlusTableColumn from './ElPlusTableColumn.vue'
 import { handelListColumn } from './util'
 import { cloneDeep } from 'lodash'
 import { Loading } from '@element-plus/icons-vue'
@@ -194,9 +165,6 @@ let toolFormData = reactive({} as any)
 const tableData = reactive((props.modelValue || []) as any[])
 const haveClassRowList = reactive([])
 
-// 初始化表头
-const headerColumns = reactive(handelListColumn(props.tableConfig?.column, props.isDialog ? 'auto' : props.colMinWidth))
-
 // 0:未加载; 1:加载中；2:加载完成
 const loadingStatus = ref(0)
 
@@ -214,9 +182,10 @@ const pageInfo = reactive({
 // 数型解析
 const treeProps = (props.tableConfig?.explan?.treeProps || { children: 'children', hasChildren: 'hasChildren' }) as ITreeProps
 
-// 列的显示
-const columnShowList = computed(() => {
-  return handelVIfList(handelListColumn(props.tableConfig?.column, props.isDialog ? 'auto' : props.colMinWidth))
+// 处理后的列显示
+const headerColumns = computed(() => {
+  const tempList = handelListColumn(props.tableConfig?.column, defaultConf, props.tableConfig?.tbName || '', props.isDialog ? 'auto' : props.colMinWidth)
+  return tempList
 })
 
 // 合计行数据
@@ -249,41 +218,6 @@ const summaryList = computed(() => {
   }
   return tempList
 })
-
-/**
- * 处理列表的vif
- * @param list
- */
-function handelVIfList(list: any[]): any[] {
-  return list.map((item) => {
-    if (item.children) {
-      return handelVIfList(item.children)
-    }
-    if (props.tableConfig.tbName) {
-      return item._vif && item.scShow
-    } else {
-      // 这里初始化一下vif
-      if (item.vif !== undefined && item.vif !== null) {
-        if (typeof item.vif === 'function') {
-          item._vif = item.vif(item)
-        } else {
-          item._vif = !!item.vif
-        }
-      } else {
-        item._vif = true
-      }
-      // 这里最终处理一下auth权限问题
-      if (item.auth) {
-        if (!defaultConf.auth) {
-          console.warn('使用auth属性，请在crud注册时传入auth校验方法~')
-        } else {
-          item._vif = defaultConf.auth(item.auth)
-        }
-      }
-      return item._vif
-    }
-  })
-}
 
 /**
  * Tab切换

@@ -1,5 +1,5 @@
 import { cloneDeep } from 'lodash'
-import { IColumnItem } from 'types'
+import { ICRUDConfig, IColumnItem } from 'types'
 
 /**
  * 获取随机字符串
@@ -66,16 +66,21 @@ export function handelBtnType(item: any): Object {
 /**
  * 处理列表表头，list转Map
  */
-export function handelListColumn(columnList: Array<IColumnItem>, minWidth?: string): any[] {
+export function handelListColumn(columnList: Array<IColumnItem>, defaultConf: ICRUDConfig, tbName: string, minWidth?: string): any[] {
   const tempColumnList = [] as any[]
   if (columnList && columnList.length > 0) {
     // 不影响原有的对象，这里进行拷贝
     cloneDeep(columnList).map((item: IColumnItem) => {
-      // 处理下一个单元格显示多个数据
-      if (item.nodes) {
-        const tempList = (handelListColumn(item.nodes, minWidth) as any)[0].children
-        item.nodes = tempList || item.nodes
+      // 如果有子集
+      if (item.children) {
+        item.children = handelListColumn(item.children, defaultConf, tbName, minWidth)
       }
+
+      // 处理下一个单元格显示多个数据
+      // if (item.nodes) {
+      //   const tempList = (handelListColumn(item.nodes, minWidth) as any)[0].children
+      //   item.nodes = tempList || item.nodes
+      // }
       // 检查type属性,没有type属性的自动补一个text类型
       if (!item.type) {
         item.type = 'text'
@@ -104,23 +109,54 @@ export function handelListColumn(columnList: Array<IColumnItem>, minWidth?: stri
       // 处理下‘操作’
       item.showOverflowTooltip = item.label !== '操作'
 
-      if (item.parent) {
-        let isExists = false
-        tempColumnList.forEach((colum: any) => {
-          if (colum.label === item.parent) {
-            colum.children.push(item)
-            isExists = true
-          }
-        })
-        if (!isExists) {
-          tempColumnList.push({ label: item.parent, children: [item] })
-        }
-      } else {
-        tempColumnList.push(item)
+      // 处理vif
+      handelVIf(item, defaultConf, tbName)
+
+      // 表头居中
+      if (item.children?.length) {
+        item.headerAlign = item.headerAlign || 'center'
       }
+
+      tempColumnList.push(item)
     })
   }
   return tempColumnList
+}
+
+/**
+ * 处理item的vif
+ * @param item
+ * @param defaultConf
+ * @param tbName
+ */
+export function handelVIf(item: IColumnItem, defaultConf: ICRUDConfig, tbName: string) {
+  if (tbName) {
+    item.__vif = item._vif && item.scShow
+  } else {
+    // 这里初始化一下vif
+    if (item.vif !== undefined && item.vif !== null) {
+      if (typeof item.vif === 'function') {
+        item._vif = item.vif(item)
+      } else {
+        item._vif = !!item.vif
+      }
+    } else {
+      item._vif = true
+    }
+    // 这里最终处理一下auth权限问题
+    if (item.auth) {
+      if (!defaultConf.auth) {
+        console.warn('使用auth属性，请在crud注册时传入auth校验方法~')
+      } else {
+        item._vif = defaultConf.auth(item.auth)
+      }
+    }
+    item.__vif = item._vif
+  }
+  // 这里要判断下下级显示状态, 如果下级全部隐藏了，那么本级也应该隐藏
+  if (item.children && item.children.every((info) => !info.__vif)) {
+    item.__vif = false
+  }
 }
 
 /**

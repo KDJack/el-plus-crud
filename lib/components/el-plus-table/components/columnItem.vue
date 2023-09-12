@@ -19,7 +19,7 @@ import { IColumnItem } from 'types'
 
 const props = defineProps<{
   modelValue?: any
-  field?: string
+  field?: string | ((data?: any) => string)
   desc: IColumnItem
   scope: { [key: string]: any }
   size?: string
@@ -35,7 +35,8 @@ const cells = computed(() => {
       _cells.push(handelItem(item.field || props.field, item, i))
     })
   } else {
-    const porpList = props.field ? props.field.split(',') : ([] as string[])
+    const tempField = (typeof props.field === 'function' ? props.field() : props.field) || ''
+    const porpList = tempField.split(',')
     porpList.map((item, i) => {
       _cells.push(handelItem(item, props.desc, i))
     })
@@ -117,7 +118,8 @@ const handelItem = (prop: string, item: any, i: number) => {
     tempCell.desc.style = item.style || {}
 
     if (typeof item.color === 'function') {
-      tempCell.desc.style.color = item.color(props.scope?.row[props.field || ''], props.scope?.row, props.field)
+      const tempField = (typeof props.field === 'function' ? props.field() : props.field) || ''
+      tempCell.desc.style.color = item.color(props.scope?.row[tempField], props.scope?.row, props.field)
     } else if (typeof item.color === 'string') {
       tempCell.desc.style.color = item.color
     } else {

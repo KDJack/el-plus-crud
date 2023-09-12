@@ -45,7 +45,7 @@ import * as validates from './util/validate'
 import { typeList } from './components/index'
 import ElPlusFormBtn from './components/ElPlusFormBtn.vue'
 import { cloneDeep } from 'lodash'
-import { ICRUDConfig, IFormBack, IFormDescItem } from 'types'
+import { ICRUDConfig, IFormBack, IFormDesc, IFormDescItem } from 'types'
 
 // IFormProps定义
 export interface IFormProps {
@@ -227,7 +227,7 @@ const computedRules = computed(() => {
               tempRules[field].push(item)
             })
           }
-        } else if (props.formDesc[field].required || props.formDesc[field].require) {
+        } else if (props.formDesc[field].required) {
           // 如果直接指定 required || require，手动添加校验信息
           //
           let rules = 'notAllBlank'

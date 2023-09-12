@@ -58,6 +58,8 @@ export type IDescItem = {
   linkLabel?: string | ((val: any, formData: any) => string)
   // 内部使用属性
   _vif?: boolean
+  // 权限
+  auth?: string
 }
 
 /**
@@ -100,8 +102,6 @@ export interface IFormDescItem extends IDescItem {
   // 其他属性
   // 级联下拉是否只选中最后一级
   checkStrictly?: boolean
-  // 权限
-  auth?: string
   // key的前缀-方便同一个表单中，存在多个daterange等组件
   propPrefix?: string
 }
@@ -187,12 +187,14 @@ export interface IColumnItem extends IDescItem {
   nodes?: Array<any>
   inline?: Boolean
   text?: Boolean
-  parent?: string
+  children?: Array<IColumnItem>
   scShow?: boolean
   showOverflowTooltip?: boolean
   content?: any
   hstyle?: any
   noHide?: boolean | ((data?: any) => boolean)
+  // 真正的vif
+  __vif?: boolean
 }
 
 /**

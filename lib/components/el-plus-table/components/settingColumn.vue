@@ -4,7 +4,7 @@
     <el-button v-else type="primary" icon="ele-Setting" @click="showSettingDialog" :size="size" title="编辑显示列" plain circle />
 
     <!-- 编辑列 -->
-    <el-dialog title="编辑显示列" v-model="showSettingColumn" width="40%">
+    <el-dialog title="编辑显示列" v-model="showSettingColumn" draggable width="40%">
       <template #default>
         <div class="select-panel">
           <el-checkbox v-model="checkAll" :indeterminate="isIndeterminate" @change="selectAll"> 全选 </el-checkbox>

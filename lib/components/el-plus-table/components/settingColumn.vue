@@ -45,7 +45,7 @@ let tempList = ref([] as Array<String>)
 const defaultProps = {
   children: 'children',
   label: 'label',
-  disabled: 'disabled'
+  disabled: 'disabledcheckd'
 }
 
 /**
@@ -58,7 +58,7 @@ function addIndex(item: any, index?: string) {
     i.idx = index !== undefined ? `${index}-${idx}` : `${idx}`
     // 禁用判断
     if (i.required || i.noHide || i.disabled) {
-      i.disabled = true
+      i.disabledcheckd = true
       tempList.value.splice(tempList.value.indexOf(i.idx), 1)
     }
     // 如果子集全部禁用，那么父级也禁用 ,如果父集禁用，那么子级也禁用

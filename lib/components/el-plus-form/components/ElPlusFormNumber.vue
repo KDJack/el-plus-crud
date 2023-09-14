@@ -55,14 +55,17 @@ function handelFocus() {
  * @param event
  */
 function handelBlur() {
+  console.log('currentValue', currentValue.value)
+
   if (!isDoChange.value) {
-    if (!currentValue.value) {
+    if (currentValue.value !== 0 && !currentValue.value) {
       nextTick(() => {
         currentValue.value = props.desc?.required ? numBindAttr.value.min : 0
-        if (!props.desc?.required) {
+        if (currentValue.value === 0) {
           // 查看了源码，这里需要二次赋不一样的值，这里才会真正重新渲染
           nextTick(() => {
             currentValue.value = null
+            change && change()
           })
         }
       })
@@ -147,4 +150,3 @@ function handelValChange(val: any, oldVal: any) {
   }
 }
 </style>
-types

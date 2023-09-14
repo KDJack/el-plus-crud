@@ -66,14 +66,14 @@ export function handelBtnType(item: any): Object {
 /**
  * 处理列表表头，list转Map
  */
-export function handelListColumn(columnList: Array<IColumnItem>, defaultConf: ICRUDConfig, tbName: string, minWidth?: string): any[] {
+export function handelListColumn(columnList: Array<IColumnItem>, defaultConf: ICRUDConfig, tbName: string, headerAlign?: string, minWidth?: string): any[] {
   const tempColumnList = [] as any[]
   if (columnList && columnList.length > 0) {
     // 不影响原有的对象，这里进行拷贝
     cloneDeep(columnList).map((item: IColumnItem) => {
       // 如果有子集
       if (item.children) {
-        item.children = handelListColumn(item.children, defaultConf, tbName, minWidth)
+        item.children = handelListColumn(item.children, defaultConf, tbName, headerAlign, minWidth)
       }
 
       // 处理下一个单元格显示多个数据
@@ -90,7 +90,7 @@ export function handelListColumn(columnList: Array<IColumnItem>, defaultConf: IC
         case 'image':
           item.width = item.width || '110px'
           item.align = item.align || 'left'
-          item.headerAlign = item.headerAlign || 'left'
+          item.headerAlign = item.headerAlign || headerAlign || 'left'
           break
         case 'btns':
           if (!item.minWidth && item.btns && item.btns.length >= 2) {
@@ -99,7 +99,7 @@ export function handelListColumn(columnList: Array<IColumnItem>, defaultConf: IC
             item.width = item.width || labelLength * 20 + 'px'
           }
           item.align = item.align || 'left'
-          item.headerAlign = item.headerAlign || 'left'
+          item.headerAlign = item.headerAlign || headerAlign || 'left'
           item.text = true
           break
       }
@@ -114,7 +114,7 @@ export function handelListColumn(columnList: Array<IColumnItem>, defaultConf: IC
 
       // 表头居中
       if (item.children?.length) {
-        item.headerAlign = item.headerAlign || 'center'
+        item.headerAlign = item.headerAlign || headerAlign || 'center'
       }
 
       tempColumnList.push(item)

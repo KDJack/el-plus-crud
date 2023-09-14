@@ -33,7 +33,7 @@
         <!-- 复选框 -->
         <el-table-column v-if="type === 'selection'" type="selection" width="55px" :selectable="selectable" header-align="center" align="center" />
         <!-- 下标 -->
-        <el-table-column v-if="isIndex" type="index" width="60" label="序号" />
+        <el-table-column v-if="isIndex" type="index" width="60" label="序号" :headerAlign="headerAlign" />
         <!-- 首列 -->
         <template v-if="useSlots().firstColumn">
           <slot name="firstColumn" />
@@ -112,6 +112,8 @@ const props = withDefaults(
     selectList?: Array<any> | []
     // 默认列宽
     colMinWidth?: string
+    // 表头文本排列方式
+    headerAlign?: 'left' | 'right' | 'center'
   }>(),
   {
     modelValue: null,
@@ -126,7 +128,8 @@ const props = withDefaults(
     isEmptyImg: true,
     isDIYMain: false,
     selectList: () => [],
-    colMinWidth: 'auto'
+    colMinWidth: 'auto',
+    headerAlign: 'left'
   }
 )
 
@@ -184,7 +187,7 @@ const treeProps = (props.tableConfig?.explan?.treeProps || { children: 'children
 
 // 处理后的列显示
 const headerColumns = computed(() => {
-  const tempList = handelListColumn(props.tableConfig?.column, defaultConf, props.tableConfig?.tbName || '', props.isDialog ? 'auto' : props.colMinWidth)
+  const tempList = handelListColumn(props.tableConfig?.column, defaultConf, props.tableConfig?.tbName || '', props.headerAlign, props.isDialog ? 'auto' : props.colMinWidth)
   return tempList
 })
 

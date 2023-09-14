@@ -434,10 +434,10 @@ export interface ICRUDConfig {
   size?: 'default' | 'small' | 'large'
   storagePrefix?: string
   form?: {
-    leng: {
-      input: number
-      textare: number
-      nbinput: {
+    leng?: {
+      input?: number
+      textare?: number
+      nbinput?: {
         min: number
         max: number
         precision: number

@@ -6,16 +6,7 @@
     <!-- 编辑列 -->
     <el-dialog title="编辑显示列" v-model="showSettingColumn" draggable width="40%">
       <template #default>
-        <div class="select-panel">
-          <el-checkbox v-model="checkAll" :indeterminate="isIndeterminate" @change="selectAll"> 全选 </el-checkbox>
-        </div>
-        <el-checkbox-group v-model="localColumn" @change="changeSelect" style="padding: 0 10px; flex-wrap: wrap; display: flex">
-          <template v-for="item in props.column" :key="item.label">
-            <el-checkbox v-if="item._vif" :label="item.label" :disabled="item.required || item.noHide || false">
-              {{ item.label }}
-            </el-checkbox>
-          </template>
-        </el-checkbox-group>
+        <el-tree ref="treeRef" :data="options" show-checkbox node-key="idx" :default-expand-all="true" :default-checked-keys="checkColumn" :props="defaultProps" @check="handelCheckChange" />
       </template>
       <template #footer>
         <div class="dialog-footer">
@@ -27,7 +18,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ref, onMounted, inject } from 'vue'
+import { ref, onMounted, inject, reactive } from 'vue'
 import { ElMessage } from 'element-plus'
 import { ICRUDConfig, IColumnItem } from 'types'
 
@@ -40,11 +31,46 @@ const props = defineProps<{
   showText?: boolean
 }>()
 
+// 弹框显示
 const showSettingColumn = ref(false)
-const localColumn = ref([] as Array<String>)
-const localOldColumn = ref([] as Array<String>)
-const isIndeterminate = ref(false)
-const checkAll = ref(false)
+const treeRef = ref()
+
+let options = ref([])
+
+const treeAll = ref([] as Array<String>)
+const checkColumn = ref([] as Array<String>)
+// 定义一个需要隐藏的列表-存储到本地用
+let tempList = ref([] as Array<String>)
+
+const defaultProps = {
+  children: 'children',
+  label: 'label',
+  disabled: 'disabled'
+}
+
+/**
+ * 匹配序号并获取全部序号
+ */
+
+function addIndex(item: any, index?: string) {
+  item.map((i: any, idx: number) => {
+    // 匹配序号
+    i.idx = index !== undefined ? `${index}-${idx}` : `${idx}`
+    // 禁用判断
+    if (i.required || i.noHide || i.disabled) {
+      i.disabled = true
+      tempList.value.splice(tempList.value.indexOf(i.idx), 1)
+    }
+    // 如果子集全部禁用，那么父级也禁用 ,如果父集禁用，那么子级也禁用
+    i.children && i.children.every((info: any) => info.disabled) ? (i.disabled = true) : i.children && i.disabled ? i.children.map((info: any) => (info.disabled = true)) : ''
+    // 是否有子集
+    if (i.children?.length > 0) {
+      addIndex(i.children, `${i.idx}`)
+    }
+    i.children ? '' : treeAll.value.push(i.idx)
+  })
+  return item
+}
 
 /**
  * 打开弹框
@@ -53,111 +79,78 @@ function showSettingDialog() {
   showSettingColumn.value = true
 }
 
+/**
+ * 获取没有选中的选项
+ */
+function handelCheckChange(val: any, data: any) {
+  data.checkedAllKeys = Array.from(new Set([...data.checkedKeys, ...data.halfCheckedKeys]))
+  tempList.value = treeAll.value.filter((x) => {
+    return data.checkedAllKeys.indexOf(x) < 0
+  })
+}
+
+// 设置是否显示
+function setShow(item: any) {
+  for (let index = 0; index < item.length; index++) {
+    if (item[index].children) {
+      setShow(item[index].children)
+    }
+    if (tempList.value.indexOf(item[index].idx) < 0) {
+      item[index].scShow = true
+    } else {
+      item[index].scShow = false
+    }
+  }
+}
+
 function changeColumnData() {
-  if (localColumn.value.length <= 0) {
+  if (treeAll.value.length === tempList.value.length) {
     ElMessage.warning('请至少选择一列！')
     return false
   }
-  // 定义一个需要隐藏的列表-存储到本地用
-  const hideList = [] as Array<String>
-  props.column.map((item: any) => {
-    if (localColumn.value.indexOf(item.label) < 0) {
-      hideList.push(item.label)
-      item.scShow = false
-    } else {
-      item.scShow = true
-    }
-  })
-  if (hideList.length > 0) {
-    localStorage.setItem(defaultConf.storagePrefix + 'hideColumnsList_' + props.tbName, hideList.join('__'))
+  setShow(props.column)
+  if (tempList.value.length > 0) {
+    localStorage.setItem(defaultConf.storagePrefix + 'hideColumnsList_' + props.tbName, tempList.value.join('__'))
   } else {
-    // 如果是对象，删除
     localStorage.removeItem(defaultConf.storagePrefix + 'hideColumnsList_' + props.tbName)
   }
   showSettingColumn.value = false
-  // 赋值
-  localOldColumn.value = localColumn.value
-}
-
-/**
- * 全选列
- */
-function selectAll() {
-  localColumn.value = [] as Array<String>
-  if (checkAll.value) {
-    localColumn.value = props.column.map((item: any) => item.label)
-  } else {
-    // 这里要屏蔽掉禁止勾选的项
-    localColumn.value = props.column.filter((item) => item.required || item.noHide).map((item: any) => item.label)
-  }
-  isIndeterminate.value = false
-}
-
-/**
- * 复选框改变时触发
- */
-function changeSelect() {
-  if (localColumn.value.length === 0) {
-    isIndeterminate.value = false
-    checkAll.value = false
-  } else if (props.column.length === localColumn.value.length) {
-    isIndeterminate.value = false
-    checkAll.value = true
-  } else {
-    isIndeterminate.value = true
-    checkAll.value = false
-  }
 }
 
 /**
  * 初始化选择列
  * @param init
  */
-function initLocalCheckList(init?: Boolean) {
+function initLocalCheckList() {
   // 从本地获取处理过的字段一级顺序
   const tempLocalStr = localStorage.getItem(defaultConf.storagePrefix + 'hideColumnsList_' + props.tbName) as String
-  let tempList: any[] = []
-
   // 判断为空
   if (tempLocalStr !== undefined && tempLocalStr !== null && tempLocalStr.length > 0) {
     // 用两个下划线拆分
-    tempList = tempLocalStr.split('__')
+    tempList.value = tempLocalStr.split('__')
   }
-  props.column.map((item: any) => {
-    // 这里初始化一下vif
-    if (item.vif !== undefined && item.vif !== null) {
-      if (typeof item.vif === 'function') {
-        item._vif = item.vif(item)
-      } else {
-        item._vif = !!item.vif
-      }
-    } else {
-      item._vif = true
-    }
-    if (tempList.indexOf(item.label) < 0 || item.required || item.noHide) {
-      localColumn.value.push(item.label)
-    }
-  })
+  options.value = addIndex(props.column)
 
-  // 初始化的时候需要执行一次全选的状态校验
-  changeSelect()
-  if (init) {
-    changeColumnData()
-  }
+  setShow(props.column)
+  // 过滤出隐藏的节点
+  checkColumn.value = treeAll.value.filter((x) => {
+    return tempList.value.indexOf(x) < 0
+  })
 }
 
 /**
  * 取消
  */
 function handelCancel() {
-  showSettingColumn.value = false
   // 还原
-  localColumn.value = localOldColumn.value
+  treeRef.value.setCheckedKeys(checkColumn.value)
+
+  showSettingColumn.value = false
 }
 
 onMounted(() => {
   if (props.tbName) {
-    initLocalCheckList(true)
+    initLocalCheckList()
   }
 })
 
@@ -177,4 +170,3 @@ defineExpose({ initCol: initLocalCheckList })
   }
 }
 </style>
-types

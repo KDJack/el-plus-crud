@@ -130,29 +130,26 @@ export function handelListColumn(columnList: Array<IColumnItem>, defaultConf: IC
  * @param tbName
  */
 export function handelVIf(item: IColumnItem, defaultConf: ICRUDConfig, tbName: string) {
-  if (tbName) {
-    item.__vif = item._vif && item.scShow
-  } else {
-    // 这里初始化一下vif
-    if (item.vif !== undefined && item.vif !== null) {
-      if (typeof item.vif === 'function') {
-        item._vif = item.vif(item)
-      } else {
-        item._vif = !!item.vif
-      }
+  // 这里初始化一下vif
+  if (item.vif !== undefined && item.vif !== null) {
+    if (typeof item.vif === 'function') {
+      item._vif = item.vif(item)
     } else {
-      item._vif = true
+      item._vif = !!item.vif
     }
-    // 这里最终处理一下auth权限问题
-    if (item.auth) {
-      if (!defaultConf.auth) {
-        console.warn('使用auth属性，请在crud注册时传入auth校验方法~')
-      } else {
-        item._vif = defaultConf.auth(item.auth)
-      }
-    }
-    item.__vif = item._vif
+  } else {
+    item._vif = true
   }
+  // 这里最终处理一下auth权限问题
+  if (item.auth) {
+    if (!defaultConf.auth) {
+      console.warn('使用auth属性，请在crud注册时传入auth校验方法~')
+    } else {
+      item._vif = defaultConf.auth(item.auth)
+    }
+  }
+  item.__vif = item.scShow && item._vif
+
   // 这里要判断下下级显示状态, 如果下级全部隐藏了，那么本级也应该隐藏
   if (item.children && item.children.every((info) => !info.__vif)) {
     item.__vif = false

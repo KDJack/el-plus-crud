@@ -9,8 +9,8 @@
       </template>
     </template>
     <template v-if="limitList && limitList.length > 0">
-      <el-dropdown class="group-menu-btn" :size="desc.size || 'small'" :disabled="disabled">
-        <el-button type="primary" :size="desc.size || 'small'" :plain="desc.plain ?? true"> 更多<i class="ele-ArrowDown el-icon--right" /> </el-button>
+      <el-dropdown class="group-menu-btn" :size="desc.size || 'default'" :disabled="disabled">
+        <el-button type="primary" :size="desc.size || 'default'" :plain="desc.plain ?? true"> 更多<i class="ele-ArrowDown el-icon--right" /> </el-button>
         <template #dropdown>
           <el-dropdown-menu>
             <el-dropdown-item v-for="(item, i) in limitList" :key="i + (item.label || item.title)" v-on="handelEvelt(item)">

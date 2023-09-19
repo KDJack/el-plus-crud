@@ -158,7 +158,7 @@ const props = withDefaults(defineProps<IFormProps>(), {
   // options 的请求方法
   optionsFn: null,
   // 表单全局size
-  size: 'small',
+  size: 'default',
   // 表单列 默认1
   column: 1,
   // 是否是列表头部的表单

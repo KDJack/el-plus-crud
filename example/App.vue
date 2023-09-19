@@ -1,6 +1,8 @@
 <template>
   <el-config-provider :locale="zhCn">
     <div class="layout-padding">
+      <ElPlusTable ref="listTableRef" :tableConfig="tableConfig" colMinWidth="100px" :isIndex="false" headerAlign="center"></ElPlusTable>
+
       <ElPlusFormGroup v-model="formData" :formGroup="formGroupConfig">
         <template #default0>default0插槽</template>
         <template #default1>default1插槽</template>
@@ -14,7 +16,7 @@
 import { reactive, ref, onMounted } from 'vue'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import { ElMessage } from 'element-plus'
-import { IFormBack, IFormDesc, IFormGroupConfig } from 'types'
+import { IFormBack, IFormDesc, IFormGroupConfig, ITableConfig } from 'types'
 
 let formData = reactive({
   name: ''
@@ -61,6 +63,188 @@ const formGroupConfig = ref({
     }
   ]
 } as IFormGroupConfig)
+
+const tableConfig = ref({
+  // fetch: queryDistributorPage,
+  // tbName: 'goodsList',
+  column: [
+    { prop: 'distributorName', label: '二级企业名称', width: '120px', fixed: 'left' },
+    { prop: 'distributorName', label: '经营主体', width: '160px', fixed: 'left' },
+    {
+      label: '合同执行',
+      children: [
+        {
+          label: '采购业务',
+          children: [
+            {
+              label: '本月发生',
+              children: [
+                { prop: 'goodsName', label: '数量（万吨）' },
+                { prop: 'goodsName', label: '金额（万元）' }
+              ]
+            },
+            {
+              label: '本年累计数',
+              children: [
+                {
+                  label: '上游供应',
+                  children: [
+                    { prop: 'goodsName', label: '区域' },
+                    { prop: 'goodsName', label: '供应方性质' }
+                  ]
+                },
+                {
+                  label: '数量（万吨）',
+                  children: [
+                    { prop: 'goodsName', label: '数值' },
+                    { prop: 'goodsName', label: '去年金额' },
+                    { prop: 'goodsName', label: '同比' }
+                  ]
+                },
+                {
+                  label: '金额（万元）',
+                  children: [
+                    { prop: 'goodsName', label: '数值' },
+                    { prop: 'goodsName', label: '去年金额' },
+                    { prop: 'goodsName', label: '同比' }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          label: '销售业务',
+          children: [
+            {
+              label: '本月发生',
+              children: [
+                { prop: 'goodsName', label: '数量（万吨）' },
+                { prop: 'goodsName', label: '金额（万元）' }
+              ]
+            },
+            {
+              label: '本年累计数',
+              children: [
+                {
+                  label: '上游供应',
+                  children: [
+                    { prop: 'goodsName', label: '区域' },
+                    { prop: 'goodsName', label: '供应方性质' }
+                  ]
+                },
+                {
+                  label: '数量（万吨）',
+                  children: [
+                    { prop: 'goodsName', label: '数值' },
+                    { prop: 'goodsName', label: '去年金额' },
+                    { prop: 'goodsName', label: '同比' }
+                  ]
+                },
+                {
+                  label: '金额（万元）',
+                  children: [
+                    { prop: 'goodsName', label: '数值' },
+                    { prop: 'goodsName', label: '去年金额' },
+                    { prop: 'goodsName', label: '同比' }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      label: '财务数据',
+      children: [
+        {
+          label: '营业收入',
+          children: [
+            {
+              label: '本月发生',
+              children: [
+                { prop: 'goodsName', label: '数量（万吨）' },
+                { prop: 'goodsName', label: '金额（万元）' }
+              ]
+            },
+            {
+              label: '本年累计数',
+              children: [
+                { prop: 'goodsName', label: '数量（万吨）' },
+                { prop: 'goodsName', label: '金额（万元）' },
+                { prop: 'goodsName', label: '去年金额' },
+                { prop: 'goodsName', label: '同比' }
+              ]
+            }
+          ]
+        },
+        {
+          label: '营业成本',
+          children: [
+            {
+              label: '本月发生',
+              children: [
+                { prop: 'goodsName', label: '数量（万吨）' },
+                { prop: 'goodsName', label: '金额（万元）' }
+              ]
+            },
+            {
+              label: '本年累计数',
+              children: [
+                { prop: 'goodsName', label: '数量（万吨）' },
+                { prop: 'goodsName', label: '金额（万元）' },
+                { prop: 'goodsName', label: '去年金额' },
+                { prop: 'goodsName', label: '同比' }
+              ]
+            }
+          ]
+        },
+        {
+          label: '业务毛利率',
+          children: [
+            { prop: 'goodsName', label: '数值' },
+            { prop: 'goodsName', label: '去年数值' },
+            { prop: 'goodsName', label: '同比' }
+          ]
+        },
+        {
+          label: '营业利润',
+          children: [
+            { prop: 'goodsName', label: '金额（万元）' },
+            { prop: 'goodsName', label: '去年金额' },
+            { prop: 'goodsName', label: '同比' }
+          ]
+        }
+      ]
+    },
+    {
+      label: '操作',
+      fixed: 'right',
+      type: 'btns',
+      btns: []
+    }
+  ],
+  queryMap: {},
+  toolbar: {
+    // 功能按钮列表
+    btns: [{ label: '新增商品', type: 'add', on: { click: () => {} } }],
+    formConfig: {
+      beforeRequest: (data: any) => {
+        if (data.goodsKinds) {
+          data.goodsKinds = data.goodsKinds[data.goodsKinds.length - 1]
+        }
+        return data
+      },
+      formDesc: {
+        searchKey: { type: 'input', label: '输入查询', placeholder: '物料编码、商品条码、商品名称、自编码、属性' },
+        enabled: { type: 'select', label: '状态', options: 'enabledList' }
+      }
+    }
+    // 导出信息
+    // export: { url: exportUrl, name: '商品信息导出' }
+  }
+} as ITableConfig)
 
 onMounted(async () => {
   // 初始化部门列表

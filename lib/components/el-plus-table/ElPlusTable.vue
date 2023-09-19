@@ -6,7 +6,7 @@
         {{ item[tableConfig.showSelectNameKey || 'name'] }}
       </el-tag>
     </div> -->
-    <EleTabletHeader ref="tableHeaderRef" v-if="Object.keys(tableConfig?.toolbar || {}).length || tableConfig.tbName" v-model="toolFormData" :tbName="tableConfig.tbName" :column="tableConfig.column" :size="size" :isShowRefresh="isShowRefresh" :loading="loading" :toolbar="tableConfig.toolbar" :isDialog="isDialog" @query="handelTopQuery" />
+    <EleTabletHeader ref="tableHeaderRef" v-if="Object.keys(tableConfig?.toolbar || {}).length || tableConfig.tbName" v-model="toolFormData" :tbName="tableConfig.tbName" :column="tableConfig?.column || []" :size="size" :isShowRefresh="isShowRefresh" :loading="loading" :toolbar="tableConfig.toolbar" :isDialog="isDialog" @query="handelTopQuery" />
 
     <!-- 中部的Tabs -->
     <div class="table-tabs-panel" v-if="tableConfig.tabConf">
@@ -158,14 +158,14 @@ const tableHeaderRef = ref()
 const loading = ref(false)
 const loadingTab = ref(!!props.tableConfig?.tabConf?.fetch)
 const listLoading = ref(false)
-const size = defaultConf.size || 'small'
+const size = defaultConf.size || 'default'
 
 // 顶部查询条件数据缓存
 const topQueryData = ref({} as any)
 
 // 数据
 let toolFormData = reactive({} as any)
-const tableData = reactive((props.modelValue || []) as any[])
+const tableData = ref((props.modelValue || []) as any[])
 const haveClassRowList = reactive([])
 
 // 0:未加载; 1:加载中；2:加载完成
@@ -212,9 +212,9 @@ const summaryList = computed(() => {
     propList.map((prop, i: number) => {
       let value = ''
       if (props.tableConfig.summaryConf?.sumFn) {
-        value = props.tableConfig.summaryConf?.sumFn(tableData, allSelectRowList)
+        value = props.tableConfig.summaryConf?.sumFn(tableData.value, allSelectRowList)
       } else {
-        value = format.yuan(tableData.reduce((total: number, current) => (total += current[prop]), 0))
+        value = format.yuan(tableData.value.reduce((total: number, current) => (total += current[prop]), 0))
       }
       tempList.push({ label: labelList[i], value })
     })
@@ -250,7 +250,7 @@ function loadExpandData(row: any, treeNode: any, resolve: any) {
   postData[props.tableConfig?.explan?.idName || 'parentId'] = row.id
   props.tableConfig.fetch &&
     props.tableConfig.fetch(postData).then((pageInfo) => {
-      resolve(pageInfo?.records)
+      resolve(pageInfo?.[props.tableConfig?.fetchMap?.list || 'records'])
     })
 }
 
@@ -284,7 +284,7 @@ function handelTableSelect(selection: any[], item: any) {
  */
 function handelTableSelectAll(selection: any[]) {
   const isRemove = !(selection && selection.length > 0)
-  ;(isRemove ? tableData : selection).map((item) => {
+  ;(isRemove ? tableData.value : selection).map((item) => {
     checkAndRemove(item, isRemove)
   })
   // 通知父类
@@ -474,7 +474,6 @@ async function loadData(isInit: Boolean) {
   if (loadingStatus.value === 1 || loading.value) return false
   loadingStatus.value = 1
   loading.value = true
-  tableData.splice(0, tableData.length)
   if (isInit) {
     pageInfo.current = 1
   }
@@ -483,15 +482,21 @@ async function loadData(isInit: Boolean) {
   if (props.tableConfig?.toolbar?.formConfig?.beforeRequest) {
     postData = props.tableConfig?.toolbar?.formConfig?.beforeRequest(JSON.parse(JSON.stringify(postData))) || postData
   }
-  const dataPage = (await props.tableConfig.fetch(postData)) as any
+  let dataPage = ((await props.tableConfig.fetch(postData)) || {}) as any
+  // 这里要进行赋值操作-同时要转换相关key
+  if (Array.isArray(dataPage)) {
+    dataPage = { [props.tableConfig?.fetchMap?.list || 'records']: dataPage }
+  }
   try {
+    let dataResult = [] as any
     if (props.isPager) {
-      pageInfo.total = dataPage?.total * 1 || 0
-      pageInfo.current = dataPage?.current || 1
-      tableData.push(...(dataPage?.records || null))
+      pageInfo.total = dataPage[props.tableConfig?.fetchMap?.total || 'total'] * 1 || 0
+      pageInfo.current = dataPage[props.tableConfig?.fetchMap?.current || 'current'] || 1
+      dataResult = dataPage[props.tableConfig?.fetchMap?.list || 'records'] || null
     } else {
-      tableData.push(...(dataPage?.records || dataPage || null))
+      dataResult = dataPage[props.tableConfig?.fetchMap?.list || 'records'] || null
     }
+    tableData.value = dataResult
     if (isInit) {
       // 初始化完毕后，调用一次父类更新
       // emits('update:modelValue', tableData)
@@ -499,7 +504,7 @@ async function loadData(isInit: Boolean) {
     // 如果是树形结构
     if (props.type === 'expand') {
       treeIndexList.splice(0, treeIndexList.length)
-      handelTreeIndex(tableData, [])
+      handelTreeIndex(tableData.value, [])
     }
     listLoading.value = false
     nextTick(() => {
@@ -518,8 +523,8 @@ async function loadData(isInit: Boolean) {
  * 渲染列表的选中项
  */
 function refreshTableSelect() {
-  if (tableData && tableData.length > 0 && props.type === 'selection') {
-    tableData.map((item: any) => {
+  if (tableData.value && tableData.value.length > 0 && props.type === 'selection') {
+    tableData.value.map((item: any) => {
       elPlusTableRef.value!.toggleRowSelection(
         item,
         allSelectRowList.some((i) => i[props.rowKey] === item[props.rowKey])
@@ -538,7 +543,7 @@ async function reload(isTab: boolean = false) {
     tabStatic.value = await props.tableConfig?.tabConf.fetch(Object.assign({}, await getListQueryData(), props.tableConfig?.tabConf.queryMap))
     loadingTab.value = false
   }
-  return tableData
+  return tableData.value
 }
 
 /**
@@ -562,9 +567,9 @@ watch(
   (data) => {
     // console.log('data: ', JSON.parse(JSON.stringify(data)))
     if (!props.tableConfig.fetch) {
-      if (JSON.parse(JSON.stringify(data)) !== JSON.parse(JSON.stringify(tableData))) {
+      if (JSON.parse(JSON.stringify(data)) !== JSON.parse(JSON.stringify(tableData.value))) {
         loadingStatus.value = 2
-        tableData.splice(0, tableData.length, ...(data || []))
+        tableData.value.splice(0, tableData.value.length, ...(data || []))
       }
     }
   },
@@ -598,6 +603,7 @@ defineExpose({ reload, tableData, changeSelect, resetSelect, initCol })
   display: flex;
   flex-direction: column;
   position: relative;
+  box-sizing: border-box;
   .th-required {
     position: relative;
     &::before {

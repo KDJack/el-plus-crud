@@ -66,7 +66,7 @@ export function handelBtnType(item: any): Object {
 /**
  * 处理列表表头，list转Map
  */
-export function handelListColumn(columnList: Array<IColumnItem>, defaultConf: ICRUDConfig, tbName: string, headerAlign?: string, minWidth?: string): any[] {
+export function handelListColumn(columnList: Array<IColumnItem> | undefined, defaultConf: ICRUDConfig, tbName: string, headerAlign?: string, minWidth?: string): any[] {
   const tempColumnList = [] as any[]
   if (columnList && columnList.length > 0) {
     // 不影响原有的对象，这里进行拷贝

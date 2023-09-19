@@ -30,6 +30,18 @@ export interface IFetch<T> {
 }
 
 /**
+ * 设定如何解析请求结果
+ */
+export interface IFetchMap {
+  // 结果列表key-默认records
+  list?: string
+  // 总数key-默认total
+  total?: string
+  // 当前页key-默认current
+  current?: string
+}
+
+/**
  *  表单描述
  */
 export interface IFormDesc {
@@ -319,8 +331,10 @@ export interface ITableConfig {
   tabConf?: ITableTabConf
   // 调用接口
   fetch?: IFetch<any>
+  // 如何去解析数据结果
+  fetchMap?: IFetchMap
   // 列表配置，包含表头，每列信息等
-  column: Array<IColumnItem>
+  column?: Array<IColumnItem>
   // 查询条件
   queryMap?: any
   // 列表顶部的工具栏

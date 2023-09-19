@@ -1,6 +1,9 @@
 <template>
   <div class="el-plus-form-group">
     <template v-for="(group, i) in getGroupFowmLayout" :key="i">
+      <template v-if="useSlots()['top' + i]">
+        <slot :name="'top' + i"> </slot>
+      </template>
       <div class="title-line" v-if="group.title">{{ group.title }}</div>
       <ElPlusForm v-model="currentValue" v-bind="group.formProps" :ref="(el) => setComponentRef(el, 'form' + i)" @reset="handleReset">
         <template v-if="useSlots()['default' + i]">

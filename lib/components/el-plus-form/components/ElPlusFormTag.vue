@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-tag v-bind="attrs" :size="attrs.size || 'small'" :type="tagType !== '--' ? tagType : ''" v-on="onEvents">
+    <el-tag v-bind="attrs" :size="attrs.size || 'default'" :type="tagType !== '--' ? tagType : ''" v-on="onEvents">
       {{ formatValue || modelValue }}
     </el-tag>
   </div>

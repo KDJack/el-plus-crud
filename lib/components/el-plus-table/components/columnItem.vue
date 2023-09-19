@@ -64,7 +64,7 @@ const handelItem = (prop: string, item: any, i: number) => {
     desc: {
       prop: prop,
       default: '',
-      size: item.size || props.size || 'small'
+      size: item.size || props.size || 'default'
     }
   } as any
   Object.assign(tempCell.desc, item)
@@ -79,9 +79,9 @@ const handelItem = (prop: string, item: any, i: number) => {
       tempCell.desc.default = item.default || '-'
     }
     if (item.type === 'tag') {
-      // tempCell.size = tempCell.size || 'small '
+      // tempCell.size = tempCell.size || 'default'
     } else {
-      // tempCell.size = tempCell.size || size || 'small';
+      // tempCell.size = tempCell.size || size || 'default';
     }
     if (typeof item.type === 'string') {
       tempCell.desc.type = item.type

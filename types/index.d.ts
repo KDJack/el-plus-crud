@@ -173,6 +173,12 @@ export interface IFormGroupConfig {
   group: Array<{
     // 小标题
     title?: string
+    // 是否显示showBtns
+    showBtns?: boolean
+    // 最大宽度
+    maxWidth?: string
+    // label宽度
+    labelWidth?: string
     // 表单的列数，默认是1
     column?: number
     // 表单描述对象
@@ -207,6 +213,8 @@ export interface IColumnItem extends IDescItem {
   noHide?: boolean | ((data?: any) => boolean)
   // 真正的vif
   __vif?: boolean
+  // 是否合并行
+  isRowSpan?: boolean
 }
 
 /**

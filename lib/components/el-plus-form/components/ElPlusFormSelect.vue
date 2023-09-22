@@ -134,9 +134,9 @@ watch(
   () => currentValue.value,
   (val: any) => {
     if (attrs.value.allowCreate) {
-      if (val && Array.isArray(val) && (val as Array<any>).some((item) => typeof item === 'string' && item.length > (defaultConf.form?.leng.input || 20))) {
-        ElMessage.warning('最大长度为： ' + (defaultConf.form?.leng.input || 20))
-        currentValue.value = (val as Array<string>).filter((item) => typeof item !== 'string' || item.length <= (defaultConf.form?.leng.input || 20))
+      if (val && Array.isArray(val) && (val as Array<any>).some((item) => typeof item === 'string' && item.length > (defaultConf.form?.leng?.input || 20))) {
+        ElMessage.warning('最大长度为： ' + (defaultConf.form?.leng?.input || 20))
+        currentValue.value = (val as Array<string>).filter((item) => typeof item !== 'string' || item.length <= (defaultConf.form?.leng?.input || 20))
       }
     }
   }

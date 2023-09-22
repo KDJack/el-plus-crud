@@ -37,7 +37,7 @@ const onEvents = ref(getEvents(props))
 const isDoChange = ref(false)
 
 onBeforeMount(async () => {
-  attrs.value = await getAttrs(props, { ...defaultConf.form?.leng.nbinput, ...useAttrs() })
+  attrs.value = await getAttrs(props, { ...defaultConf.form?.leng?.nbinput, ...useAttrs() })
   delete attrs.value.min
   delete attrs.value.max
   isInit.value = true
@@ -82,7 +82,7 @@ function handelBlur() {
  * 绑定属性
  */
 const numBindAttr = computed(() => {
-  let numAttrs = props.desc.attrs || defaultConf.form?.leng.nbinput
+  let numAttrs = props.desc.attrs || defaultConf.form?.leng?.nbinput
   if (typeof props.desc.attrs === 'function') {
     numAttrs = props.desc.attrs(props.formData)
   }

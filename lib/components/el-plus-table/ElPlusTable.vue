@@ -29,7 +29,26 @@
         <slot name="main" :tableData="tableData"></slot>
       </template>
       <!-- 这里开始是表格内容  -->
-      <el-table ref="elPlusTableRef" v-else style="width: 100%" height="100%" :maxHeight="tableConfig.maxHeight || 'auto'" v-bind="tableConfig.tableAttr" :class="{ 'big-h-bar': tableConfig?.tableAttr?.bigHBar, 'big-v-bar': tableConfig.tableAttr?.bigVBar }" :data="tableData" :row-key="rowKey" lazy :load="loadExpandData" :size="size" :row-class-name="initRowClassName" @select="handelTableSelect" @select-all="handelTableSelectAll" @expand-change="handelTableExpandChange" :treeProps="treeProps">
+      <el-table
+        ref="elPlusTableRef"
+        v-else
+        style="width: 100%"
+        height="100%"
+        :maxHeight="tableConfig.maxHeight || 'auto'"
+        v-bind="tableConfig.tableAttr"
+        :class="{ 'big-h-bar': tableConfig?.tableAttr?.bigHBar, 'big-v-bar': tableConfig.tableAttr?.bigVBar }"
+        :data="tableData"
+        :row-key="rowKey"
+        lazy
+        :load="loadExpandData"
+        :size="size"
+        :row-class-name="initRowClassName"
+        @select="handelTableSelect"
+        @select-all="handelTableSelectAll"
+        @expand-change="handelTableExpandChange"
+        :treeProps="treeProps"
+        :span-method="handelSpanMethod"
+      >
         <!-- 复选框 -->
         <el-table-column v-if="type === 'selection'" type="selection" width="55px" :selectable="selectable" header-align="center" align="center" />
         <!-- 下标 -->
@@ -77,12 +96,20 @@ import ElPlusTableColumn from './ElPlusTableColumn.vue'
 import { handelListColumn } from './util'
 import { cloneDeep } from 'lodash'
 import { Loading } from '@element-plus/icons-vue'
+import type { TableColumnCtx } from 'element-plus'
 import { ICRUDConfig, ITableConfig, ITableTabItem, ITreeProps } from 'types'
+
+interface SpanMethodProps {
+  row: any
+  column: TableColumnCtx<any>
+  rowIndex: number
+  columnIndex: number
+}
 
 const defaultConf = inject('defaultConf') as ICRUDConfig
 const format = inject('format') as any
 
-const emits = defineEmits(['getUrlConsumerIds', 'selection', 'select', 'selectAll', 'update:modelValue', 'tabChange', 'expandChange'])
+const emits = defineEmits(['getUrlConsumerIds', 'selection', 'select', 'selectAll', 'update:modelValue', 'tabChange', 'expandChange', 'inited'])
 const props = withDefaults(
   defineProps<{
     tableConfig: ITableConfig
@@ -132,6 +159,10 @@ const props = withDefaults(
     headerAlign: 'left'
   }
 )
+
+// 合并行算法
+const needSpanColIndex = ref([] as any[])
+const handelSpanMethod = ref(null as unknown as Function)
 
 const elPlusTableRef = ref()
 
@@ -188,6 +219,45 @@ const treeProps = (props.tableConfig?.explan?.treeProps || { children: 'children
 // 处理后的列显示
 const headerColumns = computed(() => {
   const tempList = handelListColumn(props.tableConfig?.column, defaultConf, props.tableConfig?.tbName || '', props.headerAlign, props.isDialog ? 'auto' : props.colMinWidth)
+  // 这里重构一下合并行算法
+  // 获取所有列
+  const allColumn = getColumList(tempList)
+  // 查询是否有合并行属性
+  needSpanColIndex.value = []
+  allColumn.map((item, i) => {
+    if (item.isRowSpan) {
+      needSpanColIndex.value.push(i)
+      let value = undefined as any
+      let first = 0
+      let count = 1
+      // 这里修改data数据
+      tableData.value?.map((row, j) => {
+        if (value !== row[item.prop]) {
+          if (count > 1 && j > 0) {
+            // 这里要设置之前的数据合并行数
+            tableData.value[first]['rowSpan_' + i] = count
+          }
+          first = j
+          count = 1
+          value = row[item.prop]
+        } else {
+          count += 1
+          row['rowSpan_' + i] = 0
+        }
+        if (j === tableData.value.length - 1) {
+          // 这里要设置之前的数据合并行数
+          tableData.value[first]['rowSpan_' + i] = count
+        }
+      })
+    }
+  })
+  if (needSpanColIndex.value.length > 0) {
+    handelSpanMethod.value = ({ row, columnIndex }: SpanMethodProps) => {
+      if (needSpanColIndex.value.includes(columnIndex)) {
+        return { rowspan: row['rowSpan_' + columnIndex], colspan: 1 }
+      }
+    }
+  }
   return tempList
 })
 
@@ -221,6 +291,49 @@ const summaryList = computed(() => {
   }
   return tempList
 })
+
+/**
+ * 获取所有显示的列信息
+ * @param list
+ */
+function getColumList(list: Array<any>): Array<any> {
+  const tempList = [] as any
+  list?.map((item) => {
+    if (item.children?.length) {
+      tempList.push(...getColumList(item.children))
+    } else {
+      if (item.__vif) {
+        tempList.push(item)
+      }
+    }
+  })
+  return tempList
+}
+
+/**
+ * 获取合并行方法
+ * @param param0
+ */
+function getSpanMethod(): Function {
+  // const
+  return ({ row, column, rowIndex, columnIndex }: SpanMethodProps) => {
+    if (needSpanColIndex.value.includes(columnIndex)) {
+    }
+    if (columnIndex === 0) {
+      if (rowIndex % 2 === 0) {
+        return {
+          rowspan: 2,
+          colspan: 1
+        }
+      } else {
+        return {
+          rowspan: 0,
+          colspan: 0
+        }
+      }
+    }
+  }
+}
 
 /**
  * Tab切换
@@ -497,9 +610,11 @@ async function loadData(isInit: Boolean) {
       dataResult = dataPage[props.tableConfig?.fetchMap?.list || 'records'] || null
     }
     tableData.value = dataResult
+    // 初始化完毕后，调用一次父类更新
+    emits('update:modelValue', tableData)
     if (isInit) {
-      // 初始化完毕后，调用一次父类更新
-      // emits('update:modelValue', tableData)
+      // 调用父类init
+      emits('inited', tableData)
     }
     // 如果是树形结构
     if (props.type === 'expand') {

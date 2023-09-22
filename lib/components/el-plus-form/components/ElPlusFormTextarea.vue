@@ -33,7 +33,7 @@ const currentValue = ref(props.modelValue)
 emits('update:modelValue', currentValue)
 
 onBeforeMount(async () => {
-  attrs.value = await getAttrs(props, { maxlength: defaultConf.form?.leng.textare, showWordLimit: true, rows: 3, ...useAttrs() })
+  attrs.value = await getAttrs(props, { maxlength: defaultConf.form?.leng?.textare, showWordLimit: true, rows: 3, ...useAttrs() })
   isInit.value = true
 })
 

@@ -194,7 +194,6 @@ const formLayout = computed(() => ({ display: 'flex', flexDirection: props.isTab
 // 表单的Attrs
 const computedFormAttrs = computed(() => {
   return {
-    scrollToError: true,
     ...props.formAttrs,
     labelWidth: props.labelWidth === 'auto' ? (props.isDialog ? '100px' : '120px') : parseInt(props.labelWidth + '') + 'px',
     // validateOnRuleChange: false,

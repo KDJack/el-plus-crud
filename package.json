@@ -2,7 +2,7 @@
   "name": "el-plus-crud",
   "description": "采用Vue3 + TS，封装的element-plus数据驱动表单、列表组件",
   "author": "K.D.Jack",
-  "version": "0.0.86",
+  "version": "0.0.87",
   "license": "MIT",
   "private": false,
   "main": "dist/el-plus-crud.mjs",

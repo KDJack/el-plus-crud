@@ -225,12 +225,16 @@ export interface IExportConfig {
   url?: string
   // 查询导出URL的fetch
   fetch?: IFetch<string>
+  // 如何去解析数据结果获取url
+  urlKey?: string | Array<string>
   // 请求夹带的数据
   data?: Object
   // 文件名
   name?: string
   // 是否增加token权限
   isAuth?: Boolean
+  // token名称
+  tokenKey?: string
   // 是否需要拼接查询条件
   noQuery?: Boolean
   // 导出文件的后缀

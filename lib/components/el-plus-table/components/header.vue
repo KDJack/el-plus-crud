@@ -120,7 +120,13 @@ async function handelDownload({ callBack }: IBtnBack) {
       }
     }
     if (props.toolbar.export.fetch) {
-      url = (await props.toolbar.export.fetch(postData)) as string
+      let result = (await props.toolbar.export.fetch(postData)) as string
+      if (props.toolbar.export.urlKey) {
+        let tempKeyList = (typeof props.toolbar.export.urlKey === 'string' ? [props.toolbar.export.urlKey] : props.toolbar.export.urlKey) as string[]
+        // 循环遍历
+        tempKeyList?.map((key) => (result = result[key]))
+      }
+      url = result
     } else {
       if (!props.toolbar.export.noQuery && method === 'get') {
         url += (url.indexOf('?') >= 0 ? '&' : '?') + mapToUrlStr(postData)
@@ -138,7 +144,7 @@ async function handelDownload({ callBack }: IBtnBack) {
       if (typeof defaultConf.token === 'function') {
         token = defaultConf.token()
       }
-      xhr.setRequestHeader('Authorization', '' + token)
+      xhr.setRequestHeader(props.toolbar?.export?.tokenKey || 'Authorization', '' + token)
     }
     xhr.onload = function () {
       if (this.status == 200) {

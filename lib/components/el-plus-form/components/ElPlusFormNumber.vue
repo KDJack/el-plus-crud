@@ -55,8 +55,6 @@ function handelFocus() {
  * @param event
  */
 function handelBlur() {
-  console.log('currentValue', currentValue.value)
-
   if (!isDoChange.value) {
     if (currentValue.value !== 0 && !currentValue.value) {
       nextTick(() => {

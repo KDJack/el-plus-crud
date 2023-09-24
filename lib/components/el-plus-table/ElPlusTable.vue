@@ -252,9 +252,14 @@ const headerColumns = computed(() => {
     }
   })
   if (needSpanColIndex.value.length > 0) {
-    handelSpanMethod.value = ({ row, columnIndex }: SpanMethodProps) => {
-      if (needSpanColIndex.value.includes(columnIndex)) {
-        return { rowspan: row['rowSpan_' + columnIndex], colspan: 1 }
+    handelSpanMethod.value = ({ row, column, columnIndex }: SpanMethodProps) => {
+      let tempColumnIndex = columnIndex
+      // 这里要排除默认的列
+      if (props.type === 'selection') tempColumnIndex -= 1
+      if (props.isIndex) tempColumnIndex -= 1
+      if (useSlots().firstColumn) tempColumnIndex -= 1
+      if (needSpanColIndex.value.includes(tempColumnIndex)) {
+        return { rowspan: row['rowSpan_' + tempColumnIndex], colspan: 1 }
       }
     }
   }

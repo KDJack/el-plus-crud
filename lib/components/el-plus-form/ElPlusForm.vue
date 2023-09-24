@@ -477,7 +477,6 @@ const handelValToForm = (desc: IFormDescItem, field: string, val: any) => {
       result[desc.propPrefix ? desc.propPrefix + 'StreetId' : 'streetId'] = sid || -1
     }
   } else if (desc.type === 'daterange') {
-    console.log('val: ', val)
     if (val && val.length === 2) {
       const startTimeKey = desc.propPrefix ? desc.propPrefix + 'StartTime' : 'startTime'
       const endTimeKey = desc.propPrefix ? desc.propPrefix + 'EndTime' : 'endTime'

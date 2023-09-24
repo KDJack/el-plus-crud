@@ -215,6 +215,8 @@ export interface IColumnItem extends IDescItem {
   __vif?: boolean
   // 是否合并行
   isRowSpan?: boolean
+  // 是否合并列
+  isColSpan?: boolean
 }
 
 /**

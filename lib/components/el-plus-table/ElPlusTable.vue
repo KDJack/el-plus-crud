@@ -161,7 +161,7 @@ const props = withDefaults(
 )
 
 // 合并行算法
-const needSpanColIndex = ref([] as any[])
+const needSpanCellIndex = ref([] as any[])
 const handelSpanMethod = ref(null as unknown as Function)
 
 const elPlusTableRef = ref()
@@ -223,43 +223,83 @@ const headerColumns = computed(() => {
   // 获取所有列
   const allColumn = getColumList(tempList)
   // 查询是否有合并行属性
-  needSpanColIndex.value = []
-  allColumn.map((item, i) => {
-    if (item.isRowSpan) {
-      needSpanColIndex.value.push(i)
-      let value = undefined as any
-      let first = 0
-      let count = 1
-      // 这里修改data数据
-      tableData.value?.map((row, j) => {
-        if (value !== row[item.prop]) {
-          if (count > 1 && j > 0) {
+  needSpanCellIndex.value = []
+
+  const tempColList = allColumn
+    .map((item, i) => {
+      // 合并行
+      if (item.isRowSpan) {
+        needSpanCellIndex.value.push(i)
+        let value = undefined as any
+        let first = 0
+        let count = 1
+        // 这里修改data数据
+        tableData.value?.map((row, j) => {
+          if (value !== row[item.prop]) {
+            if (count > 1 && j > 0) {
+              // 这里要设置之前的数据合并行数
+              tableData.value[first]['rowSpan_' + i] = count
+            }
+            first = j
+            count = 1
+            value = row[item.prop]
+          } else {
+            count += 1
+            row['rowSpan_' + i] = 0
+          }
+          if (j === tableData.value.length - 1) {
             // 这里要设置之前的数据合并行数
             tableData.value[first]['rowSpan_' + i] = count
           }
-          first = j
+        })
+      }
+      // 返回需要合并列的列数据
+      return item.isColSpan ? i : null
+    })
+    .filter((item) => item !== null) as number[]
+
+  if (tempColList.length) {
+    // 这里开始合并列-遍历行数据
+    tableData.value?.map((row, j) => {
+      let value = undefined as any
+      let first = 0
+      let count = 1
+      // 遍历表头
+      tempColList.map((val: number, i: number) => {
+        // 不存在时才添加
+        if (!needSpanCellIndex.value.includes(val)) {
+          needSpanCellIndex.value.push(val)
+        }
+        // 如果值不等 或者 列序号已经中断
+        if (value !== row[allColumn[val].prop] || (i > 0 && val - 1 !== tempColList[i - 1])) {
+          if (count > 1) {
+            // 这里要设置之前的数据合并行数
+            row['colSpan_' + first] = count
+          }
+          first = val
           count = 1
-          value = row[item.prop]
+          value = row[allColumn[val].prop]
         } else {
           count += 1
-          row['rowSpan_' + i] = 0
+          row['colSpan_' + val] = 0
         }
-        if (j === tableData.value.length - 1) {
+        // 如果是最后一个
+        if (i === tempColList.length - 1) {
           // 这里要设置之前的数据合并行数
-          tableData.value[first]['rowSpan_' + i] = count
+          row['colSpan_' + first] = count
         }
       })
-    }
-  })
-  if (needSpanColIndex.value.length > 0) {
+    })
+  }
+  if (needSpanCellIndex.value.length > 0) {
     handelSpanMethod.value = ({ row, column, columnIndex }: SpanMethodProps) => {
       let tempColumnIndex = columnIndex
       // 这里要排除默认的列
       if (props.type === 'selection') tempColumnIndex -= 1
       if (props.isIndex) tempColumnIndex -= 1
       if (useSlots().firstColumn) tempColumnIndex -= 1
-      if (needSpanColIndex.value.includes(tempColumnIndex)) {
-        return { rowspan: row['rowSpan_' + tempColumnIndex], colspan: 1 }
+      if (needSpanCellIndex.value.includes(tempColumnIndex)) {
+        return { rowspan: row['rowSpan_' + tempColumnIndex] ?? 1, colspan: row['colSpan_' + tempColumnIndex] ?? 1 }
       }
     }
   }
@@ -313,31 +353,6 @@ function getColumList(list: Array<any>): Array<any> {
     }
   })
   return tempList
-}
-
-/**
- * 获取合并行方法
- * @param param0
- */
-function getSpanMethod(): Function {
-  // const
-  return ({ row, column, rowIndex, columnIndex }: SpanMethodProps) => {
-    if (needSpanColIndex.value.includes(columnIndex)) {
-    }
-    if (columnIndex === 0) {
-      if (rowIndex % 2 === 0) {
-        return {
-          rowspan: 2,
-          colspan: 1
-        }
-      } else {
-        return {
-          rowspan: 0,
-          colspan: 0
-        }
-      }
-    }
-  }
 }
 
 /**

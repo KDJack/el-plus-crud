@@ -159,7 +159,12 @@ async function handelDownload({ callBack }: IBtnBack) {
         }, 1000)
       }
     }
-    xhr.onerror = function () {
+    xhr.onerror = function (e: any) {
+      // 如果错误，则尝试直接打开链接
+      const aLink = document.createElement('a')
+      aLink.href = url
+      aLink.download = (props.toolbar?.export?.name || new Date().getTime()) + (props.toolbar?.export?.suffix || '.xlsx')
+      aLink.click()
       setTimeout(() => {
         callBack && callBack()
       }, 1000)

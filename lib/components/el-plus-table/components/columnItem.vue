@@ -6,7 +6,7 @@
           <el-icon style="color: #f56c6c; font-size: 26px; padding: 0px 8px 0 0"><WarningFilled /></el-icon>
         </template>
       </el-popover>
-      <div style="width: 100%; display: flex">
+      <div style="width: 100%; display: flex" :style="{ 'justify-content': item.align || 'flex-start' }">
         <component v-if="item.vshow === undefined || item.vshow" v-bind="item" :isTable="true" :formData="props.scope?.row" :size="item.size || size" :rowIndex="rowIndex" v-model="props.scope.row[item.field]" :is="'el-plus-form-' + item.desc.type"> </component>
       </div>
     </template>
@@ -152,7 +152,7 @@ const handelItem = (prop: string, item: any, i: number) => {
       tempCell.desc.attrs = item.attrs
     }
   }
-
+  tempCell.align = item.align
   tempCell.desc._label = item.label
 
   // 处理attrs

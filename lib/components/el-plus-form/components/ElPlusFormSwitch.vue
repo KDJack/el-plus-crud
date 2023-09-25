@@ -18,7 +18,7 @@ import { ElMessageBox } from 'element-plus'
 
 const emits = defineEmits(['update:modelValue'])
 const props = defineProps<{
-  modelValue?: number | null
+  modelValue?: boolean | string | number | null
   field: string
   loading?: boolean
   desc: { [key: string]: any }

@@ -90,7 +90,7 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { ref, reactive, onMounted, computed, watch, nextTick, useSlots, inject } from 'vue'
+import { ref, reactive, onMounted, computed, watch, nextTick, useSlots, inject, provide } from 'vue'
 import EleTabletHeader from './components/header.vue'
 import ElPlusTableColumn from './ElPlusTableColumn.vue'
 import { handelListColumn } from './util'
@@ -720,6 +720,12 @@ watch(
   },
   { deep: true }
 )
+
+// 这里注入插槽的reload事件
+if (props.isDIYMain) {
+  // 只有isDIYMain=true时才注册事件
+  provide('reloadTable', reload)
+}
 
 onMounted(() => {
   reload()

@@ -120,13 +120,17 @@ async function handelDownload({ callBack }: IBtnBack) {
       }
     }
     if (props.toolbar.export.fetch) {
-      let result = (await props.toolbar.export.fetch(postData)) as string
-      if (props.toolbar.export.urlKey) {
-        let tempKeyList = (typeof props.toolbar.export.urlKey === 'string' ? [props.toolbar.export.urlKey] : props.toolbar.export.urlKey) as string[]
-        // 循环遍历
-        tempKeyList?.map((key) => (result = result[key]))
+      try {
+        let result = (await props.toolbar.export.fetch(postData)) as string
+        if (props.toolbar.export.urlKey) {
+          let tempKeyList = (typeof props.toolbar.export.urlKey === 'string' ? [props.toolbar.export.urlKey] : props.toolbar.export.urlKey) as string[]
+          // 循环遍历
+          tempKeyList?.map((key) => (result = result[key]))
+        }
+        url = result
+      } finally {
+        callBack && callBack()
       }
-      url = result
     } else {
       if (!props.toolbar.export.noQuery && method === 'get') {
         url += (url.indexOf('?') >= 0 ? '&' : '?') + mapToUrlStr(postData)

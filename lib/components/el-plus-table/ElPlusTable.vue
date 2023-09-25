@@ -882,4 +882,3 @@ defineExpose({ reload, tableData, changeSelect, resetSelect, initCol })
   }
 }
 </style>
-types

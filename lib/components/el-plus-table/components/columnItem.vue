@@ -213,4 +213,3 @@ onMounted(() => {})
   }
 }
 </style>
-types

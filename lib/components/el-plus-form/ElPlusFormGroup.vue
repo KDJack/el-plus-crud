@@ -171,4 +171,3 @@ defineExpose({ validate, getData, clearValid })
   }
 }
 </style>
-types

@@ -43,4 +43,3 @@ onBeforeMount(async () => {
   isInit.value = true
 })
 </script>
-types

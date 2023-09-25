@@ -301,4 +301,3 @@ defineExpose({ getData: () => elPlusFormRef.value?.getData(), initCol })
   width: 100%;
 }
 </style>
-types

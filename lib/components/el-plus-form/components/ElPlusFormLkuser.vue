@@ -489,4 +489,3 @@ onMounted(async () => {
   }
 }
 </style>
-types

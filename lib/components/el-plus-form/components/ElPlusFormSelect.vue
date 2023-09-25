@@ -161,4 +161,3 @@ watch(
   white-space: break-spaces;
 }
 </style>
-types

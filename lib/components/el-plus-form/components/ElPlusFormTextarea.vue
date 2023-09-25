@@ -49,4 +49,3 @@ watch(
   { immediate: true }
 )
 </script>
-types

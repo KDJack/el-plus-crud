@@ -368,4 +368,3 @@ watch(
   }
 }
 </style>
-types

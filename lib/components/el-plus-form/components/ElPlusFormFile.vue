@@ -46,4 +46,3 @@ const props = defineProps<{
   }
 }
 </style>
-types

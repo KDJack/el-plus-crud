@@ -681,14 +681,18 @@ const clear = () => {
   // 这里进行数据清空
   if (props.modelValue) {
     Object.keys(props.modelValue).map((key) => {
-      props.modelValue[key] = null
+      if (props.formDesc && props.formDesc[key]) {
+        props.modelValue[key] = props.formDesc[key].default ?? null
+      } else {
+        props.modelValue[key] = null
+      }
     })
   }
   // 重置校验
   nextTick(() => {
     setTimeout(() => {
       clearValid()
-    }, 10)
+    }, 50)
   })
 }
 
@@ -792,4 +796,3 @@ defineExpose({ submit: handleSubmitForm, getData: getFormData, validate: validat
   }
 }
 </style>
-types

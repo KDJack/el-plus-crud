@@ -95,4 +95,3 @@ watch(
   }
 }
 </style>
-types

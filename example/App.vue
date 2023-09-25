@@ -250,4 +250,3 @@ onMounted(async () => {
   // 初始化部门列表
 })
 </script>
-types

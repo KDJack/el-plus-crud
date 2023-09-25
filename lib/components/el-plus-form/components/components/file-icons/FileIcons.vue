@@ -134,4 +134,3 @@ function handelPreview(file: IOssInfo) {
   }
 }
 </style>
-types

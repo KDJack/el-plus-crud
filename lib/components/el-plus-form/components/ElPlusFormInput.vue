@@ -61,4 +61,3 @@ watch(
   }
 )
 </script>
-types

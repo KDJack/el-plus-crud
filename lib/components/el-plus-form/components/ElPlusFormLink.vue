@@ -191,7 +191,7 @@ watch(
       // 如果是多选
       if (multiple.value) {
         // TODO
-      } else if (!multiple.value && tempConfig.column[tempConfig.column.length - 1].label !== '操作') {
+      } else if (!multiple.value && tempConfig.column && tempConfig.column[tempConfig.column.length - 1].label !== '操作') {
         // 如果是单选
         tempConfig.column.push({ label: '操作', width: '120px', fixed: 'right', type: 'btns', btns: [{ label: '选中', on: { click: handelSignleSelect } }] })
       }
@@ -281,4 +281,3 @@ onMounted(async () => {})
   }
 }
 </style>
-types

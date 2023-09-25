@@ -143,4 +143,3 @@ onBeforeMount(async () => {
   padding: 0;
 }
 </style>
-types

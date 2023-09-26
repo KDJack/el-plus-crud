@@ -112,7 +112,13 @@ async function handelDownload({ callBack }: IBtnBack) {
     const xhr = new XMLHttpRequest()
     let url = props.toolbar.export.url || ''
     const method = props.toolbar.export.method || 'get'
+
     let postData = Object.assign({}, elPlusFormRef.value?.getData(), props.toolbar.export?.data || {})
+    // 提交数据前的处理
+    if (props.toolbar?.formConfig?.beforeRequest) {
+      postData = await (props.toolbar.formConfig.beforeRequest as Function)(postData)
+    }
+
     // 处理为空的请求数据
     for (let key in postData) {
       if (postData[key] === undefined || postData[key] === null || postData[key] === '') {

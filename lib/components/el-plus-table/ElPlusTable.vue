@@ -630,8 +630,6 @@ async function loadData(isInit: Boolean) {
       dataResult = dataPage[props.tableConfig?.fetchMap?.list || 'records'] || null
     }
     tableData.value = dataResult
-    // 初始化完毕后，调用一次父类更新
-    emits('update:modelValue', tableData)
     if (isInit) {
       // 调用父类init
       emits('inited', tableData)

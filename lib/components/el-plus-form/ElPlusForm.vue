@@ -40,7 +40,7 @@ export default {
 <script lang="ts" setup>
 import { ref, computed, useAttrs, nextTick, onMounted, watch, inject } from 'vue'
 import { throttle } from 'lodash'
-import { castArray, isMobile } from './util'
+import { castArray, isMobile, time } from './util'
 import * as validates from './util/validate'
 import { typeList } from './components/index'
 import ElPlusFormBtn from './components/ElPlusFormBtn.vue'
@@ -107,8 +107,6 @@ export interface IFormProps {
 }
 
 const defaultConf = inject('defaultConf') as ICRUDConfig
-// 定义全局的format对象
-const elPlusFormFormat = inject('format') as any
 
 const emits = defineEmits(['request', 'reset', 'cancel'])
 const props = withDefaults(defineProps<IFormProps>(), {
@@ -488,16 +486,25 @@ const handelValToForm = (desc: IFormDescItem, field: string, val: any) => {
       }
       result[endTimeKey] = result[endTimeKey] + (24 * 60 * 60 - 1) * 1000
       // 再处理一下时间戳
-      result[startTimeKey] = elPlusFormFormat.time(result[startTimeKey], 3)
-      result[endTimeKey] = elPlusFormFormat.time(result[endTimeKey], 3)
+      result[startTimeKey] = time(result[startTimeKey], 3)
+      result[endTimeKey] = time(result[endTimeKey], 3)
     }
   } else if (desc.type === 'datetimerange') {
     if (val && val.length === 2) {
       const startTimeKey = desc.propPrefix ? desc.propPrefix + 'StartTime' : 'startTime'
       const endTimeKey = desc.propPrefix ? desc.propPrefix + 'EndTime' : 'endTime'
       // 处理一下时间戳
-      result[startTimeKey] = elPlusFormFormat.time(val[0], 3)
-      result[endTimeKey] = elPlusFormFormat.time(val[1], 3)
+      result[startTimeKey] = time(val[0], 3)
+      result[endTimeKey] = time(val[1], 3)
+    }
+  } else if (desc.type === 'timerange') {
+    if (val && val.length === 2) {
+      const startTimeKey = desc.propPrefix ? desc.propPrefix + 'StartTime' : 'startTime'
+      const endTimeKey = desc.propPrefix ? desc.propPrefix + 'EndTime' : 'endTime'
+      // 处理一下时间戳
+      result[startTimeKey] = time(val[0], 4)
+      result[endTimeKey] = time(val[1], 4)
+      console.log(startTimeKey, result, result[startTimeKey])
     }
   } else if (desc.type === 'linkuser') {
     const [userIds, deptIds, userNames, deptNames] = val

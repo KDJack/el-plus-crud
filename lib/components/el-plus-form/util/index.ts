@@ -255,3 +255,49 @@ export const getStrLength = (str: any) => {
   }
   return realLength
 }
+
+/**
+ * 格式化指定时间戳,type:返回类型
+ * @param param
+ * @param type
+ * @returns {*}
+ */
+export const time = (param: any, type?: any) => {
+  if (param === '' || param === null || param === undefined) {
+    return ''
+  }
+  let temp = null
+  // 如果本身就是日期类型
+  if (param instanceof Date) {
+    temp = param
+  } else {
+    // if (!/^[0-9]+.?[0-9]*$/.test(param)) {
+    //   return ''
+    // } else {
+    if (typeof param === 'string' && param.indexOf('-') >= 0) {
+      temp = new Date(param.replace(/-/g, '/'))
+    } else {
+      temp = new Date(param)
+    }
+    // }
+  }
+  const year = temp.getFullYear()
+  const month: any = checkTen(temp.getMonth() + 1)
+  const day: any = checkTen(temp.getDate())
+  const hour: any = checkTen(temp.getHours())
+  const minute: any = checkTen(temp.getMinutes())
+  const second: any = checkTen(temp.getSeconds())
+  if (+type === 1) return year + '-' + month + '-' + day
+  if (+type === 2) return year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second + ' ' + temp.getMilliseconds()
+  if (+type === 3) return year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second
+  if (+type === 4) return hour + ':' + minute + ':' + second
+  return year + '-' + month + '-' + day + ' ' + hour + ':' + minute
+  // + ':' + second
+}
+
+function checkTen(val: any) {
+  if (val * 1 < 10) {
+    return '0' + val
+  }
+  return val
+}

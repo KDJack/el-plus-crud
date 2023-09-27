@@ -213,6 +213,13 @@ const computedRules = computed(() => {
   if (props.formDesc) {
     Object.keys(props.formDesc).map((field: any) => {
       if (!tempRules[field]) tempRules[field] = []
+      let required = false as boolean | ((data?: any) => boolean)
+      if (props.formDesc && props.formDesc[field]) {
+        required = (props.formDesc && props.formDesc[field].required) || false
+      }
+      if (typeof required === 'function') {
+        required = required(cloneDeep(props.modelValue))
+      }
       if (props.formDesc) {
         if (props.formDesc[field].rules) {
           if (typeof props.formDesc[field].rules === 'string') {
@@ -224,9 +231,7 @@ const computedRules = computed(() => {
               tempRules[field].push(item)
             })
           }
-        } else if (props.formDesc[field].required) {
-          // 如果直接指定 required || require，手动添加校验信息
-          //
+        } else if (required) {
           let rules = 'notAllBlank'
           switch (props.formDesc[field].type) {
             case 'upload':
@@ -252,6 +257,12 @@ const computedRules = computed(() => {
       }
     })
   }
+  // 清空校验
+  nextTick(() => {
+    setTimeout(() => {
+      clearValid()
+    }, 50)
+  })
   return tempRules
 })
 

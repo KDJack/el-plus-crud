@@ -60,7 +60,7 @@ export type IDescItem = {
   vif?: boolean | ((data?: any) => boolean)
   vshow?: boolean | ((data?: any) => boolean)
   limit?: number
-  required?: boolean | ((data?: any) => boolean)
+  required?: boolean | Ref<boolean> | ((data?: any) => boolean)
   style?: IBaseObj | ((data?: any) => IBaseObj)
   // 事件
   on?: { [key: string]: Function }

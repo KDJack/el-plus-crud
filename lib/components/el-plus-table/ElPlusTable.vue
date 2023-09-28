@@ -168,15 +168,16 @@ const elPlusTableRef = ref()
 
 // 顶部Tab数据
 const tabStatic = ref({} as any)
-const tableTabVal = computed(() => {
-  if (props.tableConfig?.tabConf) {
-    if (props.tableConfig?.tabConf?.defaultVal !== undefined && props.tableConfig?.tabConf?.defaultVal !== null) {
-      return props.tableConfig?.tabConf?.defaultVal
-    }
-    return props.tableConfig?.tabConf?.tabs[props.tableConfig?.tabConf?.default || 0].value ?? ''
-  }
-  return ''
-})
+const tableTabVal = ref(props.tableConfig?.tabConf?.tabs[props.tableConfig?.tabConf?.default || 0].value ?? '')
+// const tableTabVal = computed(() => {
+//   if (props.tableConfig?.tabConf) {
+//     if (props.tableConfig?.tabConf?.defaultVal !== undefined && props.tableConfig?.tabConf?.defaultVal !== null) {
+//       return props.tableConfig?.tabConf?.defaultVal
+//     }
+//     return props.tableConfig?.tabConf?.tabs[props.tableConfig?.tabConf?.default || 0].value ?? ''
+//   }
+//   return ''
+// })
 const getTabLabel = computed(() => (item: ITableTabItem) => {
   if (item.key) {
     return tabStatic.value[item.key] || 0

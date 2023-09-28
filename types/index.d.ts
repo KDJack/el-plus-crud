@@ -308,6 +308,8 @@ export interface ITableTabConf {
   queryMap?: any
   // 默认选中的下标
   default?: number
+  // 默认选中的值
+  defaultVal?: string | number
 }
 
 /**

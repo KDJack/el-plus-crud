@@ -9,6 +9,7 @@ lib
 .vscode
 .idea
 dist
+docs
 mock
 public
 bin

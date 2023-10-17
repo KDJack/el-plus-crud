@@ -1,6 +1,6 @@
 <template>
   <div class="el-plus-form-switch">
-    <el-switch v-if="isInit" v-bind="attrs" v-on="onEvents" :disabled="disabled" :loading="props.loading || localLoading" v-model="currentValue" :before-change="handelBeforeChange" />
+    <el-switch v-if="isInit" v-bind="attrs" v-on="onEvents" :loading="props.loading || localLoading" v-model="currentValue" :before-change="handelBeforeChange" />
   </div>
 </template>
 <script lang="ts">
@@ -19,11 +19,10 @@ import { ElMessageBox } from 'element-plus'
 const emits = defineEmits(['update:modelValue'])
 const props = defineProps<{
   modelValue?: boolean | string | number | null
-  field: string
+  field?: string
   loading?: boolean
   desc: { [key: string]: any }
-  formData: { [key: string]: any }
-  disabled?: boolean
+  formData?: { [key: string]: any }
 }>()
 
 const localLoading = ref(false)
@@ -41,7 +40,7 @@ const onEvents = ref(getEvents(props))
 function handelBeforeChange() {
   let confirm = props.desc?.confirm
   if (typeof confirm === 'function') {
-    confirm = confirm(currentValue.value, props.formData)
+    confirm = confirm(currentValue.value, props.formData || {})
   }
   if (confirm) {
     localLoading.value = true

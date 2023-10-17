@@ -20,10 +20,10 @@ import FileIcons from './components/file-icons/FileIcons.vue'
 
 const props = defineProps<{
   modelValue?: Array<IOssInfo>
-  field: string
+  field?: string
   loading?: boolean
   desc: { [key: string]: any }
-  formData: { [key: string]: any }
+  formData?: { [key: string]: any }
 }>()
 </script>
 <style lang="scss">

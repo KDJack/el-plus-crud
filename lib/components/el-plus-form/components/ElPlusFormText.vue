@@ -1,7 +1,7 @@
 <template>
   <div class="ele-form-text" :class="[...(desc.class || []), desc.linkType ? 'ele-form-text-click' : '']" :style="desc.style" v-bind="attrs" v-on="onEvents">
     <span v-if="desc.title">{{ desc.title + ': ' }}</span>
-    <i v-if="desc.icon" :class="[formData.icon]"></i>
+    <i v-if="desc.icon" :class="[(formData || {}).icon]"></i>
     {{ formatValue }}
   </div>
 </template>
@@ -17,16 +17,22 @@ export default {
 import { ref, watch, computed, onBeforeMount, useAttrs, inject } from 'vue'
 import { getEvents, getAttrs } from '../mixins'
 
-const showInfo = inject('showInfo') as Function
+let showInfo = null as any
+
 const format = inject('format') as any
 
 const props = defineProps<{
   modelValue?: any
-  field: string
+  field?: string
   loading?: boolean
   desc: { [key: string]: any }
-  formData: { [key: string]: any }
+  formData?: { [key: string]: any }
 }>()
+
+// 有点击事件时，才inject
+if (props.desc.linkId || props.desc.linkType) {
+  showInfo = inject('showInfo') as Function
+}
 
 const attrs = ref({} as any)
 
@@ -36,9 +42,11 @@ const onEvents = computed(() => {
   // 如果这里有linkType，则会替换点击事件
   let linkId = props.desc.linkId || 'id'
   if (typeof linkId === 'function') {
-    linkId = linkId(props.modelValue, props.formData)
+    linkId = linkId(props.modelValue, props.formData || {})
   } else {
-    linkId = props.formData[linkId]
+    if (props.formData) {
+      linkId = props.formData[linkId]
+    }
   }
   if (props.desc.linkType && linkId) {
     let linkType = props.desc.linkType
@@ -49,11 +57,13 @@ const onEvents = computed(() => {
     if (typeof linkLabel === 'function') {
       linkLabel = linkLabel(props.modelValue, props.formData)
     } else {
-      linkLabel = props.formData[linkLabel]
+      if (props.formData) {
+        linkLabel = props.formData[linkLabel]
+      }
     }
     tempOn.click = () => {
       // 显示详情
-      showInfo(linkId, linkType, linkLabel, props.formData)
+      showInfo && showInfo(linkId, linkType, linkLabel, props.formData || {})
     }
   }
   return tempOn

@@ -94,7 +94,7 @@ import { ref, reactive, onMounted, computed, watch, nextTick, useSlots, inject, 
 import EleTabletHeader from './components/header.vue'
 import ElPlusTableColumn from './ElPlusTableColumn.vue'
 import { handelListColumn } from './util'
-import { cloneDeep } from 'lodash'
+import { cloneDeep } from './util'
 import { Loading } from '@element-plus/icons-vue'
 import type { TableColumnCtx } from 'element-plus'
 import { ICRUDConfig, ITableConfig, ITableTabItem, ITreeProps } from 'types'
@@ -742,7 +742,9 @@ defineExpose({ reload, tableData, changeSelect, resetSelect, initCol })
 </script>
 <style lang="scss">
 .el-plus-table-content {
-  background-color: #ffffff;
+  // background-color: #ffffff;
+  color: var(--text-color);
+  background-color: var(--bg-color);
   border-radius: 5px;
   padding: 10px;
   width: 100%;

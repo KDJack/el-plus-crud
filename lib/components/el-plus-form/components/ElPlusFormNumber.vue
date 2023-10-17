@@ -1,5 +1,5 @@
 <template>
-  <el-input-number v-if="isInit" class="ElPlusFormNumber-panel" v-bind="attrs" v-on="onEvents" v-model="currentValue" :disabled="disabled" @focus="handelFocus" @blur="handelBlur" onkeypress="return( /[-\d\.]/.test(String.fromCharCode(event.keyCode)))" />
+  <el-input-number v-if="isInit" class="ElPlusFormNumber-panel" v-bind="attrs" v-on="onEvents" v-model="currentValue" @focus="handelFocus" @blur="handelBlur" onkeypress="return( /[-\d\.]/.test(String.fromCharCode(event.keyCode)))" />
 </template>
 <script lang="ts">
 export default {
@@ -19,12 +19,11 @@ const defaultConf = inject('defaultConf') as ICRUDConfig
 
 const props = defineProps<{
   modelValue?: number | null
-  field: string
+  field?: string
   loading?: boolean
   desc: { [key: string]: any }
-  formData: { [key: string]: any }
+  formData?: { [key: string]: any }
   rowIndex?: number
-  disabled?: boolean
 }>()
 
 const emits = defineEmits(['update:modelValue', 'validateThis'])
@@ -81,17 +80,25 @@ function handelBlur() {
  * 绑定属性
  */
 const numBindAttr = computed(() => {
-  let numAttrs = props.desc.attrs || defaultConf.form?.leng?.nbinput
-  if (typeof props.desc.attrs === 'function') {
-    numAttrs = props.desc.attrs(props.formData)
+  let { min = 0, max = 999999999, precision = 0, controlsPosition = 'right' } = defaultConf.form?.leng?.nbinput || {}
+  let tempAttrs = props.desc?.attrs || props.desc
+  if (props.desc?.attrs && typeof props.desc.attrs === 'function') {
+    tempAttrs = props.desc.attrs(props.formData || {})
   }
+
+  const { min: min_, max: max_, precision: precision_, controlsPosition: controlsPosition_ } = (tempAttrs || {}) as any
+  if (min_ !== undefined && min_ !== null && min_ !== '') min = min_
+  if (max_ !== undefined && max_ !== null && max_ !== '') max = max_
+  if (precision_ !== undefined && precision_ !== null && precision_ !== '') precision = precision_
+  if (controlsPosition_ !== undefined && controlsPosition_ !== null && controlsPosition_ !== '') controlsPosition = controlsPosition_
+
   // 这里判断一下，最小和最大值的大小
-  if (numAttrs.min > numAttrs.max) {
-    numAttrs.min = numAttrs.max
-  } else if (numAttrs.max < numAttrs.min) {
-    numAttrs.max = numAttrs.min
+  if (min > max) {
+    min = max
+  } else if (max < min) {
+    max = min
   }
-  return numAttrs
+  return { min, max, precision, controlsPosition }
 })
 
 // 判断一下初始值

@@ -15,7 +15,7 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { isEqual } from 'lodash'
+import { isEqual } from '../util'
 import { ref, reactive, watch, computed, inject } from 'vue'
 
 const globalData = inject('globalData') as any
@@ -23,9 +23,9 @@ const format = inject('format') as any
 
 const props = defineProps<{
   modelValue?: string | number | '' | null
-  field: string
+  field?: string
   desc: { [key: string]: any }
-  formData: { [key: string]: any }
+  formData?: { [key: string]: any }
 }>()
 
 const emits = defineEmits(['update:modelValue'])
@@ -39,7 +39,7 @@ const formatValue = ref('' as any)
 const iconStyle = computed(() => {
   if (props.desc.icolor) {
     if (typeof props.desc.icolor === 'function') {
-      return { background: props.desc.icolor(props.formData) || '#909399' }
+      return { background: props.desc.icolor(props.formData || {}) || '#909399' }
     }
     return { background: props.desc.icolor || '#909399' }
   }
@@ -54,7 +54,7 @@ watch(
       // 从全局数据中获取options
       options.splice(0, options.length, ...(globalData[data] || []))
     } else if (typeof data === 'function') {
-      options.splice(0, options.length, ...(await data(props.formData)))
+      options.splice(0, options.length, ...(await data(props.formData || {})))
     } else if (Array.isArray(data)) {
       if (data && options && !isEqual(data, options)) {
         options.splice(0, options.length, ...data)
@@ -74,9 +74,9 @@ watch(
     } else {
       if (typeof props.desc.format === 'function') {
         // 如果有方法类型的判断，则需要启用动态监测
-        formatValue.value = await props.desc.format(props.modelValue, props.formData, props.field)
+        formatValue.value = await props.desc.format(props.modelValue, props.formData || {}, props.field)
       } else if (typeof props.desc.format === 'string') {
-        formatValue.value = format[props.desc.format] ? format[props.desc.format](props.modelValue, props.formData, props.field) : '--'
+        formatValue.value = format[props.desc.format] ? format[props.desc.format](props.modelValue, props.formData || {}, props.field) : '--'
       } else {
         formatValue.value = props.modelValue || '—'
       }

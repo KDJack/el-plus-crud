@@ -1,5 +1,5 @@
 <template>
-  <el-input v-if="isInit" :class="desc.class" :style="desc.style" :clearable="attrs.clearable ?? true" type="number" v-bind="attrs" v-on="onEvents" :disabled="disabled" v-model="currentValue">
+  <el-input v-if="isInit" :class="desc.class" :style="desc.style" :clearable="attrs.clearable ?? true" type="number" v-bind="attrs" v-on="onEvents" v-model="currentValue">
     <template v-for="(item, key, index) of slots" #[key] :key="index">
       <slot :name="key" />
     </template>
@@ -20,12 +20,11 @@ import { getAttrs, getEvents } from '../mixins'
 
 const props = defineProps<{
   modelValue?: string | number | '' | null
-  field: string
+  field?: string
   loading?: boolean
   desc: { [key: string]: any }
-  formData: { [key: string]: any }
+  formData?: { [key: string]: any }
   rowIndex?: number
-  disabled?: boolean
 }>()
 const emits = defineEmits(['update:modelValue'])
 const currentValue = ref(props.modelValue)

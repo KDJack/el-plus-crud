@@ -1,5 +1,5 @@
 <template>
-  <el-checkbox-group v-if="isInit" class="ElPlusFormCheckboxButton-panel" v-bind="attrs" v-on="onEvents" v-model="currentValue" :disabled="disabled">
+  <el-checkbox-group v-if="isInit" class="ElPlusFormCheckboxButton-panel" v-bind="attrs" v-on="onEvents" v-model="currentValue">
     <el-checkbox-button v-for="option of desc.options" :key="option.value" :label="option.value" v-bind="option.attrs">
       {{ option.text }}
     </el-checkbox-button>
@@ -19,10 +19,9 @@ import { getAttrs, getEvents } from '../mixins'
 
 const props = defineProps<{
   modelValue?: string | number | '' | null
-  field: string
+  field?: string
   desc: { [key: string]: any }
-  formData: { [key: string]: any }
-  disabled?: boolean
+  formData?: { [key: string]: any }
 }>()
 
 const emits = defineEmits(['update:modelValue'])

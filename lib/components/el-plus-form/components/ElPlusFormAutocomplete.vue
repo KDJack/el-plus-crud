@@ -25,9 +25,8 @@ import { getAttrs, getEvents } from '../mixins'
 
 const props = defineProps<{
   modelValue?: string | number | '' | null
-  field: string
   desc: { [key: string]: any }
-  formData: { [key: string]: any }
+  formData?: { [key: string]: any }
 }>()
 
 const emits = defineEmits(['update:modelValue'])

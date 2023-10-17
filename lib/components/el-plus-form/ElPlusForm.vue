@@ -39,12 +39,10 @@ export default {
 </script>
 <script lang="ts" setup>
 import { ref, computed, useAttrs, nextTick, onMounted, watch, inject } from 'vue'
-import { throttle } from 'lodash'
-import { castArray, isMobile, time } from './util'
+import { castArray, isMobile, time, cloneDeep, throttle } from './util'
 import * as validates from './util/validate'
 import { typeList } from './components/index'
 import ElPlusFormBtn from './components/ElPlusFormBtn.vue'
-import { cloneDeep } from 'lodash'
 import { ICRUDConfig, IFormBack, IFormDesc, IFormDescItem } from 'types'
 
 // IFormProps定义

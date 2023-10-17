@@ -1,6 +1,6 @@
 <template>
   <div class="el-plus-form-link">
-    <el-select ref="selectRef" style="width: 100%" :class="desc.class" :style="desc.style" v-bind="topAttrs" :disabled="disabled" :teleported="false" :loading="loading" :modelValue="values" @visible-change="handelVisibleChange" @clear="handelClear" v-on="onEvents">
+    <el-select ref="selectRef" style="width: 100%" :class="desc.class" :style="desc.style" v-bind="topAttrs" :disabled="disabled || desc.disabled" :teleported="false" :loading="loading" :modelValue="values" @visible-change="handelVisibleChange" @clear="handelClear" v-on="onEvents">
       <el-option v-for="option in options" :key="option.value" v-bind="option" />
     </el-select>
     <!-- 弹框 -->
@@ -35,7 +35,7 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { cloneDeep } from 'lodash'
+import { cloneDeep } from '../util'
 import { ref, reactive, watch, onMounted, computed } from 'vue'
 import { getEvents } from '../mixins'
 import { IBtnBack, ITableConfig } from 'types'
@@ -48,10 +48,10 @@ interface ILinkItem {
 
 const props = defineProps<{
   modelValue?: []
-  field: string
+  field?: string
   loading?: boolean
   desc: { [key: string]: any }
-  formData: { [key: string]: any }
+  formData?: { [key: string]: any }
   disabled?: boolean
 }>()
 
@@ -169,7 +169,7 @@ function submit() {
 
   // 触发外部change事件
   if (onEvents.value.change) {
-    onEvents.value.change(props.formData, null, currentValue.value)
+    onEvents.value.change(props.formData || {}, null, currentValue.value)
   }
 
   isShowDialog.value = false
@@ -184,7 +184,7 @@ watch(
     if (val) {
       tempConfig = cloneDeep(val)
       if (typeof props.desc.multiple === 'function') {
-        multiple.value = props.desc.multiple(props.formData)
+        multiple.value = props.desc.multiple(props.formData || {})
       } else {
         multiple.value = props.desc.multiple
       }

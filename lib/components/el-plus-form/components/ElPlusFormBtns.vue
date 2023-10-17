@@ -2,14 +2,14 @@
   <div class="el-plus-form-btn-group" :style="{ 'justify-content': getAlignItems }">
     <template v-for="(item, i) in localBtnList" :key="i + (item.label || item.title || '')">
       <template v-if="item.elType === 'upload'">
-        <ElPlusFormUpbtn type="primary" :field="field" :desc="item || {}" :formData="formData" :plain="(item && item.plain) ?? desc.plain ?? true" :disabled="disabled" :text="desc.text" :rowIndex="rowIndex" />
+        <ElPlusFormUpbtn type="primary" :field="field" :desc="item || {}" :formData="formData" :plain="(item && item.plain) ?? desc.plain ?? true" :disabled="disabled || desc.disabled" :text="desc.text" :rowIndex="rowIndex" />
       </template>
       <template v-else>
-        <ElPlusFormBtn type="primary" :field="field" :desc="item || {}" :formData="formData" :plain="(item && item.plain) ?? desc.plain ?? true" :disabled="disabled" :text="desc.text" :rowIndex="rowIndex" />
+        <ElPlusFormBtn type="primary" :field="field" :desc="item || {}" :formData="formData" :plain="(item && item.plain) ?? desc.plain ?? true" :disabled="disabled || desc.disabled" :text="desc.text" :rowIndex="rowIndex" />
       </template>
     </template>
     <template v-if="limitList && limitList.length > 0">
-      <el-dropdown class="group-menu-btn" :size="desc.size || 'default'" :disabled="disabled">
+      <el-dropdown class="group-menu-btn" :size="desc.size || 'default'" :disabled="disabled || desc.disabled">
         <el-button type="primary" :size="desc.size || 'default'" :plain="desc.plain ?? true"> 更多<i class="ele-ArrowDown el-icon--right" /> </el-button>
         <template #dropdown>
           <el-dropdown-menu>
@@ -38,10 +38,10 @@ import { ElMessageBox } from 'element-plus'
 import { IBtnBack } from 'types'
 
 const props = defineProps<{
-  field: string
+  field?: string
   rowIndex?: number
   desc: { [key: string]: any }
-  formData: { [key: string]: any }
+  formData?: { [key: string]: any }
   disabled?: boolean
 }>()
 
@@ -72,12 +72,12 @@ const handelEvelt = computed(() => {
             ElMessageBox.confirm(item.confirm, '提示', {
               type: 'warning'
             }).then(() => {
-              item.on[key]({ row: props.formData, field: props.field, rowIndex: props.rowIndex } as IBtnBack)
+              item.on[key]({ row: props.formData || {}, field: props.field, rowIndex: props.rowIndex } as IBtnBack)
             })
           }
         } else {
           events[key] = function () {
-            item.on[key]({ row: props.formData, field: props.field, rowIndex: props.rowIndex } as IBtnBack)
+            item.on[key]({ row: props.formData || {}, field: props.field, rowIndex: props.rowIndex } as IBtnBack)
           }
         }
       }
@@ -113,7 +113,7 @@ const handelItemVIf = (formItem: any): Boolean => {
 }
 // 执行函数,获取相关数据
 const runFnGetData = (fn: Function) => {
-  return fn(props.formData)
+  return fn(props.formData || {})
 }
 
 watch(

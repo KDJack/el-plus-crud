@@ -8,9 +8,9 @@ import defaultConf from './config'
 import { ICRUDConfig } from '../types'
 
 export default {
-  install: (app: App, config: ICRUDConfig, format?: { [key: string]: Function }, globalData?: { [key: string]: Function }) => {
+  install: (app: App, config?: ICRUDConfig, format?: { [key: string]: Function }, globalData?: { [key: string]: Function }) => {
     // 合并配置
-    deepMerge(defaultConf, config)
+    deepMerge(defaultConf, config || {})
     defaultConf.debug && console.log('initConfig: ', defaultConf)
 
     // 这里注入format对象

@@ -1,5 +1,5 @@
 <template>
-  <el-input v-if="isInit" :class="desc.class" :show-password="true" v-bind="attrs" v-on="onEvents" v-model="currentValue" :disabled="disabled">
+  <el-input v-if="isInit" :class="desc.class" :show-password="true" v-bind="attrs" v-on="onEvents" v-model="currentValue">
     <!-- 组件内部插槽 -->
     <template v-for="(item, key, index) in slots" #[key]="data" :key="index">
       <slot :name="key" :data="data" />
@@ -23,11 +23,10 @@ const defaultConf = inject('defaultConf') as ICRUDConfig
 
 const props = defineProps<{
   modelValue?: string | number | '' | null
-  field: string
+  field?: string
   loading?: boolean
   desc: { [key: string]: any }
-  formData: { [key: string]: any }
-  disabled?: boolean
+  formData?: { [key: string]: any }
 }>()
 const emits = defineEmits(['update:modelValue'])
 const currentValue = ref(props.modelValue)

@@ -17,15 +17,17 @@ export interface IMixinsProps {
  */
 export const getAttrs = async (props: IMixinsProps, customAttrs?: { [key: string]: any }) => {
   // 合并属性
-  const attrs = Object.assign({}, customAttrs, props.desc?._attrs, props.desc?.attrs, getPlaceholder(props.desc))
+  const attrs = Object.assign({}, customAttrs, props.desc?._attrs, props.desc, props.desc?.attrs, getPlaceholder(props.desc))
+
+  // delete attrs.remote
 
   // 处理多选
   if (props.desc.multiple) {
     attrs.multiple = true
     attrs.showCheckbox = true
     if (['select'].indexOf(props.desc.type) >= 0) {
-      attrs.collapseTags = props.desc.attrs?.collapseTags ?? false
-      attrs.collapseTagsTooltip = props.desc.attrs?.collapseTagsTooltip ?? false
+      attrs.collapseTags = props.desc.attrs?.collapseTags ?? props.desc?.collapseTags ?? false
+      attrs.collapseTagsTooltip = props.desc.attrs?.collapseTagsTooltip ?? props.desc?.collapseTagsTooltip ?? false
     }
   }
 
@@ -66,6 +68,7 @@ export const getEvents = (props: IMixinsProps) => {
  * @returns
  */
 function getPlaceholder(desc: { [key: string]: any }) {
+  if (desc?.placeholder) return { placeholder: desc?.placeholder }
   if (!desc || !desc.type) return ''
   switch (desc.type) {
     case 'input':

@@ -1,6 +1,6 @@
 <template>
   <div class="ele-form-upload-image" :class="{ 'ele-form-upload-file': desc.upType === 'file' }">
-    <el-upload class="ele-image-upload" v-bind="attrs" v-on="onEvents" :disabled="disabled" :fileList="currentValue || []" :class="{ 'over-limit': currentValue?.length >= attrs.limit, 'upload-disabled': attrs.disabled }">
+    <el-upload class="ele-image-upload" v-bind="attrs" v-on="onEvents" :disabled="attrs.disabled" :fileList="currentValue || []" :class="{ 'over-limit': currentValue?.length >= attrs.limit, 'upload-disabled': attrs.disabled }">
       <div class="upload-panel-icon">
         <i v-if="desc.icon" :class="desc.icon" :style="{ fontSize: desc.fontSize || '14px', color: desc.color || '#C0C4CC' }"></i>
         <el-icon v-else :style="{ fontSize: desc.fontSize || '14px', color: desc.color || '#C0C4CC' }"><Plus /></el-icon>
@@ -19,7 +19,7 @@
     <!-- 图片查看的站位标签 -->
     <el-image-viewer v-if="showPreview" @close="showPreview = false" teleported :initialIndex="previewIndex" :url-list="previewList" />
     <div v-if="!attrs.autoUpload" class="upload-hands-submit">
-      <el-button style="margin-left: 10px" size="small" type="success" @click="submit" :disabled="disabled"> 上传到服务器 </el-button>
+      <el-button style="margin-left: 10px" size="small" type="success" @click="submit" :disabled="attrs.disabled"> 上传到服务器 </el-button>
     </div>
   </div>
 </template>
@@ -56,11 +56,10 @@ const iconMap = { excel, pdf, file, txt, word, zip, ppt }
 
 const props = defineProps<{
   modelValue?: Array<IOssInfo>
-  field: string
+  field?: string
   loading?: boolean
   desc: { [key: string]: any }
-  formData: { [key: string]: any }
-  disabled?: boolean
+  formData?: { [key: string]: any }
 }>()
 
 const emits = defineEmits(['update:modelValue', 'validateThis'])

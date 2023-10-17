@@ -1,5 +1,5 @@
 <template>
-  <el-date-picker v-if="isInit" class="el-plusF-form-datetimerange-panel" v-bind="attrs" v-on="onEvents" v-model="currentValue" :disabled="disabled">
+  <el-date-picker v-if="isInit" class="el-plusF-form-datetimerange-panel" v-bind="attrs" v-on="onEvents" v-model="currentValue">
     <!-- 非作用域插槽 -->
     <template v-for="(item, key, index) in slots" #[key]="data" :key="index">
       <slot :name="key" :data="data" />
@@ -20,10 +20,9 @@ import { getAttrs, getEvents } from '../mixins'
 
 const props = defineProps<{
   modelValue?: Array<string> | Date
-  field: string
+  field?: string
   desc: { [key: string]: any }
-  formData: { [key: string]: any }
-  disabled?: boolean
+  formData?: { [key: string]: any }
 }>()
 
 const emits = defineEmits(['update:modelValue'])

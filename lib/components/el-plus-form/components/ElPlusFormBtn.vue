@@ -1,20 +1,20 @@
 <template>
   <template v-if="vif">
-    <template v-if="props.desc.confirm">
-      <el-popconfirm @confirm="onEvents.click" :title="props.desc.confirm">
+    <template v-if="props.desc?.confirm">
+      <el-popconfirm @confirm="onEvents.click" :title="props.desc?.confirm">
         <template #reference>
-          <el-button :loading="localLoading" :size="props.desc.size || 'default'" v-bind="attrs" :disabled="disabled">
-            <template #default v-if="!!desc.label">
-              {{ btnShowText }}
-            </template>
+          <el-button :loading="localLoading" :size="props.desc?.size || 'default'" v-bind="attrs">
+            <slot name="default">
+              <template v-if="!!props.desc?.label">{{ btnShowText }}</template>
+            </slot>
           </el-button>
         </template>
       </el-popconfirm>
     </template>
-    <el-button v-else :loading="localLoading" :size="props.desc.size || 'default'" v-bind="attrs" v-on="onEvents" :disabled="disabled" :style="{ pointerEvents: desc.isTag ? 'none' : 'all' }">
-      <template #default v-if="!!props.desc.label">
-        {{ btnShowText }}
-      </template>
+    <el-button v-else :loading="localLoading" :size="props.desc?.size || 'default'" v-bind="attrs" v-on="onEvents" :style="{ pointerEvents: desc?.isTag ? 'none' : 'all' }" :class="{ 'no-label': !props.desc?.label }">
+      <slot name="default">
+        <template v-if="!!props.desc?.label">{{ btnShowText }}</template>
+      </slot>
     </el-button>
   </template>
 </template>
@@ -27,8 +27,8 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { ref, computed, useAttrs, watch, inject } from 'vue'
-import { cloneDeep } from 'lodash'
+import { ref, computed, useAttrs, watch, inject, useSlots } from 'vue'
+import { cloneDeep } from '../util'
 import { IBtnBack, ICRUDConfig } from 'types'
 
 const defaultConf = inject('defaultConf') as ICRUDConfig
@@ -39,14 +39,13 @@ const props = defineProps<{
   loading?: boolean
   desc: { [key: string]: any }
   formData?: { [key: string]: any }
-  disabled?: boolean
 }>()
 
 const localLoading = ref(props.loading ?? false)
 
 const vif = computed(() => {
   // 这里最终处理一下auth权限问题
-  if (props.desc.auth) {
+  if (props.desc?.auth) {
     if (!defaultConf.auth) {
       console.warn('使用auth属性，请在crud注册时传入auth校验方法~')
     } else {
@@ -61,9 +60,6 @@ const attrs = computed(() => {
   if (attrs.btnType) {
     attrs.type = attrs.btnType
   }
-  if (!attrs.plain) {
-    delete attrs.plain
-  }
   return attrs
 })
 
@@ -75,9 +71,9 @@ const onEvents = computed(() => {
         events[key] = function () {
           localLoading.value = true
           props.desc.on[key]({
-            row: props.formData,
+            row: props.formData || {},
             callBack: () => {
-              setTimeout(() => (localLoading.value = false), 500)
+              setTimeout(() => (localLoading.value = false), 50)
             },
             field: props.field,
             rowIndex: props.rowIndex
@@ -96,13 +92,13 @@ const onEvents = computed(() => {
 const btnShowText = computed(() => {
   if (props.desc.btnLabel) {
     if (typeof props.desc.btnLabel === 'function') {
-      return props.desc.btnLabel(props.formData)
+      return props.desc.btnLabel(props.formData || {})
     }
     return props.desc.btnLabel
   }
   if (props.desc.label) {
     if (typeof props.desc.label === 'function') {
-      return props.desc.label(props.formData)
+      return props.desc.label(props.formData || {})
     }
     return props.desc.label
   }
@@ -116,4 +112,8 @@ watch(
   }
 )
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss">
+.el-button.no-label > span {
+  margin-left: 0 !important;
+}
+</style>

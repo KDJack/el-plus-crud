@@ -1,5 +1,5 @@
 <template>
-  <el-checkbox-group v-if="isInit" class="ElPlusFormCheckbox-panel" v-bind="attrs" v-on="onEvents" v-model="currentValue" :disabled="disabled">
+  <el-checkbox-group v-if="isInit" class="ElPlusFormCheckbox-panel" v-bind="attrs" v-on="onEvents" v-model="currentValue">
     <el-checkbox v-for="option of options" :key="option.value" :label="option.value" v-bind="option.attrs">
       {{ option.text || option.label }}
     </el-checkbox>
@@ -16,16 +16,15 @@ export default {
 <script lang="ts" setup>
 import { ref, reactive, watch, useAttrs, onBeforeMount, inject } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
-import { isEqual } from 'lodash'
+import { isEqual } from '../util'
 
 const globalData = inject('globalData') as any
 
 const props = defineProps<{
   modelValue?: Array<string | number> | string | number | null
-  field: string
+  field?: string
   desc: { [key: string]: any }
-  formData: { [key: string]: any }
-  disabled?: boolean
+  formData?: { [key: string]: any }
 }>()
 
 const emits = defineEmits(['update:modelValue'])
@@ -49,7 +48,7 @@ watch(
       // 从全局数据中获取options
       options.splice(0, options.length, ...(globalData[data] || []))
     } else if (typeof data === 'function') {
-      options.splice(0, options.length, ...(await data(props.formData)))
+      options.splice(0, options.length, ...(await data(props.formData || {})))
     } else if (Array.isArray(data)) {
       if (data && options && !isEqual(data, options)) {
         options.splice(0, options.length, ...data)

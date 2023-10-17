@@ -25,10 +25,10 @@ const format = inject('format') as any
 
 const props = defineProps<{
   modelValue?: Array<any> | string | null
-  field: string
+  field?: string
   loading?: boolean
   desc: { [key: string]: any }
-  formData: { [key: string]: any }
+  formData?: { [key: string]: any }
 }>()
 
 const attrs = ref({} as any)

@@ -1,5 +1,5 @@
 <template>
-  <el-input v-if="isInit" :class="desc.class" :style="desc.style" type="textarea" v-bind="attrs" v-model="currentValue" v-on="onEvents" :disabled="disabled"> </el-input>
+  <el-input v-if="isInit" :class="desc.class" :style="desc.style" type="textarea" v-bind="attrs" v-model="currentValue" v-on="onEvents"> </el-input>
 </template>
 <script lang="ts">
 export default {
@@ -18,11 +18,10 @@ const defaultConf = inject('defaultConf') as ICRUDConfig
 
 const props = defineProps<{
   modelValue?: string | null
-  field: string
+  field?: string
   loading?: boolean
   desc: { [key: string]: any }
-  formData: { [key: string]: any }
-  disabled?: boolean
+  formData?: { [key: string]: any }
 }>()
 const emits = defineEmits(['update:modelValue', 'validateThis'])
 const attrs = ref({} as any)

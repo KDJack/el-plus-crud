@@ -1,5 +1,5 @@
 <template>
-  <el-input v-if="isInit" style="display: flex" v-bind="attrs" v-on="onEvents" :disabled="disabled" v-model="currentValue">
+  <el-input v-if="isInit" style="display: flex" v-bind="attrs" v-on="onEvents" v-model="currentValue">
     <template v-for="(item, key, index) of slots" #[key] :key="index">
       <slot :name="key" />
     </template>
@@ -22,10 +22,9 @@ const defaultConf = inject('defaultConf') as ICRUDConfig
 
 const props = defineProps<{
   modelValue?: string | null
-  field: string
+  field?: string
   desc: { [key: string]: any }
-  formData: { [key: string]: any }
-  disabled?: boolean
+  formData?: { [key: string]: any }
 }>()
 
 const emits = defineEmits(['update:modelValue', 'validateThis'])

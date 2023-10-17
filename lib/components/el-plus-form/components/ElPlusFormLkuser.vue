@@ -1,6 +1,6 @@
 <template>
   <div class="el-plus-form-link-user">
-    <el-select ref="selectRef" style="width: 100%" :class="desc.class" :style="desc.style" v-bind="topAttrs" :teleported="false" :disabled="disabled" :loading="loading" :modelValue="values" @visible-change="handelVisibleChange" @clear="handelClear">
+    <el-select ref="selectRef" style="width: 100%" :class="desc.class" :style="desc.style" v-bind="topAttrs" :teleported="false" :disabled="disabled || desc.disabled" :loading="loading" :modelValue="values" @visible-change="handelVisibleChange" @clear="handelClear">
       <el-option v-for="option in options" :key="option.value" v-bind="option" />
     </el-select>
     <!-- 弹框 -->
@@ -72,7 +72,7 @@ export default {
 <script lang="ts" setup>
 import { ref, reactive, nextTick, watch, onMounted, computed, inject, onBeforeMount, useAttrs } from 'vue'
 import { Share, UserFilled } from '@element-plus/icons-vue'
-import { cloneDeep } from 'lodash'
+import { cloneDeep } from '../util'
 import { getAttrs } from '../mixins'
 import { ICRUDConfig } from 'types'
 
@@ -88,10 +88,10 @@ interface ILinkItem {
 
 const props = defineProps<{
   modelValue?: []
-  field: string
+  field?: string
   loading?: boolean
   desc: { [key: string]: any }
-  formData: { [key: string]: any }
+  formData?: { [key: string]: any }
   disabled?: boolean
 }>()
 
@@ -175,7 +175,7 @@ function getEvents(props: any) {
   if (props.desc?.on) {
     Object.keys(props.desc.on).map((key: string) => {
       tempOn[key] = (val: any) => {
-        props.desc.on[key](props.formData, props.rowIndex, val)
+        props.desc.on[key](props.formData || {}, props.rowIndex, val)
       }
     })
   }
@@ -353,7 +353,7 @@ function submit() {
   currentValue.value = selectUser.length > 0 ? [userIds, deptIds, userNames, deptNames] : []
   // 触发外部change事件
   if (onEvents.value.change) {
-    onEvents.value.change(props.formData, null, currentValue.value)
+    onEvents.value.change(props.formData || {}, null, currentValue.value)
   }
   emits('validateThis')
 }

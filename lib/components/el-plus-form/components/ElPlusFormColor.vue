@@ -1,5 +1,5 @@
 <template>
-  <el-color-picker class="ElPlusFormColor-panel" v-bind="attrs" v-on="onEvents" v-model="currentValue" :disabled="disabled" />
+  <el-color-picker class="ElPlusFormColor-panel" v-bind="attrs" v-on="onEvents" v-model="currentValue" />
 </template>
 <script lang="ts">
 export default {
@@ -15,17 +15,15 @@ import { getAttrs, getEvents } from '../mixins'
 
 const props = defineProps<{
   modelValue?: string | number | '' | null
-  field: string
+  field?: string
   desc: { [key: string]: any }
-  formData: { [key: string]: any }
-  disabled?: boolean
+  formData?: { [key: string]: any }
 }>()
 
 const emits = defineEmits(['update:modelValue'])
 const currentValue = ref(props.modelValue)
 const attrs = ref({} as any)
 const onEvents = ref(getEvents(props))
-// const { attrs, slots, onEvents } = useMixins({ modelValue: props.modelValue, field: props.field, desc: props.desc, formData: props.formData, useAttrs, useSlots })
 emits('update:modelValue', currentValue)
 
 onBeforeMount(async () => {

@@ -1,5 +1,5 @@
 <template>
-  <el-cascader v-if="isInit" class="ElPlusFormArea-panel" v-bind="attrs" v-on="onEvents" v-model="currentValue" :disabled="disabled" :options="areaList" />
+  <el-cascader v-if="isInit" class="ElPlusFormArea-panel" v-bind="attrs" v-on="onEvents" v-model="currentValue" :options="areaList" />
 </template>
 <script lang="ts">
 export default {
@@ -17,10 +17,8 @@ const globalData = inject('globalData') as any
 
 const props = defineProps<{
   modelValue?: Array<any> | null
-  field: string
   desc: { [key: string]: any }
-  formData: { [key: string]: any }
-  disabled?: boolean
+  formData?: { [key: string]: any }
 }>()
 
 const emits = defineEmits(['update:modelValue'])

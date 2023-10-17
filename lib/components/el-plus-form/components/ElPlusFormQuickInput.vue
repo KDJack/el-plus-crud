@@ -1,5 +1,5 @@
 <template>
-  <el-input v-if="isInit" :class="desc.class" :style="desc.style" type="textarea" v-bind="attrs" v-model="currentValue" v-on="onEvents" :disabled="disabled"> </el-input>
+  <el-input v-if="isInit" :class="desc.class" :style="desc.style" type="textarea" v-bind="attrs" v-model="currentValue" v-on="onEvents" />
   <div class="el-plus-form-quick-input">
     <el-tag v-for="(option, index) in options" :key="index" type="info" @click="changeTip(option.label)">{{ option.label }}</el-tag>
   </div>
@@ -15,7 +15,7 @@ export default {
 <script lang="ts" setup>
 import { ref, useAttrs, watch, onBeforeMount, inject, reactive } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
-import { isEqual } from 'lodash'
+import { isEqual } from '../util'
 import { ICRUDConfig } from 'types'
 
 const globalData = inject('globalData') as any
@@ -23,11 +23,10 @@ const defaultConf = inject('defaultConf') as ICRUDConfig
 
 const props = defineProps<{
   modelValue?: string | null
-  field: string
+  field?: string
   loading?: boolean
   desc: { [key: string]: any }
-  formData: { [key: string]: any }
-  disabled?: boolean
+  formData?: { [key: string]: any }
 }>()
 
 const emits = defineEmits(['update:modelValue', 'validateThis'])
@@ -49,7 +48,7 @@ onBeforeMount(async () => {
  * 选中
  */
 function changeTip(text: any) {
-  if (props.disabled) return false
+  if (attrs.value.disabled) return false
   currentValue.value = text
   emits('validateThis')
 }
@@ -72,7 +71,7 @@ watch(
       //   // 从全局数据中获取options
       options.splice(0, options.length, ...(globalData[data] || []))
     } else if (typeof data === 'function') {
-      options.splice(0, options.length, ...(await data(props.formData)))
+      options.splice(0, options.length, ...(await data(props.formData || {})))
     } else if (Array.isArray(data)) {
       if (data && options && !isEqual(data, options)) {
         options.splice(0, options.length, ...data)

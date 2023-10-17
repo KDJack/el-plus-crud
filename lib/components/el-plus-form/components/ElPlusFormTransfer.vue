@@ -1,5 +1,5 @@
 <template>
-  <el-transfer :class="desc.class" :data="desc.options" :style="desc.style" class="ele-form-transfer" v-bind="attrs" v-model="currentValue" v-on="onEvents" :disabled="disabled">
+  <el-transfer :class="desc.class" :data="desc.options" :style="desc.style" class="ele-form-transfer" v-bind="attrs" v-model="currentValue" v-on="onEvents">
     <!-- 非作用域插槽 -->
     <template v-for="(item, key, index) in slots" #[key]="data" :key="index">
       <slot :name="key" :data="data" />
@@ -20,11 +20,10 @@ import { getAttrs, getEvents } from '../mixins'
 
 const props = defineProps<{
   modelValue?: string | number | '' | null
-  field: string
+  field?: string
   loading?: boolean
   desc: { [key: string]: any }
-  formData: { [key: string]: any }
-  disabled?: boolean
+  formData?: { [key: string]: any }
 }>()
 const emits = defineEmits(['update:modelValue'])
 const currentValue = ref(props.modelValue)

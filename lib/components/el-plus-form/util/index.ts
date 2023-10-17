@@ -301,3 +301,54 @@ function checkTen(val: any) {
   }
   return val
 }
+
+/**
+ * 深度拷贝
+ * @param val
+ * @returns
+ */
+export function cloneDeep(val: any) {
+  if (val === null || typeof val !== 'object') return val
+  const res = new val.constructor()
+  for (var key in val) res[key] = cloneDeep(val[key]) // 递归调用
+  return res
+}
+
+/**
+ * 两个对象是否相等
+ * @param obj1
+ * @param obj2
+ */
+export function isEqual(obj1: any, obj2: any): boolean {
+  return JSON.stringify(obj1) === JSON.stringify(obj2)
+}
+
+/**
+ * 节流
+ * @param fn
+ * @param delay
+ * @returns
+ */
+export function throttle(cb: Function, delay: number) {
+  var timer = null as any
+  return function (this: any) {
+    var _this = this
+    var _arguments = arguments
+    if (!timer) {
+      timer = setTimeout(function () {
+        cb.apply(_this, _arguments)
+        clearTimeout(timer)
+        timer = null
+      }, delay)
+    }
+  }
+}
+
+/**
+ * 判断是否是Promise
+ * @param it
+ * @returns
+ */
+export function isPromiseLike<T>(it: unknown): it is PromiseLike<T> {
+  return it instanceof Promise || typeof (it as any)?.then === 'function'
+}

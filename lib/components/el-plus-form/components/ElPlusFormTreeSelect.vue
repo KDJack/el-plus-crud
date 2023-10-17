@@ -1,5 +1,5 @@
 <template>
-  <el-tree-select v-if="isInit" :class="desc.class" :style="desc.style" v-bind="attrs" v-model="currentValue" :disabled="disabled" :data="options" :loading="loading" v-on="onEvents" :render-after-expand="false" />
+  <el-tree-select v-if="isInit" :class="desc.class" :style="desc.style" v-bind="attrs" v-model="currentValue" :data="options" :loading="loading" v-on="onEvents" :render-after-expand="false" />
 </template>
 <script lang="ts">
 export default {
@@ -10,7 +10,7 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { isEqual } from 'lodash'
+import { isEqual } from '../util'
 import { ref, useAttrs, reactive, watch, onBeforeMount, inject } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
 
@@ -18,11 +18,10 @@ const globalData = inject('globalData') as any
 
 const props = defineProps<{
   modelValue?: any
-  field: string
+  field?: string
   loading?: boolean
   desc: { [key: string]: any }
-  formData: { [key: string]: any }
-  disabled?: boolean
+  formData?: { [key: string]: any }
 }>()
 const emits = defineEmits(['update:modelValue'])
 
@@ -46,7 +45,7 @@ watch(
       // 从全局数据中获取options
       options.splice(0, options.length, ...(globalData[data] || []))
     } else if (typeof data === 'function') {
-      options.splice(0, options.length, ...(await data(props.formData)))
+      options.splice(0, options.length, ...(await data(props.formData || {})))
     } else if (Array.isArray(data)) {
       if (data && options && !isEqual(data, options)) {
         options.splice(0, options.length, ...data)

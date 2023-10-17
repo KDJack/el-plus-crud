@@ -147,9 +147,11 @@ const handelItem = (prop: string, item: any, i: number) => {
   // 处理下attrs
   if (item.attrs) {
     if (typeof item.attrs === 'function') {
-      tempCell.desc.attrs = item.attrs(props.scope?.row)
+      tempCell.desc = { ...tempCell.desc, ...item.attrs(props.scope?.row) }
+      // tempCell.desc.attrs = item.attrs(props.scope?.row)
     } else {
-      tempCell.desc.attrs = item.attrs
+      tempCell.desc = { ...tempCell.desc, ...item.attrs }
+      // tempCell.desc.attrs = item.attrs
     }
   }
   tempCell.align = item.align

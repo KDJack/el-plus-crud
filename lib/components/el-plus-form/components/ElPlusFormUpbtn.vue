@@ -1,6 +1,6 @@
 <template>
   <div class="el-button el-plus-form-up-btn">
-    <el-upload class="upload-demo" style="display: flex" v-bind="attrs" :disabled="isLoading || disabled" v-model="currentValue">
+    <el-upload class="upload-demo" style="display: flex" v-bind="attrs" :disabled="isLoading || attrs.disabled" v-model="currentValue">
       <el-button type="primary" :icon="Upload" :loading="isLoading"> {{ btnShowText }}</el-button>
       <template #file>
         <div></div>
@@ -29,7 +29,6 @@ const props = defineProps<{
   loading?: boolean
   desc: { [key: string]: any }
   formData?: { [key: string]: any }
-  disabled?: boolean
 }>()
 
 const isLoading = ref(!!props.loading)
@@ -72,13 +71,13 @@ const uploadAttr = {
 const btnShowText = computed(() => {
   if (props.desc.btnLabel) {
     if (typeof props.desc.btnLabel === 'function') {
-      return props.desc.btnLabel(props.formData)
+      return props.desc.btnLabel(props.formData || {})
     }
     return props.desc.btnLabel
   }
   if (props.desc.label) {
     if (typeof props.desc.label === 'function') {
-      return props.desc.label(props.formData)
+      return props.desc.label(props.formData || {})
     }
     return props.desc.label
   }
@@ -93,8 +92,9 @@ function handelBeforeUpload(file: UploadRawFile) {
   isLoading.value = true
   const suffix = file.name.substring(file.name.lastIndexOf('.'))
   // 校验文件类型
-  if ((props.desc.attrs.accept || ['.xlsx', '.xls']).indexOf(suffix) < 0) {
-    ElMessage.warning(`请上传后缀为${(props.desc.attrs.accept || ['.xlsx', '.xls']).join(',')}格式的文件!`)
+  const accept = props.desc.accept || props.desc.attrs.accept || ['.xlsx', '.xls']
+  if (accept.indexOf(suffix) < 0) {
+    ElMessage.warning(`请上传后缀为${accept.join(',')}格式的文件!`)
     isLoading.value = false
     return false
   }

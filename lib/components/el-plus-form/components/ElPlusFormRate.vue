@@ -1,5 +1,5 @@
 <template>
-  <el-rate class="ElPlusFormRate-panel" v-bind="attrs" v-on="onEvents" v-model="currentValue" :disabled="disabled" />
+  <el-rate class="ElPlusFormRate-panel" v-bind="attrs" v-on="onEvents" v-model="currentValue" />
 </template>
 <script lang="ts">
 export default {
@@ -16,10 +16,9 @@ import { getAttrs, getEvents } from '../mixins'
 const emits = defineEmits(['update:modelValue', 'validateThis'])
 const props = defineProps<{
   modelValue?: number | null
-  field: string
+  field?: string
   desc: { [key: string]: any }
-  formData: { [key: string]: any }
-  disabled?: boolean
+  formData?: { [key: string]: any }
 }>()
 
 const currentValue = ref(props.modelValue)

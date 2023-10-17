@@ -1,4 +1,3 @@
-import { cloneDeep } from 'lodash'
 import { ICRUDConfig, IColumnItem } from 'types'
 
 /**
@@ -191,4 +190,25 @@ export const mapToUrlStr = (map: any, excludeList?: any) => {
     }
   }
   return queryStr
+}
+
+/**
+ * 深度拷贝
+ * @param val
+ * @returns
+ */
+export function cloneDeep(val: any) {
+  if (val === null || typeof val !== 'object') return val
+  const res = new val.constructor()
+  for (var key in val) res[key] = cloneDeep(val[key]) // 递归调用
+  return res
+}
+
+/**
+ * 两个对象是否相等
+ * @param obj1
+ * @param obj2
+ */
+export function isEqual(obj1: any, obj2: any): boolean {
+  return JSON.stringify(obj1) === JSON.stringify(obj2)
 }

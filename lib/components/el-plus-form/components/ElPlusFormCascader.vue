@@ -1,5 +1,5 @@
 <template>
-  <el-cascader v-if="isInit" class="ElPlusFormCascader-panel" v-bind="attrs" v-on="onEvents" :options="options" :disabled="disabled" v-model="currentValue" />
+  <el-cascader v-if="isInit" class="ElPlusFormCascader-panel" v-bind="attrs" v-on="onEvents" :options="options" v-model="currentValue" />
 </template>
 <script lang="ts">
 export default {
@@ -12,16 +12,15 @@ export default {
 <script lang="ts" setup>
 import { ref, useAttrs, onBeforeMount, inject, reactive, watch } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
-import { isEqual } from 'lodash'
+import { isEqual } from '../util'
 
 const globalData = inject('globalData') as any
 
 const props = defineProps<{
   modelValue?: Array<string> | string | null
-  field: string
+  field?: string
   desc: { [key: string]: any }
-  formData: { [key: string]: any }
-  disabled?: boolean
+  formData?: { [key: string]: any }
 }>()
 
 const emits = defineEmits(['update:modelValue'])
@@ -45,7 +44,7 @@ watch(
     if (typeof data === 'string') {
       options.splice(0, options.length, ...(globalData[data] || []))
     } else if (typeof data === 'function') {
-      options.splice(0, options.length, ...(await data(props.formData)))
+      options.splice(0, options.length, ...(await data(props.formData || {})))
     } else if (Array.isArray(data)) {
       if (data && options && !isEqual(data, options)) {
         options.splice(0, options.length, ...data)

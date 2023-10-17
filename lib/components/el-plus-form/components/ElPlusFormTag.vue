@@ -21,10 +21,10 @@ const format = inject('format') as any
 
 const props = defineProps<{
   modelValue?: string | number | '' | null
-  field: string
+  field?: string
   loading?: boolean
   desc: { [key: string]: any }
-  formData: { [key: string]: any }
+  formData?: { [key: string]: any }
 }>()
 
 const attrs = ref({} as any)
@@ -46,9 +46,9 @@ watch(
     } else {
       if (typeof props.desc.tagType === 'function') {
         // 如果有方法类型的判断，则需要启用动态监测
-        tagType.value = await props.desc.tagType(props.modelValue, props.formData, props.field)
+        tagType.value = await props.desc.tagType(props.modelValue, props.formData || {}, props.field)
       } else if (typeof props.desc.tagType === 'string') {
-        tagType.value = (await format)[props.desc.tagType](props.modelValue, props.formData, props.field)
+        tagType.value = (await format)[props.desc.tagType](props.modelValue, props.formData || {}, props.field)
       } else {
         tagType.value = ''
       }
@@ -65,9 +65,9 @@ watch(
     } else {
       if (typeof props.desc.format === 'function') {
         // 如果有方法类型的判断，则需要启用动态监测
-        formatValue.value = await props.desc.format(props.modelValue, props.formData, props.field)
+        formatValue.value = await props.desc.format(props.modelValue, props.formData || {}, props.field)
       } else if (typeof props.desc.format === 'string') {
-        formatValue.value = (await format)[props.desc.format](props.modelValue, props.formData, props.field)
+        formatValue.value = (await format)[props.desc.format](props.modelValue, props.formData || {}, props.field)
       } else {
         formatValue.value = props.modelValue || '—'
       }

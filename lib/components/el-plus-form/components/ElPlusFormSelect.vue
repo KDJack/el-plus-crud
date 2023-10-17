@@ -1,11 +1,13 @@
 <template>
-  <el-select v-if="isInit" class="el-plus-form-select" :class="desc.class" :style="desc.style" v-bind="attrs" v-model="currentValue" :loading="loading" v-on="onEvents" :disabled="disabled">
-    <el-option v-for="option in options" :key="option.value || option.v" v-bind="option">
-      <div class="el-plus-form-select-options">
-        <span>{{ option.label || option.l }}</span>
-        <div v-if="desc.optionTip">{{ tip(option) }}</div>
-      </div>
-    </el-option>
+  <el-select v-if="isInit" class="el-plus-form-select" :class="desc.class" :style="desc.style" v-bind="attrs" v-model="currentValue" :loading="loading" v-on="onEvents">
+    <template v-for="(option, i) in options" :key="i">
+      <el-option v-if="option" v-bind="option">
+        <div class="el-plus-form-select-options">
+          <span>{{ option.label || option.l }}</span>
+          <div v-if="desc.optionTip">{{ tip(option) }}</div>
+        </div>
+      </el-option>
+    </template>
   </el-select>
 </template>
 <script lang="ts">
@@ -20,21 +22,24 @@ export default {
 import { ref, reactive, computed, onBeforeMount, useAttrs, watch, inject } from 'vue'
 import { ElMessage } from 'element-plus'
 import { getAttrs } from '../mixins'
-import { isEqual } from 'lodash'
+import { isEqual, isPromiseLike } from '../util'
 import { ICRUDConfig } from 'types'
 
 const defaultConf = inject('defaultConf') as ICRUDConfig
 const globalData = inject('globalData') as any
 
-const props = defineProps<{
-  modelValue?: number | string | Array<string>
-  field: string
-  loading?: boolean
-  desc: { [key: string]: any }
-  formData: { [key: string]: any }
-  rowIndex?: number
-  disabled?: boolean
-}>()
+const props = withDefaults(
+  defineProps<{
+    modelValue?: number | string | Array<string>
+    loading?: boolean
+    desc: { [key: string]: any }
+    formData?: { [key: string]: any }
+    rowIndex?: number
+  }>(),
+  {
+    desc: () => ({})
+  }
+)
 const emits = defineEmits(['update:modelValue'])
 
 const currentValue = ref(props.modelValue || (props.desc.multiple ? [] : ''))
@@ -86,7 +91,7 @@ const onEvents = computed(() => {
     Object.keys(props.desc.on).map((key: string) => {
       tempOn[key] = () => {
         props.desc.on[key](
-          props.formData,
+          props.formData || {},
           options.find((item) => item.value === currentValue.value),
           props.rowIndex
         )
@@ -107,7 +112,9 @@ const tip = computed(() => (optionItem: any) => {
 })
 
 onBeforeMount(async () => {
+  tempAttr.remote = !!props.desc.remote
   attrs.value = await getAttrs(props, tempAttr)
+  attrs.value.remote = !!props.desc.remote
   isInit.value = true
 })
 
@@ -118,7 +125,12 @@ watch(
       // 从全局数据中获取options
       options.splice(0, options.length, ...(globalData[data] || []))
     } else if (typeof data === 'function') {
-      options.splice(0, options.length, ...(await data(props.formData)))
+      const result = data(props.formData || {})
+      if (isPromiseLike<any>(result)) {
+        options.splice(0, options.length, ...(await result))
+      } else {
+        options.splice(0, options.length, ...result)
+      }
     } else if (Array.isArray(data)) {
       if (data && options && !isEqual(data, options)) {
         options.splice(0, options.length, ...data)

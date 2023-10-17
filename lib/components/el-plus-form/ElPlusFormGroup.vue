@@ -23,7 +23,7 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { cloneDeep } from 'lodash'
+import { cloneDeep } from './util'
 import { computed, ref, useSlots } from 'vue'
 import ElPlusForm, { IFormProps } from './ElPlusForm.vue'
 import { IFormDesc, IFormGroupConfig } from 'types'

@@ -460,39 +460,64 @@ export interface IDownFile {
  * 注册curd配置
  */
 export interface ICRUDConfig {
+  // 是否开始debug调试模式,目前主要时一些console信息打印
   debug?: boolean
+  // element plus组件的size
   size?: 'default' | 'small' | 'large'
+  // 本地存储的key前缀
   storagePrefix?: string
+  // 表单相关配置
   form?: {
+    // 输入长度限制
     leng?: {
+      // input长度限制
       input?: number
+      // 文本域长度限制
       textare?: number
+      // 数字输入框限制信息
       nbinput?: {
-        min: number
-        max: number
-        precision: number
-        controlsPosition: 'right' | ''
+        // 最小数值
+        min?: number
+        // 最大数值
+        max?: number
+        // 小数位数
+        precision?: number
+        // 是左右加减，还是 右侧的上下箭头 element plus number组件的属性
+        controlsPosition?: 'right' | ''
       }
     }
+    // 用户选择组件设置
     linkUser?: {
+      // 获取用户列表的查询接口
       getUserList: IFetch<any>
+      // 部门列表key
       deptListKey: string
     }
     // 用户自定义form组件的名称,使用这个，全局注册的名字为el-plus-form-xxx，form中就可以使用xxx进行引入
     comList?: string[]
   }
+  // 上传组件配置
   upload?: {
+    // 类型 minio 或者 七牛
     type: 'minio' | 'quniu'
+    // 上传路径
     action?: string | ((data?: any) => string)
+    // 上传图片最大限制
     maxISize?: number
+    // 上传文件最大限制
     maxFSize?: number
+    // minio配置 - 主要是私有部署的minio
     minio?: {
+      // 获取上传链接
       getUploadUrl: (fileName?: string) => Promise<any>
+      // 执行上传的方法
       doElUpload: (fileName?: string) => Promise<any>
+      // 获取上传文件的访问地址
       getObjectAuthUrl: (fileName?: string) => Promise<any>
     }
   }
+  // token 或者是 获取token 的方法
   token?: string | ((data?: any) => string)
-  // 按钮权限方法
+  // 校验按钮权限方法
   auth?: (data?: any) => boolean
 }

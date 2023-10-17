@@ -1,5 +1,5 @@
 <template>
-  <el-date-picker v-if="isInit" class="ElPlusFormDatetime-panel" v-bind="attrs" v-on="onEvents" type="datetime" v-model="currentValue" :disabled="disabled" />
+  <el-date-picker v-if="isInit" class="ElPlusFormDatetime-panel" v-bind="attrs" v-on="onEvents" type="datetime" v-model="currentValue" />
 </template>
 <script lang="ts">
 export default {
@@ -15,10 +15,9 @@ import { getAttrs, getEvents } from '../mixins'
 
 const props = defineProps<{
   modelValue?: string | number | '' | null
-  field: string
+  field?: string
   desc: { [key: string]: any }
-  formData: { [key: string]: any }
-  disabled?: boolean
+  formData?: { [key: string]: any }
 }>()
 
 const emits = defineEmits(['update:modelValue'])

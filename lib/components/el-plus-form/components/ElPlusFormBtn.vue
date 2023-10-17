@@ -37,7 +37,7 @@ const props = defineProps<{
   field?: string
   rowIndex?: number
   loading?: boolean
-  desc: { [key: string]: any }
+  desc?: { [key: string]: any }
   formData?: { [key: string]: any }
 }>()
 
@@ -70,7 +70,7 @@ const onEvents = computed(() => {
       if (key === 'click' && props.desc.mask) {
         events[key] = function () {
           localLoading.value = true
-          props.desc.on[key]({
+          props.desc?.on[key]({
             row: props.formData || {},
             callBack: () => {
               setTimeout(() => (localLoading.value = false), 50)
@@ -81,7 +81,7 @@ const onEvents = computed(() => {
         }
       } else {
         events[key] = function () {
-          props.desc.on[key]({ row: cloneDeep(props.formData || {}), field: props.field, rowIndex: props.rowIndex } as IBtnBack)
+          props.desc?.on[key]({ row: cloneDeep(props.formData || {}), field: props.field, rowIndex: props.rowIndex } as IBtnBack)
         }
       }
     }
@@ -90,13 +90,13 @@ const onEvents = computed(() => {
 })
 
 const btnShowText = computed(() => {
-  if (props.desc.btnLabel) {
+  if (props.desc?.btnLabel) {
     if (typeof props.desc.btnLabel === 'function') {
       return props.desc.btnLabel(props.formData || {})
     }
     return props.desc.btnLabel
   }
-  if (props.desc.label) {
+  if (props.desc?.label) {
     if (typeof props.desc.label === 'function') {
       return props.desc.label(props.formData || {})
     }

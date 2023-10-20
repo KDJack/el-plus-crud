@@ -185,6 +185,10 @@ export interface IFormGroupConfig {
     formDesc: IFormDesc
     // 是否显示
     vif?: boolean | ((data?: any) => boolean)
+    // 是否显示-内部使用
+    _vif?: boolean
+    // 表单的ID
+    fid?: string
   }>
 }
 

@@ -70,7 +70,6 @@ function getIcon(item: IOssInfo) {
 
 // 处理点击事件
 function handelPreview(file: IOssInfo) {
-  // console.log('preview: ', props.preview, file, previewList.value)
   if (props.preview) {
     // 如果是图片
     if (imgSuffix.indexOf(file.suffix || '') >= 0) {

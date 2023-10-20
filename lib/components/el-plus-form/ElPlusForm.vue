@@ -7,7 +7,7 @@
           <el-col v-for="(formItem, y) in formList" :key="index + '-' + y + '-' + formItem.field" :xs="24" :sm="24" :md="formItem.colspan && formItem.colspan >= column ? 24 : column >= 2 ? 12 : 24" :lg="formItem.colspan && formItem.colspan >= column ? 24 : Math.floor((24 / column) * (formItem.colspan || 1))" :xl="formItem.colspan && formItem.colspan >= column ? 24 : Math.floor((24 / column) * (formItem.colspan || 1))">
             <div v-if="formItem._vif" class="el-plus-form-column-panel" :style="{ 'justify-content': isTable ? 'flex-end' : 'flex-start' }">
               <el-form-item style="min-height: 40px; display: flex" :label="showLabel && formItem.showLabel !== false ? formItem._label : null" :label-width="formItem.labelWidth || labelWidth || (isDialog ? '100px' : '120px')" :prop="formItem.field" :style="{ width: formItem._attrs?.width || formItem.width || (isTable ? '150px' : '100%') }">
-                <component style="min-width: 80px; width: 100%; flex: 1" :is="formItem._type" :formData="props.modelValue" :disabled="formItem._disabled ?? disabled ?? false" :readonly="readonly ?? false" v-bind="formItem._attrs" :desc="formItem" :ref="setComponentRef" :field="formItem.field" v-model="props.modelValue[formItem.field || '']" :isTable="isTable" @validateThis="() => handelValidateThis(formItem.field || '')"></component>
+                <component style="min-width: 80px; width: 100%; flex: 1" :is="formItem._type" :formData="props.modelValue" :disabled="formItem._disabled ?? disabled ?? false" v-bind="formItem._attrs" :desc="formItem" :ref="setComponentRef" :field="formItem.field" v-model="props.modelValue[formItem.field || '']" :isTable="isTable" @validateThis="() => handelValidateThis(formItem.field || '')"></component>
                 <div class="el-plus-form-tip" v-if="formItem._tip" v-html="formItem._tip" />
               </el-form-item>
             </div>
@@ -47,6 +47,8 @@ import { ICRUDConfig, IFormBack, IFormDesc, IFormDescItem } from 'types'
 
 // IFormProps定义
 export interface IFormProps {
+  // form的ID-主要针对group时使用
+  fid?: string
   // 表单描述
   formDesc?: IFormDesc | null
   // group的desc列表-主要针对group表单最后一个表单使用
@@ -84,12 +86,8 @@ export interface IFormProps {
   labelWidth?: number | string
   // 全局禁用表单
   disabled?: boolean
-  // 全局的readonly
-  readonly?: boolean
   // 是否为弹窗
   isDialog?: boolean
-  // options 的请求方法
-  optionsFn?: Function | null
   // 表单全局size
   size?: string
   // 表单列 默认1
@@ -147,12 +145,8 @@ const props = withDefaults(defineProps<IFormProps>(), {
   labelWidth: '',
   // 全局禁用表单
   disabled: false,
-  // 全局的readonly
-  readonly: false,
   // 是否为弹窗
   isDialog: false,
-  // options 的请求方法
-  optionsFn: null,
   // 表单全局size
   size: 'default',
   // 表单列 默认1
@@ -206,7 +200,7 @@ const computedFormAttrs = computed(() => {
 // 合并校验规则
 const computedRules = computed(() => {
   // 首先拿到表单总体传入的rules
-  const tempRules = props.rules || []
+  const tempRules = props.rules || {}
   // 遍历属性描述对象，看看里面有没有校验规则
   if (props.formDesc) {
     Object.keys(props.formDesc).map((field: any) => {
@@ -513,7 +507,6 @@ const handelValToForm = (desc: IFormDescItem, field: string, val: any) => {
       // 处理一下时间戳
       result[startTimeKey] = time(val[0], 4)
       result[endTimeKey] = time(val[1], 4)
-      console.log(startTimeKey, result, result[startTimeKey])
     }
   } else if (desc.type === 'linkuser') {
     const [userIds, deptIds, userNames, deptNames] = val
@@ -574,7 +567,9 @@ const handleSubmitForm = async () => {
       const isPass = await (tempAttr.beforeValidate as Function)(postData)
       if (isPass === false) return
     }
-    await validateForm()
+    if (!props.groupFormDesc) {
+      await validateForm()
+    }
     for (const field in postData) {
       // 去除下划线开头的参数
       if (field.indexOf('_') === 0) {
@@ -584,7 +579,7 @@ const handleSubmitForm = async () => {
       if (props.formDesc) {
         const formItem = props.formDesc[field]
         // valueFormatter的处理
-        if (formItem && formItem.valueFormat) {
+        if (formItem && formItem.valueFormat && typeof formItem.valueFormat === 'function') {
           postData[field] = formItem.valueFormat(postData[field], postData)
         }
         // 处理带有true或者false值
@@ -602,67 +597,71 @@ const handleSubmitForm = async () => {
         postData = beforeRequestData
       }
     }
-    if (props.requestFn) {
-      // 在内部调用请求
-      if (innerIsLoading.value) return
-      innerIsLoading.value = true
-      try {
-        let response = {}
+    // if (props.requestFn) {
+    // 在内部调用请求
+    if (innerIsLoading.value) return
+    innerIsLoading.value = true
+    try {
+      let response = {}
+      if (props.requestFn) {
         if (props.updateFn && postData && (postData as any)[props.idKey]) {
           response = await props.updateFn(postData)
         } else {
           response = await props.requestFn(postData)
         }
-        nextTick(() => {
-          if (tempAttr.success && typeof tempAttr.success === 'function') {
-            tempAttr.success({
-              response,
-              formData: props.modelValue,
-              callBack: () => (innerIsLoading.value = false)
-            } as IFormBack)
-          }
-        })
-      } catch (error) {
-        // 如果用户有处理异常的方法了
+      }
+      nextTick(() => {
+        if (tempAttr.success && typeof tempAttr.success === 'function') {
+          tempAttr.success({
+            response,
+            formData: postData,
+            callBack: () => (innerIsLoading.value = false)
+          } as IFormBack)
+        }
+      })
+    } catch (error) {
+      // 如果用户有处理异常的方法了
+      if (tempAttr.requestError && typeof tempAttr.requestError === 'function') {
+        tempAttr.requestError(error)
+      } else {
+        // 处理异常情况
+        if (error instanceof Error) {
+          // 返回的是Error类型, 则进行解析
+          try {
+            const msg = JSON.parse(error.message)
+            if (msg instanceof Object) {
+              // innerFormError.value = msg;
+            }
+            // eslint-disable-next-line
+          } catch {}
+        } else if (error instanceof Object) {
+          // 返回的是对象类型, 则直接设置
+          // innerFormError = error;
+        }
         if (tempAttr.requestError && typeof tempAttr.requestError === 'function') {
-          tempAttr.requestError(error)
-        } else {
-          // 处理异常情况
-          if (error instanceof Error) {
-            // 返回的是Error类型, 则进行解析
-            try {
-              const msg = JSON.parse(error.message)
-              if (msg instanceof Object) {
-                // innerFormError.value = msg;
-              }
-              // eslint-disable-next-line
-            } catch {}
-          } else if (error instanceof Object) {
-            // 返回的是对象类型, 则直接设置
-            // innerFormError = error;
-          }
-          if (tempAttr.requestError && typeof tempAttr.requestError === 'function') {
-            tempAttr.requestError()
-          }
-        }
-        // 报错了这里恢复
-        innerIsLoading.value = false
-      } finally {
-        if (!props.isDialog) {
-          innerIsLoading.value = false
-        }
-        if (tempAttr.requestEnd && typeof tempAttr.requestEnd === 'function') {
-          tempAttr.requestEnd()
+          tempAttr.requestError()
         }
       }
-    } else {
-      // 在外部用户自己处理请求
-      if (props.isLoading) return
-      emits('request', postData)
+      // 报错了这里恢复
+      innerIsLoading.value = false
+    } finally {
+      if (!props.isDialog) {
+        innerIsLoading.value = false
+      }
+      if (tempAttr.requestEnd && typeof tempAttr.requestEnd === 'function') {
+        tempAttr.requestEnd()
+      }
     }
+    // } else {
+    //   // 在外部用户自己处理请求
+    //   if (props.isLoading) return
+    //   emits('request', postData)
+    // }
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.log('error: ', error)
+    if (defaultConf.debug) {
+      // eslint-disable-next-line no-console
+      console.log('error: ', error)
+    }
   }
 }
 
@@ -673,13 +672,20 @@ const reset = () => {
   // refElPlusForm.value.resetFields();
   // 重置
   Object.keys(props.modelValue).map((key) => {
-    props.modelValue[key] = oldFormData ? oldFormData[key] : (props.formDesc && props.formDesc[key] && props.formDesc[key].default) ?? null
+    if (oldFormData && oldFormData[key] !== undefined && oldFormData[key] !== null) {
+      props.modelValue[key] = oldFormData[key]
+    } else {
+      if (props.groupFormDesc) {
+        props.modelValue[key] = props.groupFormDesc && props.groupFormDesc[key] ? props.groupFormDesc[key].default || null : null
+      } else {
+        props.modelValue[key] = props.formDesc && props.formDesc[key] ? props.formDesc[key].default || null : null
+      }
+    }
   })
   setTimeout(() => {
     // 清空校验
     clearValid()
   }, 100)
-  // 通知外部
   emits('reset')
 }
 
@@ -752,7 +758,9 @@ watch(
     if (!oldFormData || (isOpenListen.value && data && JSON.stringify(data) !== JSON.stringify(oldFormData))) {
       // 检查联动
       if (JSON.stringify(data) !== JSON.stringify(oldFormData)) {
-        oldFormData = cloneDeep(data)
+        if (!oldFormData) {
+          oldFormData = cloneDeep(data)
+        }
         initFormAttrs()
       }
     }
@@ -771,7 +779,7 @@ onMounted(async () => {
 })
 
 // 暴露对外方法
-defineExpose({ submit: handleSubmitForm, getData: getFormData, validate: validateForm, reset, clearValid, clear, changeValidImg, refresh })
+defineExpose({ fid: props.fid, submit: handleSubmitForm, getData: getFormData, validate: validateForm, reset, clearValid, clear, changeValidImg, refresh })
 </script>
 <style lang="scss">
 .el-plus-form-panel {

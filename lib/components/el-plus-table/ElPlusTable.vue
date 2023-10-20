@@ -440,7 +440,6 @@ function handelTableSelectAll(selection: any[]) {
  * @param expanded
  */
 function handelTableExpandChange(row: any, expanded: boolean) {
-  // console.log('row: ', row, expanded)
   emits('expandChange', row, expanded)
 }
 
@@ -654,8 +653,10 @@ async function loadData(isInit: Boolean) {
       refreshTableSelect()
     })
   } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log('error: ', e)
+    if (defaultConf.debug) {
+      // eslint-disable-next-line no-console
+      console.log('error: ', e)
+    }
   }
   loadingStatus.value = 2
   loading.value = false
@@ -707,7 +708,6 @@ function initCol() {
 watch(
   () => props.modelValue,
   (data) => {
-    // console.log('data: ', JSON.parse(JSON.stringify(data)))
     if (!props.tableConfig.fetch) {
       if (JSON.parse(JSON.stringify(data)) !== JSON.parse(JSON.stringify(tableData.value))) {
         loadingStatus.value = 2

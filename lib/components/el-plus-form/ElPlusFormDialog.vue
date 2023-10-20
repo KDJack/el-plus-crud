@@ -12,6 +12,9 @@
         <slot name="default" />
       </template>
     </ElPlusForm>
+    <template #footer>
+      <slot name="footer" />
+    </template>
   </el-dialog>
 </template>
 <script lang="ts">

@@ -1,5 +1,5 @@
 <template>
-  <el-input v-if="isInit" :class="desc.class" :style="desc.style" :clearable="attrs.clearable ?? true" type="number" v-bind="attrs" v-on="onEvents" v-model="currentValue">
+  <el-input v-if="isInit" :class="desc.class" :style="desc.style" :clearable="attrs.clearable ?? true" type="number" v-bind="attrs" v-on="onEvents" v-model="currentValue" onkeypress="return( /[-\d\.]/.test(String.fromCharCode(event.keyCode)))">
     <template v-for="(item, key, index) of slots" #[key] :key="index">
       <slot :name="key" />
     </template>

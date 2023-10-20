@@ -5,12 +5,12 @@
 /**
  * 不能为空
  */
-export const notNull = [{ required: true, trigger: 'blur', validator: validateInputNotNull }]
+export const notNull = [{ required: true, trigger: 'change', validator: validateInputNotNull }]
 
 /**
  * 不能全是空格
  */
-export const notAllBlank = [{ required: true, trigger: 'blur', validator: validateInputNotAllBlank }]
+export const notAllBlank = [{ required: true, trigger: 'change', validator: validateInputNotAllBlank }]
 
 /**
  * 必须是数字

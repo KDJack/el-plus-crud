@@ -1,13 +1,15 @@
 <template>
   <div class="el-plus-form-group">
-    <template v-for="(group, i) in getGroupFowmLayout" :key="i">
-      <template v-if="useSlots()['top' + i]">
-        <slot :name="'top' + i"> </slot>
+    <template v-for="(group, i) in getGroupFowmLayout" :key="i + group.formProps?.fid">
+      <template v-if="useSlots()['top' + indexList[i]]">
+        <slot :name="'top' + indexList[i]"> </slot>
       </template>
-      <div class="title-line" v-if="group.title">{{ group.title }}</div>
-      <ElPlusForm v-model="currentValue" v-bind="group.formProps" :ref="(el) => setComponentRef(el, 'form' + i)" @reset="handleReset">
-        <template v-if="useSlots()['default' + i]">
-          <slot :name="'default' + i"> </slot>
+      <slot :name="'title' + indexList[i]">
+        <div class="title-line" v-if="group.title">{{ group.title }}</div>
+      </slot>
+      <ElPlusForm v-model="currentValue" v-bind="group.formProps" :ref="setComponentRef" @reset="handleReset(group.formProps?.fid || '')">
+        <template v-if="useSlots()['default' + indexList[i]]">
+          <slot :name="'default' + indexList[i]"> </slot>
         </template>
       </ElPlusForm>
     </template>
@@ -38,7 +40,9 @@ const props = defineProps<{
 }>()
 
 const formRefs = ref([] as any[])
-const formRefsKeys = [] as string[]
+
+// 主要记录原来groupFowmLayout下标和group下标的对应
+const indexList = ref([] as number[])
 
 // 重新定义当前值
 const currentValue = computed({
@@ -58,9 +62,22 @@ const getGroupFowmLayout = computed(() => {
     column?: number
     formProps?: IFormProps
   }>
+  // 清空refs列表
+  formRefs.value = []
+  indexList.value = []
 
-  // 这里首先遍历一遍vif
-  const tempGroupList = props.formGroup.group.filter((item) => getVIf.value(item.vif))
+  const tempId = new Date().getTime()
+  props.formGroup.group.map((item, i): any => {
+    item.fid = item.fid || `${tempId + i}`
+    item._vif = getVIf.value(item.vif)
+  })
+
+  // 这里首先遍历一遍_vif
+  const tempGroupList = props.formGroup.group.filter((item, i) => {
+    // 这里单独存储下index 的对应关系
+    if (item._vif) indexList.value.push(i)
+    return item._vif
+  })
 
   const tempFormConfig = cloneDeep(props.formGroup) as any
   const column = props.formGroup.column || 1
@@ -80,12 +97,10 @@ const getGroupFowmLayout = computed(() => {
 
   // 遍历
   tempGroupList.map((groupItem, i) => {
-    if (getVIf.value(groupItem.vif)) {
-      formConfigList.push({
-        title: groupItem.title,
-        formProps: Object.assign({ column: groupItem.column || column }, i === tempGroupList.length - 1 ? tempFormConfig : { showBtns: false }, groupItem || {}) as IFormProps
-      })
-    }
+    formConfigList.push({
+      title: groupItem.title,
+      formProps: Object.assign({ column: groupItem.column || column }, i === tempGroupList.length - 1 ? tempFormConfig : { showBtns: false }, groupItem || {}) as IFormProps
+    })
   })
   return formConfigList
 })
@@ -103,19 +118,22 @@ const getVIf = computed(() => (vif: boolean | Function | undefined) => {
 })
 
 // 设置子组件的ref-重置form的时候需要用到
-function setComponentRef(el: any, key: string) {
+function setComponentRef(el: any) {
   if (!el) return
-  if (formRefsKeys.indexOf(key) < 0) {
-    formRefsKeys.push(key)
+  if (!formRefs.value.find((item) => item.fid === el.fid)) {
     formRefs.value.push(el)
   }
 }
 
 //重置
-function handleReset() {
-  formRefs.value.map((item, index, arr) => {
-    index === arr.length - 1 ? '' : item.clearValid()
-  })
+function handleReset(fid: string) {
+  setTimeout(() => {
+    formRefs.value.map((item) => {
+      if (item.fid !== fid) {
+        item.clearValid()
+      }
+    })
+  }, 100)
 }
 
 /**
@@ -154,7 +172,7 @@ defineExpose({ validate, getData, clearValid })
     height: 22px;
     font-size: 16px;
     font-weight: 500;
-    color: #222222;
+    color: var(--text-color);
     line-height: 22px;
     position: relative;
     padding-left: 10px;

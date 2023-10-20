@@ -125,7 +125,6 @@ async function handelUploadSuccess(_: any, file: any) {
   file.raw.shareUrl = objectUrl
   file.raw.previewUrl = previewUrl
   file.url = getFileIcon(file.raw)
-  // console.log('handelUploadSuccess: file: ', file)
   handelListChange(file, 1)
 }
 

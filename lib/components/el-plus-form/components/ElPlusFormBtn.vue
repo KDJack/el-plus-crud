@@ -72,8 +72,8 @@ const onEvents = computed(() => {
           localLoading.value = true
           props.desc?.on[key]({
             row: props.formData || {},
-            callBack: () => {
-              setTimeout(() => (localLoading.value = false), 50)
+            callBack: (time: number) => {
+              setTimeout(() => (localLoading.value = false), time || 50)
             },
             field: props.field,
             rowIndex: props.rowIndex

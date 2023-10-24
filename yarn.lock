@@ -4421,7 +4421,7 @@ vite-plugin-vue-setup-extend@^0.4.0:
     "@vue/compiler-sfc" "^3.2.29"
     magic-string "^0.25.7"
 
-vite@^4.3.9:
+vite@*, vite@^4.3.9:
   version "4.3.9"
   resolved "https://registry.npmmirror.com/vite/-/vite-4.3.9.tgz"
   integrity sha512-qsTNZjO9NoJNW7KnOrgYwczm0WctJ8m/yqYAMAK9Lxt4SoySUfS5S8ia9K7JHpa3KEeMfyF8LoJ3c5NeBJy6pg==

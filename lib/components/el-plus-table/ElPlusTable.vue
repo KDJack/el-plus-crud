@@ -742,9 +742,9 @@ defineExpose({ reload, tableData, changeSelect, resetSelect, initCol })
 </script>
 <style lang="scss">
 .el-plus-table-content {
-  // background-color: #ffffff;
+  background-color: #ffffff;
   color: var(--text-color);
-  background-color: var(--bg-color);
+  // background-color: var(--bg-color);
   border-radius: 5px;
   padding: 10px;
   width: 100%;

@@ -352,3 +352,36 @@ export function throttle(cb: Function, delay: number) {
 export function isPromiseLike<T>(it: unknown): it is PromiseLike<T> {
   return it instanceof Promise || typeof (it as any)?.then === 'function'
 }
+
+/**
+ * 根据key或者keyList获取对应值
+ * @param keys
+ * @param obj
+ */
+export function getValue(keys: string | Array<string>, obj: Object) {
+  if (!obj || !keys || keys.length <= 0) return null
+  if (Array.isArray(keys)) {
+    let tempObj = cloneDeep(obj)
+    for (let i = 0; i < keys.length; i++) {
+      tempObj = tempObj[Array.isArray(tempObj) ? parseInt(keys[i]) : keys[i]]
+      if (tempObj === undefined || tempObj === null) return null
+      if (tempObj === '') return ''
+    }
+    return tempObj
+  } else {
+    return obj[keys] || null
+  }
+}
+
+/**
+ * 获取值（方法）
+ * @param val
+ * @param prams
+ * @returns
+ */
+export function getFnValue<T>(val: any | Function, param?: any) {
+  if (typeof val === 'function') {
+    return val(param)
+  }
+  return val
+}

@@ -32,22 +32,33 @@ export default {
   },
   // 上传组件配置
   upload: {
-    // 类型 minio 或者 七牛
-    type: 'minio',
+    // 类型 minio 或者 七牛 / 阿里云 或者不填，不填则完全依赖 action
+    type: undefined,
     // 上传路径
-    action: '',
+    action: ({ type }: { type: 'minio' | 'quniu' | 'aliyun' | undefined }) => {
+      switch (type) {
+        case 'aliyun':
+          return 'https://jianchan.oss-cn-hangzhou.aliyuncs.com'
+        case 'quniu':
+          return 'https://up-z2.qiniup.com'
+      }
+      return undefined
+    },
+    actionMap: {
+      actionKey: 'uploadUrl',
+      nameKey: 'objectName',
+      uploadIdKey: 'uploadId'
+    },
     // 上传图片最大限制
     maxISize: 1024 * 1024 * 20,
     // 上传文件最大限制
     maxFSize: 1024 * 1024 * 20,
-    // minio配置 - 主要是私有部署的minio
-    minio: {
-      // 获取上传链接
-      getUploadUrl: () => new Promise(() => {}),
-      // 执行上传的方法
-      doElUpload: () => new Promise(() => {}),
-      // 获取上传文件的访问地址
-      getObjectAuthUrl: () => new Promise(() => {})
+    // 解析token的map对象
+    tokenKey: 'token',
+    // 解析签名数据Map
+    signMap: {
+      objectUrlKey: 'objectUrl',
+      previewUrlKey: 'previewUrl'
     }
   }
 } as ICRUDConfig

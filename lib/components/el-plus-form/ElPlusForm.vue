@@ -658,10 +658,8 @@ const handleSubmitForm = async () => {
     //   emits('request', postData)
     // }
   } catch (error) {
-    if (defaultConf.debug) {
-      // eslint-disable-next-line no-console
-      console.log('error: ', error)
-    }
+    // eslint-disable-next-line no-console
+    defaultConf.debug && console.log('error: ', error)
   }
 }
 

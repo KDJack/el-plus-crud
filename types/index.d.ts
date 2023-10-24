@@ -502,22 +502,41 @@ export interface ICRUDConfig {
   }
   // 上传组件配置
   upload?: {
-    // 类型 minio 或者 七牛
-    type: 'minio' | 'quniu'
-    // 上传路径
-    action?: string | ((data?: any) => string)
+    // 类型 minio 或者 七牛 / 阿里云 或者不填，不填则完全依赖 action
+    type?: 'minio' | 'quniu' | 'aliyun'
+    // 上传路径，也可以单独配置到子组件desc中
+    action?: string | ((data?: any) => string | Promise<any>)
+    // 如果action返回的值是对象的话，则按照以下map进行解析
+    actionMap?: {
+      // 获取文件上传地址的对象key，如果不在根级，则需使用数组的形式。如：data.xxx.action 就需要写为 ['data', 'xxx', 'action']
+      actionKey: string | Array<string>
+      // 获取文件对象的名称key，如果不在根级，则需使用数组的形式。如：data.xxx.name 就需要写为 ['data', 'xxx', 'name']
+      nameKey: string | Array<string>
+      // 获取文件上传id对象key，如果不在根级，则需使用数组的形式。如：data.xxx.uploadId 就需要写为 ['data', 'xxx', 'uploadId']
+      uploadIdKey: string | Array<string>
+    }
     // 上传图片最大限制
     maxISize?: number
     // 上传文件最大限制
     maxFSize?: number
-    // minio配置 - 主要是私有部署的minio
-    minio?: {
-      // 获取上传链接
-      getUploadUrl: (fileName?: string) => Promise<any>
-      // 执行上传的方法
-      doElUpload: (fileName?: string) => Promise<any>
-      // 获取上传文件的访问地址
-      getObjectAuthUrl: (fileName?: string) => Promise<any>
+    // 真正的上传方法
+    uploadFn?: (data?: Object) => Promise<any>
+    // 获取上传的token信息
+    token?: string | Object | ((data?: Object) => Promise<Object>)
+    // 获取文件上传的token对象key，如果不在根级，则需使用数组的形式。如：data.xxx.token 就需要写为 ['data', 'xxx', 'token']
+    tokenKey?: string | Array<string>
+    // 获取文件访问签名-私有云或私有minio时必填
+    sign?: (uploadId: string) => Promise<any>
+    // 解析签名数据Map
+    signMap?: {
+      // 获取文件对象的地址key，如果不在根级，则需使用数组的形式。如：data.xxx.objectUrl 就需要写为 ['data', 'xxx', 'objectUrl']
+      objectUrlKey: string | Array<string>
+      // 获取文件上传地址的对象key，如果不在根级，则需使用数组的形式。如：data.xxx.previewUrl 就需要写为 ['data', 'xxx', 'previewUrl']
+      previewUrlKey: string | Array<string>
+    }
+    // 分片配置
+    sharding?: {
+      // TODO
     }
   }
   // token 或者是 获取token 的方法

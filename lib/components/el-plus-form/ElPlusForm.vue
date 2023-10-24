@@ -356,7 +356,7 @@ const initFormAttrs = throttle(() => {
       }
     })
   }
-}, 500)
+}, 100)
 
 // 表单底部按钮
 const btnList = computed(() => {

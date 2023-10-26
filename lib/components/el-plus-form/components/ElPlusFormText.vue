@@ -16,6 +16,7 @@ export default {
 <script lang="ts" setup>
 import { ref, watch, computed, onBeforeMount, useAttrs, inject } from 'vue'
 import { getEvents, getAttrs } from '../mixins'
+import { isPromiseLike } from '../util'
 
 let showInfo = null as any
 
@@ -81,9 +82,13 @@ watch(
     if (!props.desc.format) {
       formatValue.value = props.modelValue === '' ? props.desc.default ?? '—' : props.modelValue ?? props.desc.default ?? '—'
     } else {
+      if (props.desc.label === '活动可约时间') {
+        debugger
+      }
       if (typeof props.desc.format === 'function') {
         // 如果有方法类型的判断，则需要启用动态监测
-        formatValue.value = await props.desc.format(props.modelValue, props.formData, props.field)
+        const result = props.desc.format(props.modelValue, props.formData, props.field)
+        formatValue.value = isPromiseLike<any>(result) ? await result : result
       } else if (typeof props.desc.format === 'string') {
         formatValue.value = format[props.desc.format] ? format[props.desc.format](props.modelValue, props.formData, props.field) : '--'
       } else {

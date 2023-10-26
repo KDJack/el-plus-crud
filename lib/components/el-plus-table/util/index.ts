@@ -95,7 +95,7 @@ export function handelListColumn(columnList: Array<IColumnItem> | undefined, def
           if (!item.minWidth && item.btns && item.btns.length >= 2) {
             let labelLength = 0
             item.btns.map((item: any) => (labelLength += typeof item.label === 'string' ? item.label.length : 4))
-            item.width = item.width || labelLength * 20 + 'px'
+            item.width = item.width || labelLength * 24 + 'px'
           }
           item.align = item.align || 'left'
           item.headerAlign = item.headerAlign || headerAlign || 'left'

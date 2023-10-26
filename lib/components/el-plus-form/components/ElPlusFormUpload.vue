@@ -48,7 +48,7 @@ import word from '../images/icon/word.png'
 import zip from '../images/icon/zip.png'
 import ppt from '../images/icon/ppt.png'
 import { ICRUDConfig, IOssInfo } from 'types'
-import { isPromiseLike, getValue, getFnValue } from '../util'
+import { isPromiseLike, getValue } from '../util'
 
 interface IUpAction {
   action: string
@@ -62,7 +62,7 @@ const defaultConf = inject('defaultConf') as ICRUDConfig
 const iconMap = { excel, pdf, file, txt, word, zip, ppt }
 
 const props = defineProps<{
-  modelValue?: Array<IOssInfo>
+  modelValue?: string | Array<IOssInfo>
   field?: string
   loading?: boolean
   desc: { [key: string]: any }
@@ -83,15 +83,15 @@ const upAction = ref('')
 
 const showPreview = ref(false)
 const previewIndex = ref(0)
-const previewList = computed(() =>
-  currentValue.value
-    .map((item: any) => {
-      if (['.png', '.jpg', '.gif', '.jpeg'].indexOf(item.raw?.suffix || item.suffix) >= 0) {
-        return item.url
-      }
-    })
-    .filter((url) => url)
-)
+const previewList = computed(() => {
+  const tempList = [] as string[]
+  currentValue.value.map((item: any) => {
+    if (fileTypes.imageSuffixes.indexOf(item.raw?.suffix || item.suffix) >= 0) {
+      tempList.push(item.url)
+    }
+  })
+  return tempList
+})
 
 onBeforeMount(async () => {
   if (!defaultConf.upload?.sign && !props.desc?.sign) {
@@ -230,10 +230,11 @@ async function handelUploadSuccess(response: any, file: any) {
  */
 function getFileIcon(file?: any): string {
   if (file) {
-    const suffix = (file?.suffix || '') as string
+    const fileUrl = file.shareUrl || file.furl || file.path || file.url
+    const suffix = (file?.suffix || fileUrl.substring(fileUrl.lastIndexOf('.')) || '') as string
     if (suffix) {
-      if (['.png', '.jpg', '.gif', '.jpeg'].indexOf(suffix.toLocaleLowerCase()) >= 0) {
-        return file.shareUrl || file.furl || file.path
+      if (fileTypes.imageSuffixes.indexOf(suffix.toLocaleLowerCase()) >= 0) {
+        return fileUrl
       }
       for (let i = 0; i < fileTypes.suffixTypes.length; i++) {
         for (let j = 0; j < fileTypes.suffixTypes[i].suffixes.length; j++) {
@@ -288,7 +289,7 @@ function handelListChange(item: UploadUserFile, type: 0 | 1) {
  * @param file
  */
 function handelPreview(file: any) {
-  if (['.png', '.jpg', '.gif', '.jpeg'].indexOf(file.raw?.suffix || file.suffix) >= 0) {
+  if (fileTypes.imageSuffixes.indexOf(file.raw?.suffix || file.suffix) >= 0) {
     previewIndex.value = previewList.value.findIndex((item) => item === (file.raw?.shareUrl || file.raw?.path || file.furl))
     if (previewIndex.value < 0) {
       previewIndex.value = 0
@@ -348,14 +349,19 @@ function validateFile(file: any, types: Array<any>, maxSize: number) {
 
 watch(
   () => props.modelValue,
-  (data: Array<IOssInfo> | undefined, oldData: any) => {
+  (data: string | Array<IOssInfo> | undefined, oldData: any) => {
     if (JSON.stringify(data) !== JSON.stringify(oldData)) {
       // 这里初始化一下
-      currentValue.value =
-        data?.map((item: IOssInfo) => {
-          item.url = getFileIcon(item)
-          return item
-        }) || []
+      if (typeof data === 'string') {
+        currentValue.value = [{ url: data, furl: data }]
+      } else {
+        currentValue.value =
+          data?.map((item: IOssInfo) => {
+            item.url = getFileIcon(item)
+            item.furl = getFileIcon(item)
+            return item
+          }) || []
+      }
     }
   },
   { immediate: true }

@@ -39,7 +39,7 @@ export default {
 </script>
 <script lang="ts" setup>
 import { ref, computed, useAttrs, nextTick, onMounted, watch, inject } from 'vue'
-import { castArray, isMobile, time, cloneDeep, throttle } from './util'
+import { castArray, isMobile, time, cloneDeep, throttle, isPromiseLike } from './util'
 import * as validates from './util/validate'
 import { typeList } from './components/index'
 import ElPlusFormBtn from './components/ElPlusFormBtn.vue'
@@ -514,7 +514,16 @@ const handelValToForm = (desc: IFormDescItem, field: string, val: any) => {
     result[desc.propPrefix ? desc.propPrefix + 'DeptIds' : 'deptIds'] = deptIds
     result[desc.propPrefix ? desc.propPrefix + 'UserNames' : 'userNames'] = userNames
     result[desc.propPrefix ? desc.propPrefix + 'DeptNames' : 'deptNames'] = deptNames
-  } else {
+  }
+  // else if (desc.type === 'upload') {
+  //   // 如果是上传
+  //   // const [userIds, deptIds, userNames, deptNames] = val
+  //   // result[desc.propPrefix ? desc.propPrefix + 'UserIds' : 'userIds'] = userIds
+  //   // result[desc.propPrefix ? desc.propPrefix + 'DeptIds' : 'deptIds'] = deptIds
+  //   // result[desc.propPrefix ? desc.propPrefix + 'UserNames' : 'userNames'] = userNames
+  //   // result[desc.propPrefix ? desc.propPrefix + 'DeptNames' : 'deptNames'] = deptNames
+  // }
+  else {
     // 这里处理下通用表单的数据类型
     switch (desc.type) {
       case 'checkbox':
@@ -564,8 +573,8 @@ const handleSubmitForm = async () => {
   try {
     // 校验表单事件处理
     if (tempAttr.beforeValidate) {
-      const isPass = await (tempAttr.beforeValidate as Function)(postData)
-      if (isPass === false) return
+      const result = (tempAttr.beforeValidate as Function)(postData)
+      if (!(isPromiseLike<any>(result) ? await result : result)) return
     }
     if (!props.groupFormDesc) {
       await validateForm()
@@ -591,7 +600,8 @@ const handleSubmitForm = async () => {
 
     // 提交数据前的通知
     if (tempAttr.beforeRequest) {
-      const beforeRequestData = await (tempAttr.beforeRequest as Function)(postData)
+      const result = (tempAttr.beforeRequest as Function)(postData)
+      const beforeRequestData = isPromiseLike<any>(result) ? await result : result
       if (beforeRequestData === false) return
       if (typeof beforeRequestData === 'object') {
         postData = beforeRequestData
@@ -659,7 +669,7 @@ const handleSubmitForm = async () => {
     // }
   } catch (error) {
     // eslint-disable-next-line no-console
-    defaultConf.debug && console.log('error: ', error)
+    console.log('error: ', error)
   }
 }
 

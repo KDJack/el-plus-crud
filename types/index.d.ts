@@ -159,6 +159,7 @@ export interface IFormGroupConfig {
   column?: number
   // 提交前执行
   beforeRequest?: (data: T) => T
+  beforeValidate?: (data: T) => T
   // 请求地址
   requestFn?: (data?: any) => Promise<T>
   // 更新的函数

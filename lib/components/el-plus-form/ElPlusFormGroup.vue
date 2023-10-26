@@ -25,7 +25,7 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { cloneDeep } from './util'
+import { cloneDeep, isPromiseLike } from './util'
 import { computed, ref, useSlots } from 'vue'
 import ElPlusForm, { IFormProps } from './ElPlusForm.vue'
 import { IFormDesc, IFormGroupConfig } from 'types'
@@ -86,7 +86,12 @@ const getGroupFowmLayout = computed(() => {
   delete tempFormConfig.column
 
   // 表单校验
-  tempFormConfig.beforeValidate = async () => {
+  tempFormConfig.beforeValidate = async (postData: any) => {
+    // 这里处理自带的 beforeValidate
+    if (props.formGroup.beforeValidate) {
+      const result = (props.formGroup.beforeValidate as Function)(postData)
+      if (!(isPromiseLike<any>(result) ? await result : result)) return false
+    }
     return await Promise.all(formRefs.value.map((tempRef) => tempRef.validate()))
   }
 

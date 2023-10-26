@@ -82,9 +82,6 @@ watch(
     if (!props.desc.format) {
       formatValue.value = props.modelValue === '' ? props.desc.default ?? '—' : props.modelValue ?? props.desc.default ?? '—'
     } else {
-      if (props.desc.label === '活动可约时间') {
-        debugger
-      }
       if (typeof props.desc.format === 'function') {
         // 如果有方法类型的判断，则需要启用动态监测
         const result = props.desc.format(props.modelValue, props.formData, props.field)

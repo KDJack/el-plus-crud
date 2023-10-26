@@ -545,7 +545,7 @@ const getFormData = () => {
   if (props.groupFormDesc || props.formDesc) {
     // 循环获取表单数据
     Object.keys(props.modelValue).map((key) => {
-      if (['provinceId', 'cityId', 'zoneId', 'streetId'].indexOf(key) >= 0) return
+      if (['provinceId', 'cityId', 'zoneId', 'streetId', 'startTime', 'endTime'].indexOf(key) >= 0) return
       if (props.groupFormDesc || props.formDesc) {
         Object.assign(tempData, handelValToForm((props.groupFormDesc || props.formDesc || {})[key], key, props.modelValue[key]))
       }

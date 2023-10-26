@@ -1,5 +1,5 @@
 <template>
-  <el-tree-select v-if="isInit" :class="desc.class" :style="desc.style" v-bind="attrs" v-model="currentValue" :data="options" :loading="loading" v-on="onEvents" :render-after-expand="false" />
+  <el-tree-select v-if="isInit" :class="desc.class" :style="desc.style" v-bind="attrs" :disabled="disabled" v-model="currentValue" :data="options" :loading="loading" v-on="onEvents" :render-after-expand="false" />
 </template>
 <script lang="ts">
 export default {
@@ -22,7 +22,9 @@ const props = defineProps<{
   loading?: boolean
   desc: { [key: string]: any }
   formData?: { [key: string]: any }
+  disabled?: boolean
 }>()
+
 const emits = defineEmits(['update:modelValue'])
 
 const currentValue = ref(props.modelValue)

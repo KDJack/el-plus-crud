@@ -1,5 +1,5 @@
 <template>
-  <el-slider class="ElPlusFormSlider-panel" v-bind="attrs" v-on="onEvents" v-model="currentValue" />
+  <el-slider class="ElPlusFormSlider-panel" v-bind="attrs" :disabled="disabled" v-on="onEvents" v-model="currentValue" />
 </template>
 <script lang="ts">
 export default {
@@ -18,6 +18,7 @@ const props = defineProps<{
   field?: string
   desc: { [key: string]: any }
   formData?: { [key: string]: any }
+  disabled?: boolean
 }>()
 
 const emits = defineEmits(['update:modelValue'])

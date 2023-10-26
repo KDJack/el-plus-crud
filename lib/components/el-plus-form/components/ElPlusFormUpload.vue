@@ -1,6 +1,6 @@
 <template>
   <div class="ele-form-upload-image" :class="{ 'ele-form-upload-file': desc.upType === 'file' }" v-if="isInit">
-    <el-upload class="ele-image-upload" v-bind="attrs" v-on="onEvents" :disabled="attrs.disabled" :fileList="currentValue || []" :class="{ 'over-limit': currentValue?.length >= attrs.limit, 'upload-disabled': attrs.disabled }">
+    <el-upload class="ele-image-upload" v-bind="attrs" v-on="onEvents" :disabled="disabled" :fileList="currentValue || []" :class="{ 'over-limit': currentValue?.length >= attrs.limit, 'upload-disabled': attrs.disabled }">
       <div class="upload-panel-icon">
         <i v-if="desc.icon" :class="desc.icon" :style="{ fontSize: desc.fontSize || '14px', color: desc.color || '#C0C4CC' }"></i>
         <el-icon v-else :style="{ fontSize: desc.fontSize || '14px', color: desc.color || '#C0C4CC' }"><Plus /></el-icon>
@@ -67,6 +67,7 @@ const props = defineProps<{
   loading?: boolean
   desc: { [key: string]: any }
   formData?: { [key: string]: any }
+  disabled?: boolean
 }>()
 
 const emits = defineEmits(['update:modelValue', 'validateThis'])
@@ -353,12 +354,13 @@ watch(
     if (JSON.stringify(data) !== JSON.stringify(oldData)) {
       // 这里初始化一下
       if (typeof data === 'string') {
-        currentValue.value = [{ url: data, furl: data }]
+        currentValue.value = [{ url: data, furl: data, suffix: data.substring(data.lastIndexOf('.')) }]
       } else {
         currentValue.value =
           data?.map((item: IOssInfo) => {
             item.url = getFileIcon(item)
             item.furl = getFileIcon(item)
+            item.suffix = item.suffix || item.url.substring(item.url.lastIndexOf('.'))
             return item
           }) || []
       }

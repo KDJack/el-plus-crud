@@ -51,6 +51,7 @@ const currentValue = computed({
 // 是否显示弹框
 const currentShow = computed({
   get() {
+    refElPlusDialogForm.value?.refresh()
     return props.show
   },
   set(val: boolean) {
@@ -60,7 +61,7 @@ const currentShow = computed({
 const refElPlusDialogForm = ref(null as any)
 
 // 合并属性
-const { width, top, modal, appendToBody, showClose, draggable, closeOnClickModal, ...attrs } = Object.assign({ width: '700px', draggable: true, top: '15vh', closeOnClickModal: false, showCancel: true }, useAttrs())
+const { width, top, modal, appendToBody, showClose, draggable, closeOnClickModal, destroyOnClose, ...attrs } = Object.assign({ width: '700px', draggable: true, top: '15vh', closeOnClickModal: false, showCancel: true, destroyOnClose: true }, useAttrs())
 // 弹框属性
 const dialogAttrs = { width, top, modal, appendToBody, showClose, draggable, closeOnClickModal }
 

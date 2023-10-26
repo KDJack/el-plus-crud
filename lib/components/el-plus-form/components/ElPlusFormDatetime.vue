@@ -1,5 +1,5 @@
 <template>
-  <el-date-picker v-if="isInit" class="ElPlusFormDatetime-panel" v-bind="attrs" v-on="onEvents" type="datetime" v-model="currentValue" />
+  <el-date-picker v-if="isInit" class="ElPlusFormDatetime-panel" v-bind="attrs" :disabled="disabled" v-on="onEvents" type="datetime" v-model="currentValue" />
 </template>
 <script lang="ts">
 export default {
@@ -18,6 +18,7 @@ const props = defineProps<{
   field?: string
   desc: { [key: string]: any }
   formData?: { [key: string]: any }
+  disabled?: boolean
 }>()
 
 const emits = defineEmits(['update:modelValue'])

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-tag v-bind="attrs" :size="attrs.size || 'default'" :type="tagType !== '--' ? tagType : ''" v-on="onEvents">
+    <el-tag v-bind="attrs" :disabled="disabled" :size="attrs.size || 'default'" :type="tagType !== '--' ? tagType : ''" v-on="onEvents">
       {{ formatValue || modelValue }}
     </el-tag>
   </div>
@@ -25,6 +25,7 @@ const props = defineProps<{
   loading?: boolean
   desc: { [key: string]: any }
   formData?: { [key: string]: any }
+  disabled?: boolean
 }>()
 
 const attrs = ref({} as any)

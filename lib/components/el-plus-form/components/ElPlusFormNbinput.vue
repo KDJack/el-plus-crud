@@ -1,5 +1,5 @@
 <template>
-  <el-input v-if="isInit" :class="desc.class" :style="desc.style" :clearable="attrs.clearable ?? true" type="number" v-bind="attrs" v-on="onEvents" v-model="currentValue" onkeypress="return( /[-\d\.]/.test(String.fromCharCode(event.keyCode)))">
+  <el-input v-if="isInit" :class="desc.class" :style="desc.style" :clearable="attrs.clearable ?? true" type="number" v-bind="attrs" :disabled="disabled" v-on="onEvents" v-model="currentValue" onkeypress="return( /[-\d\.]/.test(String.fromCharCode(event.keyCode)))">
     <template v-for="(item, key, index) of slots" #[key] :key="index">
       <slot :name="key" />
     </template>
@@ -25,6 +25,7 @@ const props = defineProps<{
   desc: { [key: string]: any }
   formData?: { [key: string]: any }
   rowIndex?: number
+  disabled?: boolean
 }>()
 const emits = defineEmits(['update:modelValue'])
 const currentValue = ref(props.modelValue)

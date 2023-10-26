@@ -1,5 +1,5 @@
 <template>
-  <el-input v-if="isInit" :class="desc.class" :style="desc.style" type="textarea" v-bind="attrs" v-model="currentValue" v-on="onEvents"> </el-input>
+  <el-input v-if="isInit" :class="desc.class" :style="desc.style" type="textarea" v-bind="attrs" :disabled="disabled" v-model="currentValue" v-on="onEvents"> </el-input>
 </template>
 <script lang="ts">
 export default {
@@ -22,7 +22,9 @@ const props = defineProps<{
   loading?: boolean
   desc: { [key: string]: any }
   formData?: { [key: string]: any }
+  disabled?: boolean
 }>()
+
 const emits = defineEmits(['update:modelValue', 'validateThis'])
 const attrs = ref({} as any)
 const isInit = ref(false)

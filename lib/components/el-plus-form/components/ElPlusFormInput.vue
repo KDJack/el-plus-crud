@@ -1,5 +1,5 @@
 <template>
-  <el-input v-if="isInit" style="display: flex" v-bind="attrs" v-on="onEvents" v-model="currentValue">
+  <el-input v-if="isInit" style="display: flex" v-bind="attrs" :disabled="disabled" v-on="onEvents" v-model="currentValue">
     <template v-for="(item, key, index) of slots" #[key] :key="index">
       <slot :name="key" />
     </template>
@@ -25,6 +25,7 @@ const props = defineProps<{
   field?: string
   desc: { [key: string]: any }
   formData?: { [key: string]: any }
+  disabled?: boolean
 }>()
 
 const emits = defineEmits(['update:modelValue', 'validateThis'])

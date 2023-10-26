@@ -1,5 +1,5 @@
 <template>
-  <el-transfer :class="desc.class" :data="desc.options" :style="desc.style" class="ele-form-transfer" v-bind="attrs" v-model="currentValue" v-on="onEvents">
+  <el-transfer :class="desc.class" :data="desc.options" :style="desc.style" class="ele-form-transfer" v-bind="attrs" :disabled="disabled" v-model="currentValue" v-on="onEvents">
     <!-- 非作用域插槽 -->
     <template v-for="(item, key, index) in slots" #[key]="data" :key="index">
       <slot :name="key" :data="data" />
@@ -24,7 +24,9 @@ const props = defineProps<{
   loading?: boolean
   desc: { [key: string]: any }
   formData?: { [key: string]: any }
+  disabled?: boolean
 }>()
+
 const emits = defineEmits(['update:modelValue'])
 const currentValue = ref(props.modelValue)
 emits('update:modelValue', currentValue)

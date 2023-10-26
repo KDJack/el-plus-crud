@@ -1,5 +1,5 @@
 <template>
-  <el-radio-group v-if="isInit" class="ElPlusFormRadio-panel" v-bind="attrs" v-on="onEvents" v-model="currentValue">
+  <el-radio-group v-if="isInit" class="ElPlusFormRadio-panel" v-bind="attrs" :disabled="disabled" v-on="onEvents" v-model="currentValue">
     <el-radio v-for="option of options" :key="option.value" :label="option.value">
       {{ option.l || option.label }}
     </el-radio>
@@ -25,6 +25,7 @@ const props = defineProps<{
   field?: string
   desc: { [key: string]: any }
   formData?: { [key: string]: any }
+  disabled?: boolean
 }>()
 
 const emits = defineEmits(['update:modelValue'])

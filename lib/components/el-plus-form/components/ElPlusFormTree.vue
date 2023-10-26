@@ -1,5 +1,5 @@
 <template>
-  <el-tree ref="treeRef" v-if="isInit" :class="desc.class" :style="desc.style" v-bind="attrs" :default-checked-keys="currentValue" :loading="loading" node-key="id" :data="options" v-on="onEvents" class="el-plus-form-tree" @check-change="handelCheckChange" />
+  <el-tree ref="treeRef" v-if="isInit" :class="desc.class" :style="desc.style" v-bind="attrs" :disabled="disabled" :default-checked-keys="currentValue" :loading="loading" node-key="id" :data="options" v-on="onEvents" class="el-plus-form-tree" @check-change="handelCheckChange" />
 </template>
 <script lang="ts">
 export default {
@@ -22,7 +22,9 @@ const props = defineProps<{
   loading?: boolean
   desc: { [key: string]: any }
   formData?: { [key: string]: any }
+  disabled?: boolean
 }>()
+
 const emits = defineEmits(['update:modelValue'])
 const currentValue = ref(props.modelValue?.split(',') || [])
 

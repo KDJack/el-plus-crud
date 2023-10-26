@@ -1,5 +1,5 @@
 <template>
-  <el-autocomplete class="ElPlusFormAutocomplete-panel" v-bind="attrs" v-on="onEvents" v-model="currentValue">
+  <el-autocomplete class="ElPlusFormAutocomplete-panel" v-bind="attrs" :disabled="disabled" v-on="onEvents" v-model="currentValue">
     <!-- 作用域插槽 -->
     <template #default="data">
       <slot :data="data" />
@@ -27,6 +27,7 @@ const props = defineProps<{
   modelValue?: string | number | '' | null
   desc: { [key: string]: any }
   formData?: { [key: string]: any }
+  disabled?: boolean
 }>()
 
 const emits = defineEmits(['update:modelValue'])

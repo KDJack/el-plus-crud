@@ -1,6 +1,6 @@
 <template>
   <div class="el-plus-form-switch">
-    <el-switch v-if="isInit" v-bind="attrs" v-on="onEvents" :loading="props.loading || localLoading" v-model="currentValue" :before-change="handelBeforeChange" />
+    <el-switch v-if="isInit" v-bind="attrs" :disabled="disabled" v-on="onEvents" :loading="props.loading || localLoading" v-model="currentValue" :before-change="handelBeforeChange" />
   </div>
 </template>
 <script lang="ts">
@@ -23,6 +23,7 @@ const props = defineProps<{
   loading?: boolean
   desc: { [key: string]: any }
   formData?: { [key: string]: any }
+  disabled?: boolean
 }>()
 
 const localLoading = ref(false)

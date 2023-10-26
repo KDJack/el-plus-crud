@@ -1,5 +1,5 @@
 <template>
-  <el-select v-if="isInit" class="el-plus-form-select" :class="desc.class" :style="desc.style" v-bind="attrs" v-model="currentValue" :loading="loading" v-on="onEvents">
+  <el-select v-if="isInit" class="el-plus-form-select" :class="desc.class" :style="desc.style" :disabled="disabled" v-bind="attrs" v-model="currentValue" :loading="loading" v-on="onEvents">
     <template v-for="(option, i) in options" :key="i">
       <el-option v-if="option" v-bind="option">
         <div class="el-plus-form-select-options">
@@ -35,6 +35,7 @@ const props = withDefaults(
     desc: { [key: string]: any }
     formData?: { [key: string]: any }
     rowIndex?: number
+    disabled?: boolean
   }>(),
   {
     desc: () => ({})

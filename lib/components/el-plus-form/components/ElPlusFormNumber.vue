@@ -1,5 +1,5 @@
 <template>
-  <el-input-number v-if="isInit" class="ElPlusFormNumber-panel" v-bind="attrs" v-on="onEvents" v-model="currentValue" @focus="handelFocus" @blur="handelBlur" onkeypress="return( /[-\d\.]/.test(String.fromCharCode(event.keyCode)))" />
+  <el-input-number v-if="isInit" class="ElPlusFormNumber-panel" v-bind="attrs" :disabled="disabled" v-on="onEvents" v-model="currentValue" @focus="handelFocus" @blur="handelBlur" onkeypress="return( /[-\d\.]/.test(String.fromCharCode(event.keyCode)))" />
 </template>
 <script lang="ts">
 export default {
@@ -24,6 +24,7 @@ const props = defineProps<{
   desc: { [key: string]: any }
   formData?: { [key: string]: any }
   rowIndex?: number
+  disabled?: boolean
 }>()
 
 const emits = defineEmits(['update:modelValue', 'validateThis'])

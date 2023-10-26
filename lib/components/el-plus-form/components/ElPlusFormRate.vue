@@ -1,5 +1,5 @@
 <template>
-  <el-rate class="ElPlusFormRate-panel" v-bind="attrs" v-on="onEvents" v-model="currentValue" />
+  <el-rate class="ElPlusFormRate-panel" v-bind="attrs" :disabled="disabled" v-on="onEvents" v-model="currentValue" />
 </template>
 <script lang="ts">
 export default {
@@ -19,6 +19,7 @@ const props = defineProps<{
   field?: string
   desc: { [key: string]: any }
   formData?: { [key: string]: any }
+  disabled?: boolean
 }>()
 
 const currentValue = ref(props.modelValue)

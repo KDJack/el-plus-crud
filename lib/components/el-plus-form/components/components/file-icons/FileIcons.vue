@@ -3,7 +3,7 @@
     <div :class="[isCard ? 'card-list' : 'file-list']" v-if="files && files.length">
       <div v-for="(item, i) in files" :key="i" class="file-item" @click="handelPreview(item)">
         <el-image :src="getIcon(item)" :style="style" fit="cover" />
-        <div v-if="showName" class="file-name">{{ cutString(item.name, 50) + item.suffix }}</div>
+        <div v-if="showName" class="file-name">{{ cutString(item.name, 50) }}</div>
       </div>
     </div>
 

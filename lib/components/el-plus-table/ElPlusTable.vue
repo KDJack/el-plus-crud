@@ -23,6 +23,11 @@
       </el-radio-group>
     </div>
 
+    <!-- 默认插槽 -->
+    <template v-if="useSlots().default">
+      <slot name="default"></slot>
+    </template>
+
     <!-- 中间列表 -->
     <div class="el-plus-table-main" v-loading="loading">
       <template v-if="isDIYMain">
@@ -109,7 +114,7 @@ interface SpanMethodProps {
 const defaultConf = inject('defaultConf') as ICRUDConfig
 const format = inject('format') as any
 
-const emits = defineEmits(['getUrlConsumerIds', 'selection', 'select', 'selectAll', 'update:modelValue', 'tabChange', 'expandChange', 'inited'])
+const emits = defineEmits(['getUrlConsumerIds', 'selection', 'select', 'selectAll', 'update:modelValue', 'tabChange', 'queryChange', 'expandChange', 'inited'])
 const props = withDefaults(
   defineProps<{
     tableConfig: ITableConfig
@@ -692,8 +697,9 @@ async function reload(isTab: boolean = false) {
 /**
  * 处理顶部条件表单筛选
  */
-function handelTopQuery() {
+async function handelTopQuery() {
   topQueryData.value = cloneDeep(tableHeaderRef.value.getData())
+  emits('queryChange', await getListQueryData())
   reload()
 }
 

@@ -140,6 +140,8 @@ async function handelUploadBefore(file: any) {
     return false
   }
   try {
+    // 这里先用本地地址进行占位
+    file.furl = URL.createObjectURL(file)
     // 获取文件上传的action
     let actionInfo = {} as IUpAction
     if (props.desc?.action) actionInfo = await getActionInfo(props.desc?.action, file)
@@ -230,7 +232,7 @@ async function handelUploadSuccess(response: any, file: any) {
  * @param file
  */
 function getFileIcon(file?: any): string {
-  if (file) {
+  if (file && props.desc.upType !== 'file') {
     const fileUrl = file.shareUrl || file.furl || file.path || file.url
     const suffix = (file?.suffix || fileUrl.substring(fileUrl.lastIndexOf('.')) || '') as string
     if (suffix) {
@@ -282,6 +284,7 @@ function handelListChange(item: UploadUserFile, type: 0 | 1) {
       currentValue.value.splice(index, 1)
     }
   }
+  console.log('currentValue: ', currentValue.value)
   emits('validateThis')
 }
 

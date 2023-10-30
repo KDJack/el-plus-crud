@@ -63,22 +63,8 @@ if (props.desc.remote) {
   tempAttr.remoteShowSuffix = true
   tempAttr.loadingText = '远程查询中...'
   tempAttr.remoteMethod = async (query: string) => {
-    if (query !== undefined && query !== null) {
-      if (oldQuery.value !== query) {
-        oldQuery.value = query
-        options.splice(0, options.length, ...(await props.desc.remote(query)))
-        if (query === '') {
-          // 判断是否有默认选项
-          if (props.desc.defaultItem) {
-            // 这里需要判断下默认值是否已经出现在了options中，如果存在，则需要删除
-            const index = options.findIndex((item) => item.value === props.desc.defaultItem.value)
-            if (index >= 0) {
-              options.splice(index, 1)
-            }
-            options.unshift(props.desc.defaultItem)
-          }
-        }
-      }
+    if (query !== undefined && query !== null && query !== '') {
+      await queryOptionsFn(query)
     }
   }
 }
@@ -104,13 +90,35 @@ const onEvents = computed(() => {
 
 // 如果options为空，则默认执行一次查询
 if (options.length <= 0 && props.desc.remote && (props.desc.initLoad ?? true)) {
-  tempAttr.remoteMethod('')
+  queryOptionsFn('')
 }
 
 // 这里处理下tip
 const tip = computed(() => (optionItem: any) => {
   return props.desc.optionTip(optionItem)
 })
+
+/**
+ * 真正远程查询的方法
+ * @param query
+ */
+async function queryOptionsFn(query: string) {
+  if (oldQuery.value !== query) {
+    oldQuery.value = query
+    options.splice(0, options.length, ...(await props.desc.remote(query)))
+    if (query === '') {
+      // 判断是否有默认选项
+      if (props.desc.defaultItem) {
+        // 这里需要判断下默认值是否已经出现在了options中，如果存在，则需要删除
+        const index = options.findIndex((item) => item.value === props.desc.defaultItem.value)
+        if (index >= 0) {
+          options.splice(index, 1)
+        }
+        options.unshift(props.desc.defaultItem)
+      }
+    }
+  }
+}
 
 onBeforeMount(async () => {
   tempAttr.remote = !!props.desc.remote

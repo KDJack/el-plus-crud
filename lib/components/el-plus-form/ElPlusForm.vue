@@ -6,7 +6,14 @@
         <el-row :gutter="10" v-for="(formList, index) in attrMapToTableList" :key="index" :style="{ marginRight: isTable ? '20px' : 0 }">
           <el-col v-for="(formItem, y) in formList" :key="index + '-' + y + '-' + formItem.field" :xs="24" :sm="24" :md="formItem.colspan && formItem.colspan >= column ? 24 : column >= 2 ? 12 : 24" :lg="formItem.colspan && formItem.colspan >= column ? 24 : Math.floor((24 / column) * (formItem.colspan || 1))" :xl="formItem.colspan && formItem.colspan >= column ? 24 : Math.floor((24 / column) * (formItem.colspan || 1))">
             <div v-if="formItem._vif" class="el-plus-form-column-panel" :style="{ 'justify-content': isTable ? 'flex-end' : 'flex-start' }">
-              <el-form-item style="min-height: 40px; display: flex" :label="showLabel && formItem.showLabel !== false ? formItem._label : null" :label-width="formItem.labelWidth || labelWidth || (isDialog ? '100px' : '120px')" :prop="formItem.field" :style="{ width: formItem._attrs?.width || formItem.width || (isTable ? '150px' : '100%') }">
+              <el-form-item style="min-height: 40px; display: flex" :prop="formItem.field" :style="{ width: formItem._attrs?.width || formItem.width || (isTable ? '150px' : '100%') }">
+                <template #label>
+                  <div v-if="showLabel && formItem.showLabel !== false" class="crud-form-label" :style="{ width: formItem.labelWidth || computedFormAttrs._labelWidth || (isDialog ? '100px' : '120px') }">
+                    <span :class="{ required: formItem.required }">
+                      {{ formItem._label }}
+                    </span>
+                  </div>
+                </template>
                 <component style="min-width: 80px; width: 100%; flex: 1" :is="formItem._type" :formData="props.modelValue" :disabled="formItem._disabled ?? disabled ?? false" v-bind="formItem._attrs" :desc="formItem" :ref="setComponentRef" :field="formItem.field" v-model="props.modelValue[formItem.field || '']" :isTable="isTable" @validateThis="() => handelValidateThis(formItem.field || '')"></component>
                 <div class="el-plus-form-tip" v-if="formItem._tip" v-html="formItem._tip" />
               </el-form-item>
@@ -185,7 +192,7 @@ const formLayout = computed(() => ({ display: 'flex', flexDirection: props.isTab
 const computedFormAttrs = computed(() => {
   return {
     ...props.formAttrs,
-    labelWidth: props.labelWidth === 'auto' ? (props.isDialog ? '100px' : '120px') : parseInt(props.labelWidth + '') + 'px',
+    _labelWidth: props.labelWidth === 'auto' ? (props.isDialog ? '100px' : '120px') : parseInt(props.labelWidth + '') + 'px',
     // validateOnRuleChange: false,
     disabled: props.disabled || innerIsLoading.value,
     rules: computedRules,
@@ -820,10 +827,26 @@ defineExpose({ fid: props.fid, submit: handleSubmitForm, getData: getFormData, v
   .el-plus-form-column-panel {
     & > .el-form-item--default {
       margin-bottom: 18px !important;
+      // & > .el-form-item__label-wrap {
       & > .el-form-item__label {
         line-height: 40px;
         margin-bottom: 0;
+        width: auto !important;
+        &::before {
+          content: '' !important;
+        }
+        .crud-form-label {
+          text-align: right;
+          .required {
+            &::before {
+              content: '*';
+              color: var(--el-color-danger);
+              margin-right: 4px;
+            }
+          }
+        }
       }
+      // }
     }
   }
 }

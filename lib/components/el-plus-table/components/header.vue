@@ -3,7 +3,7 @@
     <template v-if="props.toolbar && Object.keys(props.toolbar || {}).length">
       <el-form :inline="true" class="el-plus-table-header-form" :style="{ justifyContent: !props.toolbar.formConfig && props.toolbar.btnRight ? 'flex-end' : 'space-between' }">
         <div v-if="props.toolbar.formConfig" class="el-plus-table-form-items">
-          <ElPlusForm ref="elPlusFormRef" v-bind="formConfig" v-model="props.modelValue" labelWidth="1" :requestFn="handelQueryData" :showBtns="false" :isTable="true">
+          <ElPlusForm ref="elPlusFormRef" v-bind="formConfig" v-model="props.modelValue" :requestFn="handelQueryData" :showBtns="false" :isTable="true">
             <template #row>
               <div class="table-header-form-btns">
                 <ElPlusFormBtn type="primary" icon="ele-Search" :loading="loading" :desc="{ label: '查询', on: { click: handelSearch }, size }" />

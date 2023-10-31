@@ -747,6 +747,9 @@ onMounted(() => {
 defineExpose({ reload, tableData, changeSelect, resetSelect, initCol })
 </script>
 <style lang="scss">
+.dark .el-plus-table-content {
+  background-color: transparent !important;
+}
 .el-plus-table-content {
   background-color: #ffffff;
   color: var(--text-color);

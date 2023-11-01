@@ -643,10 +643,6 @@ async function loadData(isInit: Boolean) {
       dataResult = dataPage[props.tableConfig?.fetchMap?.list || 'records'] || null
     }
     tableData.value = dataResult
-    if (isInit) {
-      // 调用父类init
-      emits('inited', tableData)
-    }
     // 如果是树形结构
     if (props.type === 'expand') {
       treeIndexList.splice(0, treeIndexList.length)

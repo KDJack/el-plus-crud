@@ -223,7 +223,11 @@ async function handelUploadSuccess(response: any, file: any) {
     file.raw.path = response.furl || file.path
   }
   file.raw.shareUrl = file.path
-  file.url = getFileIcon(file.raw)
+  if (props.desc.upType !== 'file') {
+    file.url = getFileIcon(file.raw)
+  } else {
+    file.url = response.furl || file.path
+  }
   handelListChange(file, 1)
 }
 
@@ -232,18 +236,16 @@ async function handelUploadSuccess(response: any, file: any) {
  * @param file
  */
 function getFileIcon(file?: any): string {
-  if (file && props.desc.upType !== 'file') {
-    const fileUrl = file.shareUrl || file.furl || file.path || file.url
-    const suffix = (file?.suffix || fileUrl.substring(fileUrl.lastIndexOf('.')) || '') as string
-    if (suffix) {
-      if (fileTypes.imageSuffixes.indexOf(suffix.toLocaleLowerCase()) >= 0) {
-        return fileUrl
-      }
-      for (let i = 0; i < fileTypes.suffixTypes.length; i++) {
-        for (let j = 0; j < fileTypes.suffixTypes[i].suffixes.length; j++) {
-          if (fileTypes.suffixTypes[i].suffixes[j] === suffix) {
-            return iconMap[fileTypes.suffixTypes[i].type]
-          }
+  const fileUrl = file.shareUrl || file.furl || file.path || file.url
+  const suffix = (file?.suffix || fileUrl.substring(fileUrl.lastIndexOf('.')) || '') as string
+  if (suffix) {
+    if (fileTypes.imageSuffixes.indexOf(suffix.toLocaleLowerCase()) >= 0) {
+      return fileUrl
+    }
+    for (let i = 0; i < fileTypes.suffixTypes.length; i++) {
+      for (let j = 0; j < fileTypes.suffixTypes[i].suffixes.length; j++) {
+        if (fileTypes.suffixTypes[i].suffixes[j] === suffix) {
+          return iconMap[fileTypes.suffixTypes[i].type]
         }
       }
     }
@@ -270,7 +272,7 @@ function handelListChange(item: UploadUserFile, type: 0 | 1) {
     currentValue.value.push({
       name: item.name,
       furl: (item.raw as any)?.path || item.url,
-      url: getFileIcon(item.raw),
+      url: props.desc.upType !== 'file' ? getFileIcon(item.raw) : item.url,
       fsize: item.size,
       uid: item.uid,
       mimeType: item.raw?.type,
@@ -361,13 +363,17 @@ watch(
       } else {
         currentValue.value =
           data?.map((item: IOssInfo) => {
-            item.url = getFileIcon(item)
-            item.furl = getFileIcon(item)
-            item.suffix = item.suffix || item.url.substring(item.url.lastIndexOf('.'))
+            if (props.desc.upType !== 'file') {
+              item.url = getFileIcon(item)
+              item.furl = getFileIcon(item)
+            }
+            item.suffix = item.suffix || item.url?.substring(item.url.lastIndexOf('.'))
+            item.previewUrl = item.furl || item.url
             return item
           }) || []
       }
     }
+    console.log('currentValue.value: ', currentValue.value)
   },
   { immediate: true }
 )

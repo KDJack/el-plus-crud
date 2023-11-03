@@ -695,7 +695,11 @@ async function reload(isTab: boolean = false) {
  */
 async function handelTopQuery() {
   topQueryData.value = cloneDeep(tableHeaderRef.value.getData())
-  emits('queryChange', await getListQueryData())
+  let tempQueryData = await getListQueryData()
+  if (props.tableConfig?.toolbar?.formConfig?.beforeRequest) {
+    tempQueryData = props.tableConfig?.toolbar?.formConfig?.beforeRequest(JSON.parse(JSON.stringify(tempQueryData))) || tempQueryData
+  }
+  if (tempQueryData) emits('queryChange', tempQueryData)
   reload()
 }
 

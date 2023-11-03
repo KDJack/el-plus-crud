@@ -373,7 +373,6 @@ watch(
           }) || []
       }
     }
-    console.log('currentValue.value: ', currentValue.value)
   },
   { immediate: true }
 )

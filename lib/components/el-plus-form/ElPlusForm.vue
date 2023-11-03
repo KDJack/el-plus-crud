@@ -230,6 +230,11 @@ const computedRules = computed(() => {
               tempRules[field].push(item)
             })
           }
+          // 这里判断一下rules中是否有required
+          if (tempRules[field].find((item: any) => item.required)) {
+            // 设置必填
+            props.formDesc[field].required = true
+          }
         } else if (required) {
           let rules = 'notAllBlank'
           switch (props.formDesc[field].type) {

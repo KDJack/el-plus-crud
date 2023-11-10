@@ -6,7 +6,7 @@
       </template>
     </template>
     <div v-else>
-      <span class="no-img-tip">—</span>
+      <span class="no-img-tip">-</span>
     </div>
   </div>
 </template>

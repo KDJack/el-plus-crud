@@ -70,7 +70,7 @@ watch(
   () => props.modelValue,
   async () => {
     if (!props.desc.format) {
-      formatValue.value = props.modelValue === '' ? props.desc.default ?? '—' : props.modelValue ?? props.desc.default ?? '—'
+      formatValue.value = props.modelValue === '' ? props.desc.default ?? '-' : props.modelValue ?? props.desc.default ?? '-'
     } else {
       if (typeof props.desc.format === 'function') {
         // 如果有方法类型的判断，则需要启用动态监测
@@ -78,7 +78,7 @@ watch(
       } else if (typeof props.desc.format === 'string') {
         formatValue.value = format[props.desc.format] ? format[props.desc.format](props.modelValue, props.formData || {}, props.field) : '--'
       } else {
-        formatValue.value = props.modelValue || '—'
+        formatValue.value = props.modelValue || '-'
       }
     }
   },

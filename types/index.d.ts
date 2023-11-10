@@ -1,3 +1,5 @@
+import { Ref } from 'vue'
+
 // 基础类型
 export type IBaseObj = IBaseObj
 
@@ -79,14 +81,14 @@ export type IDescItem = {
  */
 export interface IFormDescItem extends IDescItem {
   field?: string
-  disabled?: boolean | ((data?: any) => boolean)
+  disabled?: boolean | Ref<boolean> | ((data?: any) => boolean)
   showLabel?: boolean
   labelWidth?: string | number
   tip?: string | ((data?: any) => string)
   size?: string
   placeholder?: string
   attrs?: IBaseObj | ((data?: any) => IBaseObj)
-  options?: Array<IFormDescItemOptionItem> | IFetch<Array<IFormDescItemOptionItem>> | string
+  options?: Ref<Array<IFormDescItemOptionItem>> | Array<IFormDescItemOptionItem> | (() => Array<IFormDescItemOptionItem>) | IFetch<Array<IFormDescItemOptionItem>> | string
   default?: string | boolean | number
   defaultItem?: { value: string | number; label: string; dataItem?: IBaseObj }
   rules?: string | Array<any>

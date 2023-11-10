@@ -18,7 +18,7 @@ import { ICRUDConfig } from 'types'
 const defaultConf = inject('defaultConf') as ICRUDConfig
 
 const props = defineProps<{
-  modelValue?: number | null
+  modelValue?: string | number | null
   field?: string
   loading?: boolean
   desc: { [key: string]: any }
@@ -28,7 +28,7 @@ const props = defineProps<{
 }>()
 
 const emits = defineEmits(['update:modelValue', 'validateThis'])
-const currentValue = ref(props.modelValue)
+const currentValue = ref(typeof props.modelValue === 'string' ? +props.modelValue : props.modelValue)
 emits('update:modelValue', currentValue)
 const attrs = ref({} as any)
 const isInit = ref(false)
@@ -104,9 +104,9 @@ const numBindAttr = computed(() => {
 
 // 判断一下初始值
 if (currentValue.value !== undefined && currentValue.value !== null) {
-  if (currentValue.value < numBindAttr.value.min) {
+  if (+currentValue.value < numBindAttr.value.min) {
     currentValue.value = numBindAttr.value.min
-  } else if (currentValue.value > numBindAttr.value.max) {
+  } else if (+currentValue.value > numBindAttr.value.max) {
     currentValue.value = numBindAttr.value.max
   }
 }

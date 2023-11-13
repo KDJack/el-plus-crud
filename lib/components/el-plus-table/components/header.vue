@@ -193,7 +193,7 @@ async function handelDownload({ callBack }: IBtnBack) {
  * 处理搜索
  */
 function handelSearch() {
-  elPlusFormRef.value.submit()
+  elPlusFormRef.value?.submit()
 }
 
 /**
@@ -202,7 +202,7 @@ function handelSearch() {
 function handelReset() {
   elPlusFormRef.value.clear()
   nextTick(() => {
-    elPlusFormRef.value.submit()
+    elPlusFormRef.value?.submit()
   })
 }
 
@@ -251,7 +251,13 @@ function initCol() {
   }
 }
 
-onMounted(() => {})
+onMounted(() => {
+  nextTick(() => {
+    setTimeout(() => {
+      handelSearch()
+    }, 200)
+  })
+})
 
 defineExpose({ getData: () => elPlusFormRef.value?.getData(), initCol })
 </script>

@@ -206,7 +206,7 @@ const listLoading = ref(false)
 const size = defaultConf.size || 'default'
 
 // 顶部查询条件数据缓存
-const topQueryData = ref({} as any)
+// const topQueryData = ref({} as any)
 
 // 数据
 let toolFormData = reactive({} as any)
@@ -497,8 +497,8 @@ async function getListQueryData() {
   let queryMap = {
     // 封装查询条件
     // ...route.query,
-    // ...tableHeaderRef.value.getData(),
-    ...topQueryData.value,
+    // ...topQueryData.value,
+    ...tableHeaderRef.value.getData(),
     ...(typeof props.tableConfig.queryMap === 'function' ? await props.tableConfig.queryMap() : props.tableConfig.queryMap),
     t_: new Date().getTime()
   } as any
@@ -694,7 +694,7 @@ async function reload(isTab: boolean = false) {
  * 处理顶部条件表单筛选
  */
 async function handelTopQuery() {
-  topQueryData.value = cloneDeep(tableHeaderRef.value.getData())
+  // topQueryData.value = cloneDeep(tableHeaderRef.value.getData())
   let tempQueryData = await getListQueryData()
   if (props.tableConfig?.toolbar?.formConfig?.beforeRequest) {
     tempQueryData = props.tableConfig?.toolbar?.formConfig?.beforeRequest(JSON.parse(JSON.stringify(tempQueryData))) || tempQueryData
@@ -741,7 +741,10 @@ if (props.isDIYMain) {
 }
 
 onMounted(() => {
-  reload()
+  // toolbar.formConfig
+  if (!(Object.keys(props.tableConfig?.toolbar?.formConfig || {}).length || props.tableConfig?.tbName)) {
+    reload()
+  }
 })
 
 defineExpose({ reload, tableData, changeSelect, resetSelect, initCol })

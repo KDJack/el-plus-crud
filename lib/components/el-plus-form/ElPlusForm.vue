@@ -45,7 +45,7 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { ref, computed, useAttrs, nextTick, onMounted, watch, inject } from 'vue'
+import { ref, computed, useAttrs, nextTick, onMounted, watch, inject, Ref } from 'vue'
 import { castArray, isMobile, time, cloneDeep, throttle, isPromiseLike } from './util'
 import * as validates from './util/validate'
 import { typeList } from './components/index'
@@ -212,7 +212,7 @@ const computedRules = computed(() => {
   if (props.formDesc) {
     Object.keys(props.formDesc).map((field: any) => {
       if (!tempRules[field]) tempRules[field] = []
-      let required = false as boolean | ((data?: any) => boolean)
+      let required = false as boolean | ((data?: any) => boolean) | Ref<boolean>
       if (props.formDesc && props.formDesc[field]) {
         required = (props.formDesc && props.formDesc[field].required) || false
       }

@@ -47,7 +47,8 @@ export default {
     actionMap: {
       actionKey: 'uploadUrl',
       nameKey: 'objectName',
-      uploadIdKey: 'uploadId'
+      uploadIdKey: 'uploadId',
+      objectUrlKey: 'objectUrl'
     },
     // 上传图片最大限制
     maxISize: 1024 * 1024 * 20,

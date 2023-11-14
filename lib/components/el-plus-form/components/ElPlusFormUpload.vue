@@ -18,6 +18,7 @@
 
     <!-- 图片查看的站位标签 -->
     <el-image-viewer v-if="showPreview" @close="showPreview = false" teleported :initialIndex="previewIndex" :url-list="previewList" />
+
     <div v-if="!attrs.autoUpload" class="upload-hands-submit">
       <el-button style="margin-left: 10px" size="small" type="success" @click="submit" :disabled="attrs.disabled"> 上传到服务器 </el-button>
     </div>
@@ -54,6 +55,7 @@ interface IUpAction {
   action: string
   uploadId?: string
   token?: string
+  furl?: string
 }
 
 const defaultConf = inject('defaultConf') as ICRUDConfig
@@ -117,6 +119,9 @@ onBeforeMount(async () => {
   if (props.desc?.uploadFn || defaultConf.upload?.uploadFn) {
     attrs.value.httpRequest = handelRequest
   } else {
+    if (defaultConf.upload?.type === 'minio') {
+      attrs.value.method = 'PUT'
+    }
     attrs.value.action = upAction
   }
   isInit.value = true
@@ -134,20 +139,22 @@ async function handelUploadBefore(file: any) {
     return false
   }
   // 校验上传类型
-  if (['minio'].indexOf(defaultConf.upload?.type || '') >= 0 && !defaultConf.upload?.uploadFn) {
-    defaultConf.debug && ElMessage.warning(`上传 ${defaultConf.upload?.type} 类型需要在config或者desc中配置uploadFn方法~`)
-    defaultConf.debug && console.warn(`上传 ${defaultConf.upload?.type} 类型需要在config或者desc中配置uploadFn方法~`)
-    return false
-  }
+  // if (['minio'].indexOf(defaultConf.upload?.type || '') >= 0 && !defaultConf.upload?.uploadFn) {
+  //   defaultConf.debug && ElMessage.warning(`上传 ${defaultConf.upload?.type} 类型需要在config或者desc中配置uploadFn方法~`)
+  //   defaultConf.debug && console.warn(`上传 ${defaultConf.upload?.type} 类型需要在config或者desc中配置uploadFn方法~`)
+  //   // return false
+  // }
   try {
     // 这里先用本地地址进行占位
     file.furl = URL.createObjectURL(file)
+    console.log('file: ', file)
     // 获取文件上传的action
     let actionInfo = {} as IUpAction
-    if (props.desc?.action) actionInfo = await getActionInfo(props.desc?.action, file)
-    if (!actionInfo.action) actionInfo = await getActionInfo(defaultConf.upload?.action, file)
+    if (props.desc?.action) actionInfo = await getActionInfo(props.desc?.action, { fileName: file.name })
+    if (!actionInfo.action) actionInfo = await getActionInfo(defaultConf.upload?.action, { fileName: file.name })
     upAction.value = actionInfo.action
     file.uploadId = actionInfo.uploadId || ''
+    file.path = actionInfo.furl
 
     // 获取上传的token
     if (props.desc?.token || defaultConf.upload?.token) {
@@ -164,7 +171,7 @@ async function handelUploadBefore(file: any) {
  * @param param
  */
 async function getActionInfo(action: string | Function | undefined, param?: any): Promise<IUpAction> {
-  const tempInfo = { action: '', uploadId: undefined, token: undefined }
+  const tempInfo = { action: '', uploadId: undefined, token: undefined, furl: '' }
   if (typeof action === 'function') {
     const result = action({ ...(param || {}), type: defaultConf.upload?.type })
     const uploadInfo = isPromiseLike<any>(result) ? await result : result
@@ -172,6 +179,7 @@ async function getActionInfo(action: string | Function | undefined, param?: any)
       tempInfo.action = getValue(props.desc?.actionMap?.actionKey || defaultConf.upload?.actionMap?.actionKey || [], uploadInfo)
       tempInfo.uploadId = getValue(props.desc?.actionMap?.uploadIdKey || defaultConf.upload?.actionMap?.uploadIdKey || [], uploadInfo)
       tempInfo.token = getValue(props.desc?.tokenKey || defaultConf.upload?.tokenKey || [], uploadInfo)
+      tempInfo.furl = getValue(props.desc?.actionMap?.objectUrlKey || defaultConf.upload?.actionMap?.objectUrlKey || [], uploadInfo)
     } else {
       tempInfo.action = uploadInfo as string
     }
@@ -207,6 +215,7 @@ async function getToken(token: string | Object | Function | undefined, param?: a
  * @param fileList
  */
 async function handelUploadSuccess(response: any, file: any) {
+  debugger
   // 获取文件上传的token以及上传路径
   if (defaultConf.upload?.sign) {
     let signInfo = {} as any
@@ -219,14 +228,14 @@ async function handelUploadSuccess(response: any, file: any) {
     file.raw.previewUrl = getValue(defaultConf.upload.signMap?.previewUrlKey || [], signInfo)
     file.raw.path = getValue(defaultConf.upload.signMap?.objectUrlKey || [], signInfo)
   } else {
-    file.raw.previewUrl = response.furl || file.path
-    file.raw.path = response.furl || file.path
+    file.raw.previewUrl = file.path || response.furl
+    file.raw.path = file.path || response.furl
   }
   file.raw.shareUrl = file.path
   if (props.desc.upType !== 'file') {
     file.url = getFileIcon(file.raw)
   } else {
-    file.url = response.furl || file.path
+    file.url = file.path || response.furl
   }
   handelListChange(file, 1)
 }
@@ -268,6 +277,7 @@ function handelUploadRemove(file: UploadUserFile) {
  * @param type 0 : 删除; 1: 新增
  */
 function handelListChange(item: UploadUserFile, type: 0 | 1) {
+  debugger
   if (type === 1) {
     currentValue.value.push({
       name: item.name,
@@ -319,13 +329,8 @@ function handleOutOfLimit() {
  */
 async function handelRequest(param: any) {
   param.action = upAction.value
-  if (props.desc?.uploadFn) {
-    await props.desc.uploadFn(param)
-  } else {
-    if (defaultConf.upload?.uploadFn) {
-      await defaultConf.upload.uploadFn(param)
-    }
-  }
+  const uploadFn = props.desc?.uploadFn || defaultConf.upload?.uploadFn
+  await uploadFn(param)
 }
 
 // 手动调用上传的方法

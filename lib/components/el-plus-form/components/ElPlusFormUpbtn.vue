@@ -60,7 +60,7 @@ const uploadAttr = {
           })
       })
     } else {
-      return handelBeforeUpload(file)
+      return await handelBeforeUpload(file)
     }
   },
   onError: () => {
@@ -90,25 +90,25 @@ const btnShowText = computed(() => {
  * @param file
  */
 function handelBeforeUpload(file: UploadRawFile) {
-  isLoading.value = true
-  const suffix = file.name.substring(file.name.lastIndexOf('.'))
-  // 校验文件类型
-  const accept = props.desc.accept || props.desc.attrs.accept || ['.xlsx', '.xls']
-  if (accept.indexOf(suffix) < 0) {
-    ElMessage.warning(`请上传后缀为${accept.join(',')}格式的文件!`)
-    isLoading.value = false
-    return false
-  }
-  // 校验文件大小
-  if (file.size > 20 * 1024 * 1024) {
-    ElMessage.warning('超出文件大小限制(最大为20M)!')
-    isLoading.value = false
-    return false
-  }
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(true)
-    }, 1000)
+  return new Promise((resolve, reject) => {
+    isLoading.value = true
+    const suffix = file.name.substring(file.name.lastIndexOf('.'))
+    // 校验文件类型
+    const accept = props.desc.accept || props.desc.attrs.accept || ['.xlsx', '.xls']
+    if (accept.indexOf(suffix) < 0) {
+      ElMessage.warning(`请上传后缀为${accept.join(',')}格式的文件!`)
+      isLoading.value = false
+      reject(false)
+      return false
+    }
+    // 校验文件大小
+    if (file.size > 20 * 1024 * 1024) {
+      ElMessage.warning('超出文件大小限制(最大为20M)!')
+      isLoading.value = false
+      reject(false)
+      return false
+    }
+    resolve(true)
   })
 }
 
@@ -122,6 +122,9 @@ watch(
 
 onBeforeMount(async () => {
   attrs.value = await getAttrs(props, { ...uploadAttr, ...useAttrs() })
+  if (!attrs.value.action) {
+    console.warn('上传组件未填写action...')
+  }
   attrs.value.onSuccess = (response: any) => {
     if (props.desc?.on?.success) {
       props.desc.on.success({

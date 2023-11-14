@@ -12,8 +12,13 @@
                 <ElPlusFormBtn type="primary" v-if="props.toolbar.export" :desc="{ label: '导出Excel', size, mask: true, on: { click: handelDownload } }" />
                 <template v-for="(item, i) in headerBtns" :key="i">
                   <template v-if="getVIf(item)">
-                    <ElPlusFormUpbtn v-if="item.elType === 'upload'" :desc="item" :loading="loading" />
-                    <ElPlusFormBtn v-else :desc="item" :loading="loading" />
+                    <template v-if="item.customize">
+                      <component :is="item.elType" v-bind="item"></component>
+                    </template>
+                    <template v-else>
+                      <ElPlusFormUpbtn v-if="item.elType === 'upload'" :desc="item" :loading="loading" />
+                      <ElPlusFormBtn v-else :desc="item" :loading="loading" />
+                    </template>
                   </template>
                 </template>
               </div>
@@ -23,8 +28,13 @@
         <div v-else class="el-plus-table-header-btns" :style="{ 'min-width': isMobile() ? '100%' : headerBtns && headerBtns.length > 0 ? headerBtns.length * 110 + 'px' : '10px' }">
           <div class="el-plus-table-header-btn">
             <template v-for="(item, i) in headerBtns" :key="i">
-              <ElPlusFormUpbtn v-if="item.elType === 'upload'" :desc="item" :loading="loading" />
-              <ElPlusFormBtn v-else :desc="item" :loading="loading" />
+              <template v-if="item.customize">
+                <component :is="item.elType" v-bind="item"></component>
+              </template>
+              <template v-else>
+                <ElPlusFormUpbtn v-if="item.elType === 'upload'" :desc="item" :loading="loading" />
+                <ElPlusFormBtn v-else :desc="item" :loading="loading" />
+              </template>
             </template>
           </div>
         </div>

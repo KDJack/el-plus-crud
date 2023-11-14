@@ -517,6 +517,8 @@ export interface ICRUDConfig {
       nameKey: string | Array<string>
       // 获取文件上传id对象key，如果不在根级，则需使用数组的形式。如：data.xxx.uploadId 就需要写为 ['data', 'xxx', 'uploadId']
       uploadIdKey: string | Array<string>
+      // 获取文件对象的地址key，如果不在根级，则需使用数组的形式。如：data.xxx.objectUrl 就需要写为 ['data', 'xxx', 'objectUrl']
+      objectUrlKey: string | Array<string>
     }
     // 上传图片最大限制
     maxISize?: number

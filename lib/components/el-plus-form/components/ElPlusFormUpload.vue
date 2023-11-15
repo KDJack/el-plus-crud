@@ -11,9 +11,6 @@
           {{ desc.text || '拖拽/点击上传' }}
         </div>
       </div>
-      <!-- <template #file="file">
-				<UploadShowIcon :file="file"></UploadShowIcon>
-			</template> -->
     </el-upload>
 
     <!-- 图片查看的站位标签 -->
@@ -35,7 +32,7 @@ export default {
 <script lang="ts" setup>
 import { ref, computed, useAttrs, onBeforeMount, watch, inject } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
-import { ElMessage, UploadUserFile } from 'element-plus'
+import { ElMessage, UploadRequestOptions, UploadUserFile } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 
 import * as fileTypes from '../data/file'
@@ -98,7 +95,7 @@ const previewList = computed(() => {
 
 onBeforeMount(async () => {
   if (!defaultConf.upload?.sign && !props.desc?.sign) {
-    defaultConf.debug && console.warn('上传私有仓库必须在config或desc中配置sign方法进行图片/文件鉴权，否则图片将无法显示和预览！')
+    defaultConf.debug && console.warn('上传私有加密仓库必须在config或desc中配置sign方法进行图片/文件签名鉴权，否则图片将无法显示和预览！')
   }
   attrs.value = await getAttrs(props, {
     drag: true,
@@ -138,27 +135,27 @@ async function handelUploadBefore(file: any) {
     ElMessage.warning(message)
     return false
   }
-  // 校验上传类型
-  // if (['minio'].indexOf(defaultConf.upload?.type || '') >= 0 && !defaultConf.upload?.uploadFn) {
-  //   defaultConf.debug && ElMessage.warning(`上传 ${defaultConf.upload?.type} 类型需要在config或者desc中配置uploadFn方法~`)
-  //   defaultConf.debug && console.warn(`上传 ${defaultConf.upload?.type} 类型需要在config或者desc中配置uploadFn方法~`)
-  //   // return false
-  // }
   try {
     // 这里先用本地地址进行占位
-    file.furl = URL.createObjectURL(file)
-    console.log('file: ', file)
+    file.url = URL.createObjectURL(file)
     // 获取文件上传的action
     let actionInfo = {} as IUpAction
     if (props.desc?.action) actionInfo = await getActionInfo(props.desc?.action, { fileName: file.name })
     if (!actionInfo.action) actionInfo = await getActionInfo(defaultConf.upload?.action, { fileName: file.name })
     upAction.value = actionInfo.action
     file.uploadId = actionInfo.uploadId || ''
-    file.path = actionInfo.furl
+    file.furl = actionInfo.furl
 
     // 获取上传的token
     if (props.desc?.token || defaultConf.upload?.token) {
       attrs.value.data = { token: await getToken(props.desc?.token || defaultConf.upload?.token, file) }
+    }
+
+    if (!props.desc?.uploadFn && defaultConf.upload?.type === 'minio') {
+      attrs.value.data = file
+      attrs.value.headers = {
+        'Content-Type': file.type
+      }
     }
   } catch (e) {
     defaultConf.debug && console.log('获取action出错: ', e)
@@ -214,8 +211,7 @@ async function getToken(token: string | Object | Function | undefined, param?: a
  * @param file
  * @param fileList
  */
-async function handelUploadSuccess(response: any, file: any) {
-  debugger
+async function handelUploadSuccess(_: any, file: any) {
   // 获取文件上传的token以及上传路径
   if (defaultConf.upload?.sign) {
     let signInfo = {} as any
@@ -226,16 +222,16 @@ async function handelUploadSuccess(response: any, file: any) {
       signInfo = result
     }
     file.raw.previewUrl = getValue(defaultConf.upload.signMap?.previewUrlKey || [], signInfo)
-    file.raw.path = getValue(defaultConf.upload.signMap?.objectUrlKey || [], signInfo)
+    file.raw.shareUrl = getValue(defaultConf.upload.signMap?.objectUrlKey || [], signInfo)
+    file.raw.url = file.raw.shareUrl
   } else {
-    file.raw.previewUrl = file.path || response.furl
-    file.raw.path = file.path || response.furl
+    file.raw.previewUrl = file.raw.furl
+    file.raw.shareUrl = file.raw.furl
   }
-  file.raw.shareUrl = file.path
   if (props.desc.upType !== 'file') {
     file.url = getFileIcon(file.raw)
   } else {
-    file.url = file.path || response.furl
+    file.url = file.raw.furl
   }
   handelListChange(file, 1)
 }
@@ -245,7 +241,7 @@ async function handelUploadSuccess(response: any, file: any) {
  * @param file
  */
 function getFileIcon(file?: any): string {
-  const fileUrl = file.shareUrl || file.furl || file.path || file.url
+  const fileUrl = file.shareUrl || file.furl || file.url
   const suffix = (file?.suffix || fileUrl.substring(fileUrl.lastIndexOf('.')) || '') as string
   if (suffix) {
     if (fileTypes.imageSuffixes.indexOf(suffix.toLocaleLowerCase()) >= 0) {
@@ -277,11 +273,10 @@ function handelUploadRemove(file: UploadUserFile) {
  * @param type 0 : 删除; 1: 新增
  */
 function handelListChange(item: UploadUserFile, type: 0 | 1) {
-  debugger
   if (type === 1) {
     currentValue.value.push({
       name: item.name,
-      furl: (item.raw as any)?.path || item.url,
+      furl: item.url,
       url: props.desc.upType !== 'file' ? getFileIcon(item.raw) : item.url,
       fsize: item.size,
       uid: item.uid,
@@ -296,7 +291,6 @@ function handelListChange(item: UploadUserFile, type: 0 | 1) {
       currentValue.value.splice(index, 1)
     }
   }
-  console.log('currentValue: ', currentValue.value)
   emits('validateThis')
 }
 
@@ -306,7 +300,7 @@ function handelListChange(item: UploadUserFile, type: 0 | 1) {
  */
 function handelPreview(file: any) {
   if (fileTypes.imageSuffixes.indexOf(file.raw?.suffix || file.suffix) >= 0) {
-    previewIndex.value = previewList.value.findIndex((item) => item === (file.raw?.shareUrl || file.raw?.path || file.furl))
+    previewIndex.value = previewList.value.findIndex((item) => item === (file.raw?.shareUrl || file.furl))
     if (previewIndex.value < 0) {
       previewIndex.value = 0
     }
@@ -327,10 +321,10 @@ function handleOutOfLimit() {
  * 处理自定义上传
  * @param param
  */
-async function handelRequest(param: any) {
+function handelRequest(param: UploadRequestOptions) {
   param.action = upAction.value
   const uploadFn = props.desc?.uploadFn || defaultConf.upload?.uploadFn
-  await uploadFn(param)
+  return uploadFn(param)
 }
 
 // 手动调用上传的方法

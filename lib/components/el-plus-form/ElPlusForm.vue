@@ -149,7 +149,7 @@ const props = withDefaults(defineProps<IFormProps>(), {
   // 是否显示标签
   showLabel: true,
   // 标签宽度
-  labelWidth: '',
+  labelWidth: 'auto',
   // 全局禁用表单
   disabled: false,
   // 是否为弹窗
@@ -192,7 +192,7 @@ const formLayout = computed(() => ({ display: 'flex', flexDirection: props.isTab
 const computedFormAttrs = computed(() => {
   return {
     ...props.formAttrs,
-    _labelWidth: props.labelWidth === 'auto' ? (props.isDialog ? '100px' : '120px') : parseInt(props.labelWidth + '') + 'px',
+    _labelWidth: props.isTable ? 'auto' : props.labelWidth === 'auto' ? (props.isDialog ? '100px' : '120px') : parseInt(props.labelWidth + '') + 'px',
     // validateOnRuleChange: false,
     disabled: props.disabled || innerIsLoading.value,
     rules: computedRules,

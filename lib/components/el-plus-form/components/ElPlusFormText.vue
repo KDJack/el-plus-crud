@@ -28,6 +28,7 @@ const props = defineProps<{
   loading?: boolean
   desc: { [key: string]: any }
   formData?: { [key: string]: any }
+  rowIndex?: number
 }>()
 
 // 有点击事件时，才inject
@@ -84,7 +85,7 @@ watch(
     } else {
       if (typeof props.desc.format === 'function') {
         // 如果有方法类型的判断，则需要启用动态监测
-        const result = props.desc.format(props.modelValue, props.formData, props.field)
+        const result = props.desc.format(props.modelValue, props.formData, props.rowIndex)
         formatValue.value = isPromiseLike<any>(result) ? await result : result
       } else if (typeof props.desc.format === 'string') {
         formatValue.value = format[props.desc.format] ? format[props.desc.format](props.modelValue, props.formData, props.field) : '--'

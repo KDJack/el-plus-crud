@@ -72,7 +72,12 @@ export function handelListColumn(columnList: Array<IColumnItem> | undefined, def
     cloneDeep(columnList).map((item: IColumnItem) => {
       // 如果有子集
       if (item.children) {
-        item.children = handelListColumn(item.children, defaultConf, tbName, headerAlign, minWidth)
+        // 表头居中
+        item.headerAlign = item.headerAlign || 'center'
+        item.children = handelListColumn(item.children, defaultConf, tbName, 'center', minWidth)
+      } else {
+        // 表头居中
+        item.headerAlign = item.headerAlign || headerAlign || 'left'
       }
 
       // 处理下一个单元格显示多个数据
@@ -110,11 +115,6 @@ export function handelListColumn(columnList: Array<IColumnItem> | undefined, def
 
       // 处理vif
       handelVIf(item, defaultConf, tbName)
-
-      // 表头居中
-      if (item.children?.length) {
-        item.headerAlign = item.headerAlign || headerAlign || 'center'
-      }
 
       tempColumnList.push(item)
     })

@@ -512,13 +512,13 @@ export interface ICRUDConfig {
     // 如果action返回的值是对象的话，则按照以下map进行解析
     actionMap?: {
       // 获取文件上传地址的对象key，如果不在根级，则需使用数组的形式。如：data.xxx.action 就需要写为 ['data', 'xxx', 'action']
-      actionKey: string | Array<string>
+      actionKey?: string | Array<string>
       // 获取文件对象的名称key，如果不在根级，则需使用数组的形式。如：data.xxx.name 就需要写为 ['data', 'xxx', 'name']
-      nameKey: string | Array<string>
+      nameKey?: string | Array<string>
       // 获取文件上传id对象key，如果不在根级，则需使用数组的形式。如：data.xxx.uploadId 就需要写为 ['data', 'xxx', 'uploadId']
-      uploadIdKey: string | Array<string>
+      uploadIdKey?: string | Array<string>
       // 获取文件对象的地址key，如果不在根级，则需使用数组的形式。如：data.xxx.objectUrl 就需要写为 ['data', 'xxx', 'objectUrl']
-      objectUrlKey: string | Array<string>
+      objectUrlKey?: string | Array<string>
     }
     // 上传图片最大限制
     maxISize?: number
@@ -535,9 +535,9 @@ export interface ICRUDConfig {
     // 解析签名数据Map
     signMap?: {
       // 获取文件对象的地址key，如果不在根级，则需使用数组的形式。如：data.xxx.objectUrl 就需要写为 ['data', 'xxx', 'objectUrl']
-      objectUrlKey: string | Array<string>
+      objectUrlKey?: string | Array<string>
       // 获取文件上传地址的对象key，如果不在根级，则需使用数组的形式。如：data.xxx.previewUrl 就需要写为 ['data', 'xxx', 'previewUrl']
-      previewUrlKey: string | Array<string>
+      previewUrlKey?: string | Array<string>
     }
     // 分片配置
     sharding?: {

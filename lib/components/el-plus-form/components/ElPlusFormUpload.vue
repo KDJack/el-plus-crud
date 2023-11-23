@@ -211,7 +211,11 @@ async function getToken(token: string | Object | Function | undefined, param?: a
  * @param file
  * @param fileList
  */
-async function handelUploadSuccess(_: any, file: any) {
+async function handelUploadSuccess(response: any, file: any) {
+  if (response.data) {
+    // 从结果集中获取一下furl
+    file.raw.furl = getValue(defaultConf.upload?.actionMap?.objectUrlKey || [], response.data)
+  }
   // 获取文件上传的token以及上传路径
   if (defaultConf.upload?.sign) {
     let signInfo = {} as any

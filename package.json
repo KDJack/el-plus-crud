@@ -2,7 +2,7 @@
   "name": "el-plus-crud",
   "description": "采用Vue3 + TS，封装的element-plus数据驱动表单、列表组件",
   "author": "K.D.Jack",
-  "version": "0.0.105",
+  "version": "0.0.106",
   "license": "MIT",
   "private": false,
   "main": "dist/el-plus-crud.mjs",
@@ -35,6 +35,7 @@
   "dependencies": {
     "@element-plus/icons-vue": "^2.1.0",
     "element-plus": "^2.3.6",
+    "lodash": "^4.17.21",
     "vue": "^3.2.47"
   },
   "devDependencies": {

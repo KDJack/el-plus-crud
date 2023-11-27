@@ -151,10 +151,21 @@ async function handelUploadBefore(file: any) {
       attrs.value.data = { token: await getToken(props.desc?.token || defaultConf.upload?.token, file) }
     }
 
-    if (!props.desc?.uploadFn && defaultConf.upload?.type === 'minio') {
-      attrs.value.data = file
-      attrs.value.headers = {
-        'Content-Type': file.type
+    if (!props.desc?.uploadFn) {
+      if (defaultConf.upload?.type === 'minio') {
+        attrs.value.data = file
+        attrs.value.headers = {
+          'Content-Type': file.type
+        }
+      } else {
+        const formData = new FormData()
+        console.log('file: ', file)
+        formData.append('file', file, file.name)
+        attrs.value.data = formData
+        attrs.value.headers = {
+          // 'Content-Type': 'multipart/form-data'
+          'Content-Type': 'multipart/form-data; boundary=--------------------------751579501497574524645233'
+        }
       }
     }
 
@@ -230,6 +241,7 @@ async function getToken(token: string | Object | Function | undefined, param?: a
  * @param fileList
  */
 async function handelUploadSuccess(response: any, file: any) {
+  console.log('response: ', response)
   if (response && Object.keys(response).length > 0) {
     // 从结果集中获取一下furl
     const tempUrl = getValue(defaultConf.upload?.actionMap?.objectUrlKey || [], response)

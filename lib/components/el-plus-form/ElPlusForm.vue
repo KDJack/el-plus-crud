@@ -46,7 +46,8 @@ export default {
 </script>
 <script lang="ts" setup>
 import { ref, computed, useAttrs, nextTick, onMounted, watch, inject, Ref } from 'vue'
-import { castArray, isMobile, time, cloneDeep, throttle, isPromiseLike } from './util'
+import { castArray, isMobile, time, throttle, isPromiseLike } from './util'
+import { cloneDeep } from 'lodash'
 import * as validates from './util/validate'
 import { typeList } from './components/index'
 import ElPlusFormBtn from './components/ElPlusFormBtn.vue'
@@ -642,6 +643,8 @@ const handleSubmitForm = async () => {
         }
       })
     } catch (error) {
+      // eslint-disable-next-line
+      console.log('error: ', error)
       // 如果用户有处理异常的方法了
       if (tempAttr.requestError && typeof tempAttr.requestError === 'function') {
         tempAttr.requestError(error)

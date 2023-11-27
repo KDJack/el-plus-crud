@@ -72,7 +72,7 @@ export default {
 <script lang="ts" setup>
 import { ref, reactive, nextTick, watch, onMounted, computed, inject, onBeforeMount, useAttrs } from 'vue'
 import { Share, UserFilled } from '@element-plus/icons-vue'
-import { cloneDeep } from '../util'
+import { cloneDeep } from 'lodash'
 import { getAttrs } from '../mixins'
 import { ICRUDConfig } from 'types'
 

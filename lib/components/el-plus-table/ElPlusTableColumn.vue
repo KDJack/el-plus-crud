@@ -29,7 +29,7 @@ export default {
 import { computed } from 'vue'
 import { IColumnItem } from 'types'
 import ColumnItem from './components/columnItem.vue'
-import { cloneDeep } from './util'
+import { cloneDeep } from 'lodash'
 
 const props = defineProps<{
   item: IColumnItem

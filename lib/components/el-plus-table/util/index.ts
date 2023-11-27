@@ -1,3 +1,4 @@
+import { cloneDeep } from 'lodash'
 import { ICRUDConfig, IColumnItem } from 'types'
 
 /**
@@ -190,18 +191,6 @@ export const mapToUrlStr = (map: any, excludeList?: any) => {
     }
   }
   return queryStr
-}
-
-/**
- * 深度拷贝
- * @param val
- * @returns
- */
-export function cloneDeep(val: any) {
-  if (val === null || typeof val !== 'object') return val
-  const res = new val.constructor()
-  for (var key in val) res[key] = cloneDeep(val[key]) // 递归调用
-  return res
 }
 
 /**

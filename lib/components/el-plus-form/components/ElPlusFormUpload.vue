@@ -157,6 +157,24 @@ async function handelUploadBefore(file: any) {
         'Content-Type': file.type
       }
     }
+
+    // if (!props.desc?.uploadFn) {
+    //   if (defaultConf.upload?.type === 'minio') {
+    //     attrs.value.data = file
+    //     attrs.value.headers = {
+    //       'Content-Type': file.type
+    //     }
+    //   } else {
+    //     const formData = new FormData()
+    //     console.log('file: ', file)
+    //     formData.append('file', file, file.name)
+    //     attrs.value.data = formData
+    //     attrs.value.headers = {
+    //       // 'Content-Type': 'multipart/form-data'
+    //       'Content-Type': 'multipart/form-data; boundary=--------------------------751579501497574524645233'
+    //     }
+    //   }
+    // }
   } catch (e) {
     defaultConf.debug && console.log('获取action出错: ', e)
   }

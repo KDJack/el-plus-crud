@@ -1,3 +1,5 @@
+import { cloneDeep } from 'lodash'
+
 // 是否定义
 export function isDef(val: any) {
   return !isUnDef(val)
@@ -300,18 +302,6 @@ function checkTen(val: any) {
     return '0' + val
   }
   return val
-}
-
-/**
- * 深度拷贝
- * @param val
- * @returns
- */
-export function cloneDeep(val: any) {
-  if (val === null || typeof val !== 'object') return val
-  const res = new val.constructor()
-  for (var key in val) res[key] = cloneDeep(val[key]) // 递归调用
-  return res
 }
 
 /**

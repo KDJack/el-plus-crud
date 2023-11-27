@@ -35,7 +35,7 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { cloneDeep } from '../util'
+import { cloneDeep } from 'lodash'
 import { ref, reactive, watch, onMounted, computed } from 'vue'
 import { getEvents } from '../mixins'
 import { IBtnBack, ITableConfig } from 'types'

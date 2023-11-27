@@ -43,7 +43,7 @@
         v-bind="tableConfig.tableAttr"
         :class="{ 'big-h-bar': tableConfig?.tableAttr?.bigHBar, 'big-v-bar': tableConfig.tableAttr?.bigVBar }"
         :data="tableData"
-        :row-key="rowKey"
+        :row-key="isTempId ? 'tempId' : rowKey"
         lazy
         :load="loadExpandData"
         :size="size"
@@ -146,6 +146,8 @@ const props = withDefaults(
     colMinWidth?: string
     // 表头文本排列方式
     headerAlign?: 'left' | 'right' | 'center'
+    // 是否使用tempId
+    isTempId?: boolean
   }>(),
   {
     modelValue: null,
@@ -161,7 +163,8 @@ const props = withDefaults(
     isDIYMain: false,
     selectList: () => [],
     colMinWidth: 'auto',
-    headerAlign: 'left'
+    headerAlign: 'left',
+    isTempId: true
   }
 )
 
@@ -642,6 +645,14 @@ async function loadData(isInit: Boolean) {
     } else {
       dataResult = dataPage[props.tableConfig?.fetchMap?.list || 'records'] || null
     }
+
+    if (props.isTempId && Array.isArray(dataResult)) {
+      const nowTime = new Date().getTime()
+      dataResult.map((item, i) => {
+        item.tempId = `${nowTime + i}`
+      })
+    }
+
     tableData.value = dataResult
     // 如果是树形结构
     if (props.type === 'expand') {

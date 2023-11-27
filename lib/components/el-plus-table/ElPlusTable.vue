@@ -163,8 +163,7 @@ const props = withDefaults(
     isDIYMain: false,
     selectList: () => [],
     colMinWidth: 'auto',
-    headerAlign: 'left',
-    isTempId: true
+    headerAlign: 'left'
   }
 )
 

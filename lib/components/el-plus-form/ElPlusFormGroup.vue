@@ -80,9 +80,7 @@ const getGroupFowmLayout = computed(() => {
     return item._vif
   })
 
-  console.log('props.formGroup: ', props.formGroup)
   const tempFormConfig = cloneDeep(props.formGroup) as any
-  console.log('tempFormConfig: ', tempFormConfig)
   const column = props.formGroup.column || 1
   // 移除无用
   delete tempFormConfig.group
@@ -110,7 +108,6 @@ const getGroupFowmLayout = computed(() => {
       formProps: Object.assign({ column: groupItem.column || column }, i === tempGroupList.length - 1 ? tempFormConfig : { showBtns: false }, groupItem || {}) as IFormProps
     })
   })
-  console.log('formConfigList: ', formConfigList)
   return formConfigList
 })
 

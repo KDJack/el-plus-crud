@@ -394,8 +394,8 @@ async function handelTabChange(val: string | number | boolean) {
  * @param treeNode
  * @param resolve
  */
-function loadExpandData(row: any, treeNode: any, resolve: any) {
-  const postData = getListQueryData()
+async function loadExpandData(row: any, treeNode: any, resolve: any) {
+  const postData = await getListQueryData()
   postData[props.tableConfig?.explan?.idName || 'parentId'] = row.id
   props.tableConfig.fetch &&
     props.tableConfig.fetch(postData).then((pageInfo) => {

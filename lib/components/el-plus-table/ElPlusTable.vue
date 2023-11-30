@@ -251,14 +251,15 @@ const headerColumns = computed(() => {
         let count = 1
         // 这里修改data数据
         tableData.value?.map((row, j) => {
-          if (value !== row[item.prop]) {
+          let prefixStr = getPrefixStr(row, getRowKeyList(allColumn, i + 1))
+          if (value !== prefixStr + row[item.prop]) {
             if (count > 1 && j > 0) {
               // 这里要设置之前的数据合并行数
               tableData.value[first]['rowSpan_' + i] = count
             }
             first = j
             count = 1
-            value = row[item.prop]
+            value = prefixStr + row[item.prop]
           } else {
             count += 1
             row['rowSpan_' + i] = 0
@@ -321,6 +322,33 @@ const headerColumns = computed(() => {
   }
   return tempList
 })
+
+/**
+ * 获取rowKeyList
+ * @param columnList
+ * @param index
+ */
+function getRowKeyList(columnList: Array<any>, index: number) {
+  const rowKeyList = [] as string[]
+  for (let i = 0; i < index; i++) {
+    if (columnList[i].isRowSpan) {
+      rowKeyList.push(columnList[i].prop)
+    }
+  }
+  return rowKeyList
+}
+
+/**
+ * 获取一行数据的前缀
+ * @param row
+ * @param rowKeyList
+ */
+function getPrefixStr(row: any, rowKeyList: string[]) {
+  if (row && rowKeyList?.length) {
+    return rowKeyList.reduce((str: string, item: any) => (str += row[item]), '')
+  }
+  return ''
+}
 
 // 合计行数据
 const summaryList = computed(() => {

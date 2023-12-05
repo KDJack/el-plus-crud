@@ -71,6 +71,7 @@ const props = withDefaults(
     loading: boolean
     isShowRefresh: boolean
     size: string
+    queryDataFn?: Function
   }>(),
   { tbName: '', toolbar: null, isDialog: false, loading: false, isShowRefresh: true, size: 'default' }
 )
@@ -123,7 +124,7 @@ async function handelDownload({ callBack }: IBtnBack) {
     let url = props.toolbar.export.url || ''
     const method = props.toolbar.export.method || 'get'
 
-    let postData = Object.assign({}, elPlusFormRef.value?.getData(), props.toolbar.export?.data || {})
+    let postData = Object.assign({}, props.queryDataFn ? await props.queryDataFn() : {}, props.toolbar.export?.data || {})
     // 提交数据前的处理
     if (props.toolbar?.formConfig?.beforeRequest) {
       postData = await (props.toolbar.formConfig.beforeRequest as Function)(postData)

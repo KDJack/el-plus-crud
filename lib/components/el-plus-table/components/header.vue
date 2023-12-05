@@ -6,10 +6,10 @@
           <ElPlusForm ref="elPlusFormRef" v-bind="formConfig" v-model="props.modelValue" :requestFn="handelQueryData" :showBtns="false" :isTable="true">
             <template #row>
               <div class="table-header-form-btns">
-                <ElPlusFormBtn type="primary" icon="ele-Search" :loading="loading" :desc="{ label: '查询', on: { click: handelSearch }, size }" />
-                <ElPlusFormBtn :desc="{ label: '重置', on: { click: handelReset }, size }" />
+                <ElPlusFormBtn v-if="Object.keys(formConfig?.formDesc || {}).length" type="primary" icon="ele-Search" :loading="loading" :desc="{ label: '查询', on: { click: handelSearch }, size }" />
+                <ElPlusFormBtn v-if="Object.keys(formConfig?.formDesc || {}).length" :desc="{ label: '重置', on: { click: handelReset }, size }" />
                 <ElPlusTableSettingColumn ref="settingColumnRef" v-if="tbName" :tbName="tbName" :column="column || []" :size="size" />
-                <ElPlusFormBtn type="primary" v-if="props.toolbar.export" :desc="{ label: '导出Excel', size, mask: true, on: { click: handelDownload } }" />
+                <ElPlusFormBtn type="primary" v-if="exportConf" :desc="{ label: '导出Excel', size, disabled: exportConf?.disabled, mask: true, on: { click: handelDownload } }" />
                 <template v-for="(item, i) in headerBtns" :key="i">
                   <template v-if="getVIf(item)">
                     <template v-if="item.customize">
@@ -108,6 +108,13 @@ const formConfig = computed(() => {
   return tempConf
 })
 
+const exportConf = computed(() => {
+  const tempExport = props.toolbar?.export || null
+  if (tempExport) {
+  }
+  return tempExport
+})
+
 function handelQueryData() {
   // 通知父类执行查询
   emits('query')
@@ -118,13 +125,13 @@ function handelQueryData() {
  * @param data
  */
 async function handelDownload({ callBack }: IBtnBack) {
-  if (props.toolbar?.export) {
+  if (exportConf.value) {
     // 创建请求
     const xhr = new XMLHttpRequest()
-    let url = props.toolbar.export.url || ''
-    const method = props.toolbar.export.method || 'get'
+    let url = exportConf.value.url || ''
+    const method = exportConf.value.method || 'get'
 
-    let postData = Object.assign({}, props.queryDataFn ? await props.queryDataFn() : {}, props.toolbar.export?.data || {})
+    let postData = Object.assign({}, props.queryDataFn ? await props.queryDataFn() : {}, exportConf.value?.data || {})
     // 提交数据前的处理
     if (props.toolbar?.formConfig?.beforeRequest) {
       postData = await (props.toolbar.formConfig.beforeRequest as Function)(postData)
@@ -136,11 +143,11 @@ async function handelDownload({ callBack }: IBtnBack) {
         delete postData[key]
       }
     }
-    if (props.toolbar.export.fetch) {
+    if (exportConf.value.fetch) {
       try {
-        let result = (await props.toolbar.export.fetch(postData)) as string
-        if (props.toolbar.export.urlKey) {
-          let tempKeyList = (typeof props.toolbar.export.urlKey === 'string' ? [props.toolbar.export.urlKey] : props.toolbar.export.urlKey) as string[]
+        let result = (await exportConf.value.fetch(postData)) as string
+        if (exportConf.value.urlKey) {
+          let tempKeyList = (typeof exportConf.value.urlKey === 'string' ? [exportConf.value.urlKey] : exportConf.value.urlKey) as string[]
           // 循环遍历
           tempKeyList?.map((key) => (result = result[key]))
         }
@@ -149,18 +156,18 @@ async function handelDownload({ callBack }: IBtnBack) {
         callBack && callBack()
       }
     } else {
-      if (!props.toolbar.export.noQuery && method === 'get') {
+      if (!exportConf.value.noQuery && method === 'get') {
         url += (url.indexOf('?') >= 0 ? '&' : '?') + mapToUrlStr(postData)
       }
     }
-    if (props.toolbar.export.beforeRequest && typeof props.toolbar.export.beforeRequest === 'function') {
-      postData = props.toolbar.export.beforeRequest(postData)
+    if (exportConf.value.beforeRequest && typeof exportConf.value.beforeRequest === 'function') {
+      postData = exportConf.value.beforeRequest(postData)
     }
     xhr.open(method, url, true)
     // 转换流
     xhr.responseType = 'blob'
     // 是否授权
-    if (props.toolbar.export.isAuth !== false && defaultConf.token) {
+    if (exportConf.value.isAuth !== false && defaultConf.token) {
       let token = defaultConf.token
       if (typeof defaultConf.token === 'function') {
         token = defaultConf.token()

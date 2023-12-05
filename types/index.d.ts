@@ -254,6 +254,8 @@ export interface IExportConfig {
   method?: 'get' | 'post'
   // 请求数据处理
   beforeRequest?: Function
+  // 启用禁用状态
+  disabled?: boolean
 }
 
 /**

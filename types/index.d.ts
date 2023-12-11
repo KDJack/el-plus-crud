@@ -92,7 +92,7 @@ export interface IFormDescItem extends IDescItem {
   default?: string | boolean | number
   defaultItem?: { value: string | number; label: string; dataItem?: IBaseObj }
   rules?: string | Array<any>
-  valueFormat?: Function
+  valueFormat?: Function | string
   isBlank?: boolean
   colspan?: number
   upType?: string
@@ -118,6 +118,10 @@ export interface IFormDescItem extends IDescItem {
   checkStrictly?: boolean
   // key的前缀-方便同一个表单中，存在多个daterange等组件
   propPrefix?: string
+  // 开始时间key
+  startTimeKey?: string
+  // 结束时间key
+  endTimeKey?: string
 }
 
 /**

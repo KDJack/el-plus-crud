@@ -492,8 +492,8 @@ const handelValToForm = (desc: IFormDescItem, field: string, val: any) => {
     }
   } else if (desc.type === 'daterange') {
     if (val && val.length === 2) {
-      const startTimeKey = desc.propPrefix ? desc.propPrefix + 'StartTime' : 'startTime'
-      const endTimeKey = desc.propPrefix ? desc.propPrefix + 'EndTime' : 'endTime'
+      const startTimeKey = desc.startTimeKey ? desc.startTimeKey : desc.propPrefix ? desc.propPrefix + 'StartTime' : 'startTime'
+      const endTimeKey = desc.endTimeKey ? desc.endTimeKey : desc.propPrefix ? desc.propPrefix + 'EndTime' : 'endTime'
       result[startTimeKey] = val[0]
       if (typeof val[1] === 'string') {
         result[endTimeKey] = new Date(val[1]).getTime()
@@ -502,24 +502,24 @@ const handelValToForm = (desc: IFormDescItem, field: string, val: any) => {
       }
       result[endTimeKey] = result[endTimeKey] + (24 * 60 * 60 - 1) * 1000
       // 再处理一下时间戳
-      result[startTimeKey] = time(result[startTimeKey], 3)
-      result[endTimeKey] = time(result[endTimeKey], 3)
+      result[startTimeKey] = time(result[startTimeKey], desc.valueFormat)
+      result[endTimeKey] = time(result[endTimeKey], desc.valueFormat)
     }
   } else if (desc.type === 'datetimerange') {
     if (val && val.length === 2) {
-      const startTimeKey = desc.propPrefix ? desc.propPrefix + 'StartTime' : 'startTime'
-      const endTimeKey = desc.propPrefix ? desc.propPrefix + 'EndTime' : 'endTime'
+      const startTimeKey = desc.startTimeKey ? desc.startTimeKey : desc.propPrefix ? desc.propPrefix + 'StartTime' : 'startTime'
+      const endTimeKey = desc.endTimeKey ? desc.endTimeKey : desc.propPrefix ? desc.propPrefix + 'EndTime' : 'endTime'
       // 处理一下时间戳
-      result[startTimeKey] = time(val[0], 3)
-      result[endTimeKey] = time(val[1], 3)
+      result[startTimeKey] = time(val[0], desc.valueFormat)
+      result[endTimeKey] = time(val[1], desc.valueFormat)
     }
   } else if (desc.type === 'timerange') {
     if (val && val.length === 2) {
-      const startTimeKey = desc.propPrefix ? desc.propPrefix + 'StartTime' : 'startTime'
-      const endTimeKey = desc.propPrefix ? desc.propPrefix + 'EndTime' : 'endTime'
+      const startTimeKey = desc.startTimeKey ? desc.startTimeKey : desc.propPrefix ? desc.propPrefix + 'StartTime' : 'startTime'
+      const endTimeKey = desc.endTimeKey ? desc.endTimeKey : desc.propPrefix ? desc.propPrefix + 'EndTime' : 'endTime'
       // 处理一下时间戳
-      result[startTimeKey] = time(val[0], 4)
-      result[endTimeKey] = time(val[1], 4)
+      result[startTimeKey] = time(val[0], desc.valueFormat || 'HH:mm:ss')
+      result[endTimeKey] = time(val[1], desc.valueFormat || 'HH:mm:ss')
     }
   } else if (desc.type === 'linkuser') {
     const [userIds, deptIds, userNames, deptNames] = val

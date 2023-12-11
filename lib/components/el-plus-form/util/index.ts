@@ -1,4 +1,5 @@
 import { cloneDeep } from 'lodash'
+import dayjs from 'dayjs'
 
 // 是否定义
 export function isDef(val: any) {
@@ -259,42 +260,22 @@ export const getStrLength = (str: any) => {
 }
 
 /**
- * 格式化指定时间戳,type:返回类型
- * @param param
- * @param type
+ * 格式化指定时间格式
+ * @param value
+ * @param valueFormat
  * @returns {*}
  */
-export const time = (param: any, type?: any) => {
-  if (param === '' || param === null || param === undefined) {
-    return ''
-  }
-  let temp = null
-  // 如果本身就是日期类型
-  if (param instanceof Date) {
-    temp = param
-  } else {
-    // if (!/^[0-9]+.?[0-9]*$/.test(param)) {
-    //   return ''
-    // } else {
-    if (typeof param === 'string' && param.indexOf('-') >= 0) {
-      temp = new Date(param.replace(/-/g, '/'))
+export const time = (value: any, valueFormat?: Function | string) => {
+  if (value === '' || value === null || value === undefined) return ''
+  let _valueFormat = 'YYYY-MM-DD HH:mm:ss'
+  if (valueFormat) {
+    if (typeof valueFormat === 'string') {
+      _valueFormat = valueFormat
     } else {
-      temp = new Date(param)
+      _valueFormat = valueFormat(value) as string
     }
-    // }
   }
-  const year = temp.getFullYear()
-  const month: any = checkTen(temp.getMonth() + 1)
-  const day: any = checkTen(temp.getDate())
-  const hour: any = checkTen(temp.getHours())
-  const minute: any = checkTen(temp.getMinutes())
-  const second: any = checkTen(temp.getSeconds())
-  if (+type === 1) return year + '-' + month + '-' + day
-  if (+type === 2) return year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second + ' ' + temp.getMilliseconds()
-  if (+type === 3) return year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second
-  if (+type === 4) return hour + ':' + minute + ':' + second
-  return year + '-' + month + '-' + day + ' ' + hour + ':' + minute
-  // + ':' + second
+  return dayjs(value).format(_valueFormat)
 }
 
 function checkTen(val: any) {

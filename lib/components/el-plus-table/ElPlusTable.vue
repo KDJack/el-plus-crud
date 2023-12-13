@@ -163,7 +163,8 @@ const props = withDefaults(
     isDIYMain: false,
     selectList: () => [],
     colMinWidth: 'auto',
-    headerAlign: 'left'
+    headerAlign: 'left',
+    isTempId: true
   }
 )
 
@@ -676,7 +677,7 @@ async function loadData(isInit: Boolean) {
     if (props.isTempId && Array.isArray(dataResult)) {
       const nowTime = new Date().getTime()
       dataResult.map((item, i) => {
-        item.tempId = `${nowTime + i}`
+        item.tempId = item[props.rowKey] || `${nowTime + i}`
       })
     }
 

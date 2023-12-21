@@ -252,7 +252,7 @@ const headerColumns = computed(() => {
         let count = 1
         // 这里修改data数据
         tableData.value?.map((row, j) => {
-          let prefixStr = getPrefixStr(row, getRowKeyList(allColumn, i + 1))
+          let prefixStr = item.rsProps?.length ? getPrefixStr(row, getRowKeyList(allColumn, item.rsProps)) : ''
           if (value !== prefixStr + row[item.prop]) {
             if (count > 1 && j > 0) {
               // 这里要设置之前的数据合并行数
@@ -329,13 +329,13 @@ const headerColumns = computed(() => {
  * @param columnList
  * @param index
  */
-function getRowKeyList(columnList: Array<any>, index: number) {
+function getRowKeyList(columnList: Array<any>, rsProps: Array<string>) {
   const rowKeyList = [] as string[]
-  for (let i = 0; i < index; i++) {
-    if (columnList[i].isRowSpan) {
-      rowKeyList.push(columnList[i].prop)
+  columnList.map((item) => {
+    if (rsProps.indexOf(item.prop) >= 0) {
+      rowKeyList.push(item.prop)
     }
-  }
+  })
   return rowKeyList
 }
 

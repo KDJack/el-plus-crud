@@ -226,10 +226,10 @@ export interface IColumnItem extends IDescItem {
   __vif?: boolean
   // 是否合并行
   isRowSpan?: boolean
-  // 是否纳入合并行的判断条件
-  isRowSpanKey?: boolean
   // 是否合并列
   isColSpan?: boolean
+  // 判断合并行的prop数组
+  rsProps?: Array<string>
 }
 
 /**

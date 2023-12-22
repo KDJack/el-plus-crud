@@ -7,7 +7,7 @@
       <slot :name="'title' + indexList[i]">
         <div class="title-line" v-if="group.title">{{ group.title }}</div>
       </slot>
-      <ElPlusForm v-model="currentValue" v-bind="group.formProps" :ref="setComponentRef" @reset="handleReset(group.formProps?.fid || '')">
+      <ElPlusForm v-model="currentValue" v-bind="group.formProps" isGroupForm :ref="setComponentRef" @reset="handleReset(group.formProps?.fid || '')">
         <template v-if="useSlots()['default' + indexList[i]]">
           <slot :name="'default' + indexList[i]"> </slot>
         </template>
@@ -38,6 +38,8 @@ const props = defineProps<{
   formGroup: IFormGroupConfig
   // 提交状态
   isLoading?: boolean
+  // 是否禁用最后一个元素的tab
+  disabledTab?: boolean
 }>()
 
 const formRefs = ref([] as any[])
@@ -100,6 +102,7 @@ const getGroupFowmLayout = computed(() => {
   tempGroupList.map((item) => {
     Object.assign(tempFormConfig.groupFormDesc, item.formDesc)
   })
+  tempFormConfig.disabledTab = props.disabledTab
 
   // 遍历
   tempGroupList.map((groupItem, i) => {

@@ -46,8 +46,8 @@ export default {
 </script>
 <script lang="ts" setup>
 import { ref, computed, useAttrs, nextTick, onMounted, watch, inject, Ref } from 'vue'
-import { castArray, isMobile, time, throttle, isPromiseLike } from './util'
-import { cloneDeep } from 'lodash'
+import { castArray, isMobile, time, isPromiseLike } from './util'
+import { cloneDeep, throttle } from 'lodash'
 import * as validates from './util/validate'
 import { typeList } from './components/index'
 import ElPlusFormBtn from './components/ElPlusFormBtn.vue'
@@ -106,6 +106,10 @@ export interface IFormProps {
   idKey?: string
   // 最大宽度
   maxWidth?: string
+  // 是否是group的Form
+  isGroupForm?: boolean
+  // 是否禁用最后一个元素的tab
+  disabledTab?: boolean
   // 比如 beforeValidate, beforeRequest, success, requestError, requestEnd
   // 其他钩子 直接放到attrs里面去了
 }
@@ -162,7 +166,9 @@ const props = withDefaults(defineProps<IFormProps>(), {
   // 是否是列表头部的表单
   isTable: false,
   // 唯一标识符。默认为id
-  idKey: 'id'
+  idKey: 'id',
+  // 是否禁用最后一个元素的tab
+  disabledTab: false
   // 其他钩子 直接放到attrs里面去了
   // 比如 beforeValidate, beforeRequest, success, requestError, requestEnd
 })
@@ -275,9 +281,10 @@ const computedRules = computed(() => {
 const attrMapToTableList = computed(() => {
   const formLayoutRows = [] as Array<Array<IFormDescItem>>
   if (props.formDesc) {
+    const tempFormDesc = cloneDeep(props.formDesc)
     let tempData = [] as Array<IFormDescItem>
-    for (const key in props.formDesc) {
-      tempData.push({ ...props.formDesc[key], field: key })
+    for (const key in tempFormDesc) {
+      tempData.push({ ...tempFormDesc[key], field: key })
     }
     // 这里处理一下layout的布局-渲染
     let rowItemList = [] as Array<IFormDescItem>
@@ -300,6 +307,30 @@ const attrMapToTableList = computed(() => {
     })
     if (rowItemList.length > 0) {
       formLayoutRows.push(rowItemList)
+    }
+  }
+
+  // 这里处理下是否禁用最后一个元素的tab
+  if (formLayoutRows?.length && props.disabledTab && (!props.isGroupForm || (props.isGroupForm && props.groupFormDesc))) {
+    for (let i = formLayoutRows[formLayoutRows.length - 1].length - 1; i >= 0; i--) {
+      const type = formLayoutRows[formLayoutRows.length - 1][i].type || ''
+      if (['image', 'link', 'rate', 'status', 'tag', 'text'].indexOf(type) < 0) {
+        const eventOn = formLayoutRows[formLayoutRows.length - 1][i].on || {}
+        const oldFocus = eventOn.focus
+        const oldBlur = eventOn.blur
+        eventOn.focus = function () {
+          document.onkeydown = (event) => {
+            if (event.keyCode == 9) return false
+          }
+          oldFocus && oldFocus()
+        }
+        eventOn.blur = function () {
+          document.onkeydown = function () {}
+          oldBlur && oldBlur()
+        }
+
+        break
+      }
     }
   }
   return formLayoutRows

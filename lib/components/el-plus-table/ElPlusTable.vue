@@ -6,7 +6,7 @@
         {{ item[tableConfig.showSelectNameKey || 'name'] }}
       </el-tag>
     </div> -->
-    <EleTabletHeader ref="tableHeaderRef" v-if="Object.keys(tableConfig?.toolbar || {}).length || tableConfig.tbName" v-model="toolFormData" :tbName="tableConfig.tbName" :column="tableConfig?.column || []" :size="size" :isShowRefresh="isShowRefresh" :loading="loading" :toolbar="tableConfig.toolbar" :isDialog="isDialog" @query="handelTopQuery" :queryDataFn="getListQueryData" />
+    <EleTabletHeader ref="tableHeaderRef" v-if="Object.keys(tableConfig?.toolbar || {}).length || tableConfig.tbName" v-model="toolFormData" :tbName="tableConfig.tbName" :column="tableConfig?.column || []" :size="size" :isShowRefresh="isShowRefresh" :loading="compLoading" :toolbar="tableConfig.toolbar" :isDialog="isDialog" @query="handelTopQuery" :queryDataFn="getListQueryData" />
 
     <!-- 中部的Tabs -->
     <div class="table-tabs-panel" v-if="tableConfig.tabConf">
@@ -29,7 +29,7 @@
     </template>
 
     <!-- 中间列表 -->
-    <div class="el-plus-table-main" v-loading="loading">
+    <div class="el-plus-table-main" v-loading="compLoading">
       <template v-if="isDIYMain">
         <slot name="main" :tableData="tableData"></slot>
       </template>
@@ -66,7 +66,7 @@
         <ElPlusTableColumn v-for="(item, i) in headerColumns" :key="i" :item="item" :size="size"></ElPlusTableColumn>
 
         <!-- 空 -->
-        <template v-if="!loading && loadingStatus === 2" #empty>
+        <template v-if="!compLoading && loadingStatus === 2" #empty>
           <el-empty v-if="isEmptyImg" :description="nullText" />
           <span v-else>{{ nullText }}</span>
         </template>
@@ -99,7 +99,7 @@ import { ref, reactive, onMounted, computed, watch, nextTick, useSlots, inject, 
 import EleTabletHeader from './components/header.vue'
 import ElPlusTableColumn from './ElPlusTableColumn.vue'
 import { handelListColumn } from './util'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, throttle } from 'lodash'
 import { Loading } from '@element-plus/icons-vue'
 import type { TableColumnCtx } from 'element-plus'
 import { ICRUDConfig, ITableConfig, ITableTabItem, ITreeProps } from 'types'
@@ -148,6 +148,8 @@ const props = withDefaults(
     headerAlign?: 'left' | 'right' | 'center'
     // 是否使用tempId
     isTempId?: boolean
+    // 加载状态
+    loading?: boolean
   }>(),
   {
     modelValue: null,
@@ -164,7 +166,8 @@ const props = withDefaults(
     selectList: () => [],
     colMinWidth: 'auto',
     headerAlign: 'left',
-    isTempId: true
+    isTempId: true,
+    loading: false
   }
 )
 
@@ -203,10 +206,13 @@ const selectable = computed(() => (row: any, index: number) => {
 const tableHeaderRef = ref()
 
 // 加载
-const loading = ref(false)
+const localLoading = ref(false)
 const loadingTab = ref(!!props.tableConfig?.tabConf?.fetch)
 const listLoading = ref(false)
 const size = defaultConf.size || 'default'
+
+// 最终的loading
+const compLoading = computed(() => props.loading || localLoading.value)
 
 // 顶部查询条件数据缓存
 // const topQueryData = ref({} as any)
@@ -633,9 +639,9 @@ async function loadData(isInit: Boolean) {
     // }
     return false
   }
-  if (loadingStatus.value === 1 || loading.value) return false
+  if (loadingStatus.value === 1 || localLoading.value) return false
   loadingStatus.value = 1
-  loading.value = true
+  localLoading.value = true
   if (isInit) {
     pageInfo.current = 1
   }
@@ -644,48 +650,58 @@ async function loadData(isInit: Boolean) {
   if (props.tableConfig?.toolbar?.formConfig?.beforeRequest) {
     postData = props.tableConfig?.toolbar?.formConfig?.beforeRequest(JSON.parse(JSON.stringify(postData))) || postData
   }
-  let dataPage = ((await props.tableConfig.fetch(postData)) || {}) as any
-  // 这里要进行赋值操作-同时要转换相关key
-  if (Array.isArray(dataPage)) {
-    dataPage = { [props.tableConfig?.fetchMap?.list || 'records']: dataPage }
-  }
   try {
-    let dataResult = [] as any
-    if (props.isPager) {
-      pageInfo.total = dataPage[props.tableConfig?.fetchMap?.total || 'total'] * 1 || 0
-      pageInfo.current = dataPage[props.tableConfig?.fetchMap?.current || 'current'] || 1
-      dataResult = dataPage[props.tableConfig?.fetchMap?.list || 'records'] || null
-    } else {
-      dataResult = dataPage[props.tableConfig?.fetchMap?.list || 'records'] || null
+    let dataPage = ((await props.tableConfig.fetch(postData)) || {}) as any
+    // 这里要进行赋值操作-同时要转换相关key
+    if (Array.isArray(dataPage)) {
+      dataPage = { [props.tableConfig?.fetchMap?.list || 'records']: dataPage }
     }
+    try {
+      let dataResult = [] as any
+      if (props.isPager) {
+        pageInfo.total = dataPage[props.tableConfig?.fetchMap?.total || 'total'] * 1 || 0
+        pageInfo.current = dataPage[props.tableConfig?.fetchMap?.current || 'current'] || 1
+        dataResult = dataPage[props.tableConfig?.fetchMap?.list || 'records'] || null
+      } else {
+        dataResult = dataPage[props.tableConfig?.fetchMap?.list || 'records'] || null
+      }
 
-    if (props.isTempId && Array.isArray(dataResult)) {
-      const nowTime = new Date().getTime()
-      dataResult.map((item, i) => {
-        item.tempId = item[props.rowKey] || `${nowTime + i}`
+      if (props.isTempId && Array.isArray(dataResult)) {
+        const nowTime = new Date().getTime()
+        dataResult.map((item, i) => {
+          item.tempId = item[props.rowKey] || `${nowTime + i}`
+        })
+      }
+
+      tableData.value = dataResult
+      // 如果是树形结构
+      if (props.type === 'expand') {
+        treeIndexList.splice(0, treeIndexList.length)
+        handelTreeIndex(tableData.value, [])
+      }
+      listLoading.value = false
+      // 通知父类
+      noticeInited()
+      nextTick(() => {
+        // 遍历以及选中当前页面数据
+        refreshTableSelect()
       })
+    } catch (e) {
+      if (defaultConf.debug) {
+        // eslint-disable-next-line no-console
+        console.log('error: ', e)
+      }
     }
-
-    tableData.value = dataResult
-    // 如果是树形结构
-    if (props.type === 'expand') {
-      treeIndexList.splice(0, treeIndexList.length)
-      handelTreeIndex(tableData.value, [])
-    }
-    listLoading.value = false
-    nextTick(() => {
-      // 遍历以及选中当前页面数据
-      refreshTableSelect()
-    })
   } catch (e) {
-    if (defaultConf.debug) {
-      // eslint-disable-next-line no-console
-      console.log('error: ', e)
-    }
+    console.log('fetch error: ', e)
   }
   loadingStatus.value = 2
-  loading.value = false
+  localLoading.value = false
 }
+
+const noticeInited = throttle(() => {
+  emits('inited', tableData.value)
+}, 1000)
 
 /**
  * 渲染列表的选中项

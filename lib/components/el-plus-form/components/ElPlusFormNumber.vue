@@ -18,7 +18,7 @@ import { ICRUDConfig } from 'types'
 const defaultConf = inject('defaultConf') as ICRUDConfig
 
 const props = defineProps<{
-  modelValue?: number | null
+  modelValue?: number | string | null
   field?: string
   loading?: boolean
   desc: { [key: string]: any }
@@ -28,7 +28,7 @@ const props = defineProps<{
 }>()
 
 const emits = defineEmits(['update:modelValue', 'validateThis'])
-const currentValue = ref(props.modelValue)
+const currentValue = ref(typeof props.modelValue === 'string' ? +props.modelValue : props.modelValue)
 
 emits('update:modelValue', currentValue)
 const attrs = ref({} as any)

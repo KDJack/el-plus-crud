@@ -864,7 +864,7 @@ defineExpose({ fid: props.fid, submit: handleSubmitForm, getData: getFormData, v
     border-radius: 4px;
   }
   .el-plus-form-column-panel {
-    & > .el-form-item--default {
+    & > .el-form-item {
       margin-bottom: 18px !important;
       // & > .el-form-item__label-wrap {
       & > .el-form-item__label {

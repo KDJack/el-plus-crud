@@ -328,7 +328,7 @@ const attrMapToTableList = computed(() => {
           document.onkeydown = function () {}
           oldBlur && oldBlur()
         }
-
+        formLayoutRows[formLayoutRows.length - 1][i].on = eventOn
         break
       }
     }

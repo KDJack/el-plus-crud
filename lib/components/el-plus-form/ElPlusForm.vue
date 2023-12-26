@@ -777,7 +777,7 @@ const clear = () => {
  * @param field
  */
 function handelValidateThis(field: string) {
-  refElPlusForm.value.validateField(field, (err: any) => {
+  refElPlusForm.value?.validateField(field, (err: any) => {
     // console.log('err: ', err)
   })
 }

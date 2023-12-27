@@ -530,7 +530,7 @@ async function getListQueryData() {
     queryMap.size = pageInfo.size
   }
   // 这里处理一下列表Tab的查询条件
-  if (props.tableConfig?.tabConf && props.tableConfig?.tabConf.prop) {
+  if (props.tableConfig?.tabConf && props.tableConfig?.tabConf?.prop) {
     queryMap[props.tableConfig?.tabConf.prop] = tableTabVal.value
   }
 
@@ -757,7 +757,7 @@ watch(
     if (!props.tableConfig.fetch) {
       if (JSON.parse(JSON.stringify(data)) !== JSON.parse(JSON.stringify(tableData.value))) {
         loadingStatus.value = 2
-        tableData.value.splice(0, tableData.value.length, ...(data || []))
+        tableData.value?.splice(0, tableData.value.length, ...(data || []))
       }
     }
   },

@@ -74,6 +74,8 @@ export type IDescItem = {
   _vif?: boolean
   // 权限
   auth?: string
+  // 其他字符串
+  [key: string]: any
 }
 
 /**
@@ -314,7 +316,7 @@ export interface IStatisticConfig {
  * 列表的选项卡配置
  */
 export interface ITableTabConf {
-  prop: string
+  prop?: string
   tabs: Array<ITableTabItem>
   attrs?: IBaseObj | Function
   // 远程拉取数量信息

@@ -751,17 +751,28 @@ function initCol() {
 }
 
 // 监听父类数据变更
+// watch(
+//   () => props.modelValue,
+//   (data) => {
+//     if (!props.tableConfig.fetch) {
+//       console.log('watch modelValue data: ', data)
+//     }
+//   }
+// )
 watch(
   () => props.modelValue,
   (data) => {
     if (!props.tableConfig.fetch) {
-      if (JSON.parse(JSON.stringify(data)) !== JSON.parse(JSON.stringify(tableData.value))) {
+      // console.log('watch modelValue data: ', data)
+      // if (JSON.parse(JSON.stringify(data)) !== JSON.parse(JSON.stringify(tableData.value))) {
+      // 优化代码，这里就直接比较一下length就行了
+      if (data?.length !== tableData.value?.length) {
         loadingStatus.value = 2
         tableData.value?.splice(0, tableData.value.length, ...(data || []))
       }
     }
-  },
-  { deep: true }
+  }
+  // { deep: true }
 )
 
 watch(

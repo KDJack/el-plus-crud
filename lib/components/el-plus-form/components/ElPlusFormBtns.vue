@@ -70,7 +70,9 @@ const handelEvelt = computed(() => {
         if (key === 'click' && item.confirm) {
           events[key] = function () {
             ElMessageBox.confirm(item.confirm, '提示', {
-              type: 'warning'
+              type: 'warning',
+              confirmButtonText: '确定',
+              cancelButtonText: '取消'
             }).then(() => {
               item.on[key]({ row: props.formData || {}, field: props.field, rowIndex: props.rowIndex } as IBtnBack)
             })

@@ -51,7 +51,9 @@ const uploadAttr = {
     if (confirmText) {
       return new Promise((resolve) => {
         ElMessageBox.confirm(confirmText, '提示', {
-          type: 'warning'
+          type: 'warning',
+          confirmButtonText: '确定',
+          cancelButtonText: '取消'
         })
           .then(() => resolve(true))
           .catch(() => {

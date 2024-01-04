@@ -47,7 +47,7 @@ export default {
 <script lang="ts" setup>
 import { ref, computed, useAttrs, nextTick, onMounted, watch, inject, Ref } from 'vue'
 import { castArray, isMobile, time, isPromiseLike } from './util'
-import { cloneDeep, throttle } from 'lodash'
+import { cloneDeep, debounce } from 'lodash'
 import * as validates from './util/validate'
 import { typeList } from './components/index'
 import ElPlusFormBtn from './components/ElPlusFormBtn.vue'
@@ -281,6 +281,7 @@ const computedRules = computed(() => {
 const attrMapToTableList = computed(() => {
   const formLayoutRows = [] as Array<Array<IFormDescItem>>
   if (props.formDesc) {
+    initFormAttrs()
     const tempFormDesc = cloneDeep(props.formDesc)
     let tempData = [] as Array<IFormDescItem>
     for (const key in tempFormDesc) {
@@ -337,70 +338,74 @@ const attrMapToTableList = computed(() => {
 })
 
 // 整体初始化属性
-const initFormAttrs = throttle(() => {
-  if (props.formDesc) {
-    Object.keys(props.formDesc).forEach((field) => {
-      if (props.formDesc) {
-        const formItem = props.formDesc[field]
-        if (formItem && formItem.type) {
-          // 设置 _type
-          formItem._type = compTypeList.includes(formItem.type.toLowerCase()) ? 'el-plus-form-' + formItem.type : formItem.type
-          // 触发 v-if 显示 / 隐藏 设置_vif
-          formItem._vif = handelKeyValue(formItem, 'vif', field, !formItem.isBlank ?? true)
-          // 触发 disabled 禁用 / 启用 设置_disabled
-          formItem._disabled = handelKeyValue(formItem, 'disabled', field, props.disabled ?? false)
-          // 动态属性 attrs
-          const tempAttr = {} as any
-          // if ((typeof formItem.attrs === 'object' && formItem.attrs?.options) || formItem.options) {
-          //   tempAttr.options = (formItem.attrs as any)?.options || formItem.options
-          // }
-          formItem._attrs = Object.assign({}, handelKeyValue(formItem, 'attrs', field), tempAttr)
-          // 动态options
-          // formItem._options = handelKeyValue(formItem, 'options', field)
-          // 动态 _label
-          formItem._label = handelKeyValue(formItem, 'label', field)
-          // 动态 prop
-          // formItem._prop = handelKeyValue(formItem, 'prop', field);
-          // 动态 _tip
-          formItem._tip = handelKeyValue(formItem, 'tip', field)
-          // 单独处理下上传
-          if (!formItem._tip && !formItem.noTip && formItem.type === 'upload') {
-            formItem._tip = `最多上传${formItem.multiple ? formItem.limit || 20 : 1}${formItem.upType === 'file' ? '个文件' : '张图片'}`
-          }
-          // 这里初始化一下默认值
-          if (formItem.default !== undefined && formItem.default !== null && props.modelValue[field] === undefined) {
-            props.modelValue[field] = formItem.default
-          }
-          // 这里初始化一下默认选中项
-          if (formItem.defaultItem !== undefined && formItem.defaultItem !== null && props.modelValue[field] === undefined) {
-            props.modelValue[field] = formItem.defaultItem.value
-          }
-          // 这里格式化一下数据
-          // if (formItem.format) {
-          // if (typeof formItem.format === 'string') {
-          //   props.modelValue[field] = elPlusFormFormat[formItem.format](props.modelValue[field], props.modelValue)
-          // } else if (typeof formItem.format === 'function') {
-          //   props.modelValue[field] = (formItem as any).format(props.modelValue[field], props.modelValue)
-          // } else {
-          //   // console.log('未知的格式化类型:', formItem.format)
-          // }
-          // }
-          // 这里最终处理一下auth权限问题
-          if (formItem.auth) {
-            if (!defaultConf.auth) {
-              console.warn('使用auth属性，请在crud注册时传入auth校验方法~')
-            } else {
-              formItem._vif = defaultConf.auth(formItem.auth)
+const initFormAttrs = debounce(
+  () => {
+    if (props.formDesc) {
+      Object.keys(props.formDesc).forEach((field) => {
+        if (props.formDesc) {
+          const formItem = props.formDesc[field]
+          if (formItem && formItem.type) {
+            // 设置 _type
+            formItem._type = compTypeList.includes(formItem.type.toLowerCase()) ? 'el-plus-form-' + formItem.type : formItem.type
+            // 触发 v-if 显示 / 隐藏 设置_vif
+            formItem._vif = handelKeyValue(formItem, 'vif', field, !formItem.isBlank ?? true)
+            // 触发 disabled 禁用 / 启用 设置_disabled
+            formItem._disabled = handelKeyValue(formItem, 'disabled', field, props.disabled ?? false)
+            // 动态属性 attrs
+            const tempAttr = {} as any
+            // if ((typeof formItem.attrs === 'object' && formItem.attrs?.options) || formItem.options) {
+            //   tempAttr.options = (formItem.attrs as any)?.options || formItem.options
+            // }
+            formItem._attrs = Object.assign({}, handelKeyValue(formItem, 'attrs', field), tempAttr)
+            // 动态options
+            // formItem._options = handelKeyValue(formItem, 'options', field)
+            // 动态 _label
+            formItem._label = handelKeyValue(formItem, 'label', field)
+            // 动态 prop
+            // formItem._prop = handelKeyValue(formItem, 'prop', field);
+            // 动态 _tip
+            formItem._tip = handelKeyValue(formItem, 'tip', field)
+            // 单独处理下上传
+            if (!formItem._tip && !formItem.noTip && formItem.type === 'upload') {
+              formItem._tip = `最多上传${formItem.multiple ? formItem.limit || 20 : 1}${formItem.upType === 'file' ? '个文件' : '张图片'}`
             }
+            // 这里初始化一下默认值
+            if (formItem.default !== undefined && formItem.default !== null && props.modelValue[field] === undefined) {
+              props.modelValue[field] = formItem.default
+            }
+            // 这里初始化一下默认选中项
+            if (formItem.defaultItem !== undefined && formItem.defaultItem !== null && props.modelValue[field] === undefined) {
+              props.modelValue[field] = formItem.defaultItem.value
+            }
+            // 这里格式化一下数据
+            // if (formItem.format) {
+            // if (typeof formItem.format === 'string') {
+            //   props.modelValue[field] = elPlusFormFormat[formItem.format](props.modelValue[field], props.modelValue)
+            // } else if (typeof formItem.format === 'function') {
+            //   props.modelValue[field] = (formItem as any).format(props.modelValue[field], props.modelValue)
+            // } else {
+            //   // console.log('未知的格式化类型:', formItem.format)
+            // }
+            // }
+            // 这里最终处理一下auth权限问题
+            if (formItem.auth) {
+              if (!defaultConf.auth) {
+                console.warn('使用auth属性，请在crud注册时传入auth校验方法~')
+              } else {
+                formItem._vif = defaultConf.auth(formItem.auth)
+              }
+            }
+          } else if (formItem && formItem.isBlank) {
+            // 触发 v-if 显示 / 隐藏 设置_vif
+            formItem._vif = handelKeyValue(formItem, 'vif', '', true)
           }
-        } else if (formItem && formItem.isBlank) {
-          // 触发 v-if 显示 / 隐藏 设置_vif
-          formItem._vif = handelKeyValue(formItem, 'vif', '', true)
         }
-      }
-    })
-  }
-}, 100)
+      })
+    }
+  },
+  100,
+  { leading: true, trailing: false }
+)
 
 // 表单底部按钮
 const btnList = computed(() => {

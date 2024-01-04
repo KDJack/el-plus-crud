@@ -99,7 +99,7 @@ import { ref, reactive, onMounted, computed, watch, nextTick, useSlots, inject, 
 import EleTabletHeader from './components/header.vue'
 import ElPlusTableColumn from './ElPlusTableColumn.vue'
 import { handelListColumn } from './util'
-import { cloneDeep, throttle } from 'lodash'
+import { cloneDeep, debounce } from 'lodash'
 import { Loading } from '@element-plus/icons-vue'
 import type { TableColumnCtx } from 'element-plus'
 import { ICRUDConfig, ITableConfig, ITableTabItem, ITreeProps } from 'types'
@@ -699,9 +699,13 @@ async function loadData(isInit: Boolean) {
   localLoading.value = false
 }
 
-const noticeInited = throttle(() => {
-  emits('inited', tableData.value)
-}, 1000)
+const noticeInited = debounce(
+  () => {
+    emits('inited', tableData.value)
+  },
+  400,
+  { leading: true, trailing: false }
+)
 
 /**
  * 渲染列表的选中项

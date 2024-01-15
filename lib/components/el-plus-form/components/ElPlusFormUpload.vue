@@ -58,7 +58,7 @@ interface IUpAction {
 const defaultConf = inject('defaultConf') as ICRUDConfig
 
 // 图标Map
-const iconMap = { excel, pdf, file, txt, word, zip, ppt }
+const iconMap = { excel, pdf, file, txt, word, zip, ppt } as any
 
 const props = defineProps<{
   modelValue?: string | Array<IOssInfo>
@@ -212,7 +212,6 @@ async function getToken(token: string | Object | Function | undefined, param?: a
  * @param fileList
  */
 async function handelUploadSuccess(response: any, file: any) {
-  console.log('response: ', response)
   if (response && Object.keys(response).length > 0) {
     // 从结果集中获取一下furl
     const tempUrl = getValue(defaultConf.upload?.actionMap?.objectUrlKey || [], response)
@@ -278,12 +277,12 @@ function handelUploadRemove(file: UploadUserFile) {
  * @param file
  * @param type 0 : 删除; 1: 新增
  */
-function handelListChange(item: UploadUserFile, type: 0 | 1) {
+function handelListChange(item: any, type: 0 | 1) {
   if (type === 1) {
     currentValue.value.push({
       name: item.name,
       furl: item.url,
-      url: props.desc.upType !== 'file' ? getFileIcon(item.raw) : item.url,
+      url: props.desc.upType !== 'file' ? getFileIcon(item.raw) : item?.raw?.shareUrl || item.url,
       fsize: item.size,
       uid: item.uid,
       mimeType: item.raw?.type,

@@ -15,7 +15,6 @@
     "lint-fix": "eslint --fix --ext .js --ext .jsx --ext .vue lib/",
     "preview": "vite preview",
     "release": "standard-version",
-    "prepare": "rimraf .husky && npx husky install && npx husky add .husky/pre-commit \"npx lint-staged\"",
     "pub": "yarn build && yarn release && yarn publish"
   },
   "keywords": [
@@ -33,8 +32,7 @@
     "url": "https://github.com/KDJack/el-plus-crud"
   },
   "dependencies": {
-    "@element-plus/icons-vue": "^2.1.0",
-    "dayjs": "^1.11.10",
+    "@element-plus/icons-vue": "^2.3.1",
     "element-plus": "^2.3.6",
     "lodash": "^4.17.21",
     "vue": "^3.2.47"

@@ -1,6 +1,6 @@
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
-import { defineConfig } from 'vite'
+import { LibraryOptions, defineConfig } from 'vite'
 import dts from 'vite-plugin-dts'
 import vueSetupExtend from 'vite-plugin-vue-setup-extend'
 
@@ -41,7 +41,7 @@ const viteConfig = defineConfig(() => {
         entry: 'lib/index.ts',
         name: 'el-plus-crud',
         formats: ['umd', 'es']
-      },
+      } as LibraryOptions,
       rollupOptions: {
         external: ['vue', 'element-plus'],
         output: {

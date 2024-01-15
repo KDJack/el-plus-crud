@@ -1,5 +1,4 @@
 import { cloneDeep } from 'lodash'
-import dayjs from 'dayjs'
 
 // 是否定义
 export function isDef(val: any) {
@@ -260,6 +259,37 @@ export const getStrLength = (str: any) => {
 }
 
 /**
+ * 格式化日期
+ * @param date
+ * @param format
+ * @returns
+ */
+function formatTime(date: Date, format: string) {
+  debugger
+  const o = {
+    'M+': date.getMonth() + 1, // 月份
+    'd+': date.getDate(), // 日
+    'h+': date.getHours() % 12 === 0 ? 12 : date.getHours() % 12, // 小时
+    'H+': date.getHours(), // 小时
+    'm+': date.getMinutes(), // 分
+    's+': date.getSeconds(), // 秒
+    'q+': Math.floor((date.getMonth() + 3) / 3), // 季度
+    S: date.getMilliseconds(), // 毫秒
+    a: date.getHours() < 12 ? '上午' : '下午', // 上午/下午
+    A: date.getHours() < 12 ? 'AM' : 'PM' // AM/PM
+  } as any
+  if (/(y+)/.test(format)) {
+    format = format.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length))
+  }
+  for (let k in o) {
+    if (new RegExp('(' + k + ')').test(format)) {
+      format = format.replace(RegExp.$1, RegExp.$1.length === 1 ? o[k] : ('00' + o[k]).substr(('' + o[k]).length))
+    }
+  }
+  return format
+}
+
+/**
  * 格式化指定时间格式
  * @param value
  * @param valueFormat
@@ -275,7 +305,7 @@ export const time = (value: any, valueFormat?: Function | string) => {
       _valueFormat = valueFormat(value) as string
     }
   }
-  return dayjs(value).format(_valueFormat)
+  return formatTime(new Date(value), _valueFormat)
 }
 
 function checkTen(val: any) {
@@ -329,10 +359,10 @@ export function isPromiseLike<T>(it: unknown): it is PromiseLike<T> {
  * @param keys
  * @param obj
  */
-export function getValue(keys: string | Array<string>, obj: Object) {
+export function getValue(keys: string | Array<string>, obj: any) {
   if (!obj || !keys || keys.length <= 0) return null
   if (Array.isArray(keys)) {
-    let tempObj = cloneDeep(obj)
+    let tempObj = cloneDeep(obj) as any
     for (let i = 0; i < keys.length; i++) {
       tempObj = tempObj[Array.isArray(tempObj) ? parseInt(keys[i]) : keys[i]]
       if (tempObj === undefined || tempObj === null) return null

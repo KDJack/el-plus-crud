@@ -237,8 +237,8 @@ const tableConfig = ref({
         return data
       },
       formDesc: {
-        searchKey: { type: 'input', label: '输入查询', placeholder: '物料编码、商品条码、商品名称、自编码、属性' },
-        enabled: { type: 'select', label: '状态', options: 'enabledList' }
+        searchKey: { type: 'input', label: '输入查询', placeholder: '物料编码、商品条码、商品名称、自编码、属性' }
+        // enabled: { type: 'select', label: '状态', options: 'enabledList' }
       }
     }
     // 导出信息

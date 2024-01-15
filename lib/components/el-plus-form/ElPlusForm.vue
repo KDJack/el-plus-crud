@@ -62,7 +62,7 @@ export interface IFormProps {
   // group的desc列表-主要针对group表单最后一个表单使用
   groupFormDesc?: IFormDesc | null
   // 表单数据
-  modelValue?: { [key: string]: any } | {}
+  modelValue?: { [key: string]: any }
   // 表单自身属性
   formAttrs?: { [key: string]: any }
   // 校检规则
@@ -730,17 +730,19 @@ const handleSubmitForm = async () => {
 const reset = () => {
   // refElPlusForm.value.resetFields();
   // 重置
-  Object.keys(props.modelValue).map((key) => {
-    if (oldFormData && oldFormData[key] !== undefined && oldFormData[key] !== null) {
-      props.modelValue[key] = oldFormData[key]
-    } else {
-      if (props.groupFormDesc) {
-        props.modelValue[key] = props.groupFormDesc && props.groupFormDesc[key] ? props.groupFormDesc[key].default || null : null
+  if (props.modelValue) {
+    Object.keys(props.modelValue).map((key) => {
+      if (oldFormData && oldFormData[key] !== undefined && oldFormData[key] !== null) {
+        props.modelValue[key] = oldFormData[key]
       } else {
-        props.modelValue[key] = props.formDesc && props.formDesc[key] ? props.formDesc[key].default || null : null
+        if (props.groupFormDesc) {
+          props.modelValue[key] = props.groupFormDesc && props.groupFormDesc[key] ? props.groupFormDesc[key].default || null : null
+        } else {
+          props.modelValue[key] = props.formDesc && props.formDesc[key] ? props.formDesc[key].default || null : null
+        }
       }
-    }
-  })
+    })
+  }
   setTimeout(() => {
     // 清空校验
     clearValid()

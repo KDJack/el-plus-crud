@@ -43,7 +43,7 @@
         v-bind="tableConfig.tableAttr"
         :class="{ 'big-h-bar': tableConfig?.tableAttr?.bigHBar, 'big-v-bar': tableConfig.tableAttr?.bigVBar }"
         :data="tableData"
-        :row-key="isTempId ? 'tempId' : rowKey"
+        :row-key="type !== 'expand' && isTempId ? 'tempId' : rowKey"
         lazy
         :load="loadExpandData"
         :size="size"
@@ -666,7 +666,7 @@ async function loadData(isInit: Boolean) {
         dataResult = dataPage[props.tableConfig?.fetchMap?.list || 'records'] || null
       }
 
-      if (props.isTempId && Array.isArray(dataResult)) {
+      if (props.type !== 'expand' && props.isTempId && Array.isArray(dataResult)) {
         const nowTime = new Date().getTime()
         dataResult.map((item, i) => {
           item.tempId = item[props.rowKey] || `${nowTime + i}`

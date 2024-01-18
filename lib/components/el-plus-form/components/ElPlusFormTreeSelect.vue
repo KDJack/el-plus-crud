@@ -10,7 +10,7 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { isEqual } from '../util'
+import { isEqual } from '../../../util'
 import { ref, useAttrs, reactive, watch, onBeforeMount, inject } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
 
@@ -59,3 +59,4 @@ watch(
   { immediate: true }
 )
 </script>
+../util/aaaaa

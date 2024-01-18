@@ -98,7 +98,7 @@ export default {
 import { ref, reactive, onMounted, computed, watch, nextTick, useSlots, inject, provide } from 'vue'
 import EleTabletHeader from './components/header.vue'
 import ElPlusTableColumn from './ElPlusTableColumn.vue'
-import { handelListColumn } from './util'
+import { handelListColumn } from '../../util'
 import { cloneDeep, debounce } from 'lodash'
 import { Loading } from '@element-plus/icons-vue'
 import type { TableColumnCtx } from 'element-plus'

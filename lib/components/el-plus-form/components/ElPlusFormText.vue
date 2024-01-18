@@ -16,7 +16,7 @@ export default {
 <script lang="ts" setup>
 import { ref, watch, computed, onBeforeMount, useAttrs, inject } from 'vue'
 import { getEvents, getAttrs } from '../mixins'
-import { isPromiseLike } from '../util'
+import { isPromiseLike } from '../../../util'
 
 let showInfo = null as any
 
@@ -110,3 +110,4 @@ watch(
   cursor: pointer;
 }
 </style>
+../util/aaaaa

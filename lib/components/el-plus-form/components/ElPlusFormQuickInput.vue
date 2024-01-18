@@ -15,7 +15,7 @@ export default {
 <script lang="ts" setup>
 import { ref, useAttrs, watch, onBeforeMount, inject, reactive } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
-import { isEqual } from '../util'
+import { isEqual } from '../../../util'
 import { ICRUDConfig } from 'types'
 
 const globalData = inject('globalData') as any
@@ -95,3 +95,4 @@ watch(
   }
 }
 </style>
+../util/aaaaa

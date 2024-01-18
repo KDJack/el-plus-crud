@@ -12,7 +12,7 @@ export default {
 <script lang="ts" setup>
 import { ref, useAttrs, onBeforeMount, inject, reactive, watch } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
-import { isEqual } from '../util'
+import { isEqual } from '../../../util'
 
 const globalData = inject('globalData') as any
 
@@ -62,3 +62,4 @@ watch(
   display: flex;
 }
 </style>
+../util/aaaaa

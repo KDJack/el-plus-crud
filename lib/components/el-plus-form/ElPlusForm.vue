@@ -46,7 +46,7 @@ export default {
 </script>
 <script lang="ts" setup>
 import { ref, computed, useAttrs, nextTick, onMounted, watch, inject, Ref } from 'vue'
-import { castArray, isMobile, time, isPromiseLike } from './util'
+import { castArray, isMobile, time, isPromiseLike } from '../../util'
 import { cloneDeep, debounce } from 'lodash'
 import * as validates from './util/validate'
 import { typeList } from './components/index'
@@ -897,3 +897,4 @@ defineExpose({ fid: props.fid, submit: handleSubmitForm, getData: getFormData, v
   }
 }
 </style>
+./util/aaaaa

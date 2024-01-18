@@ -14,7 +14,7 @@
 <script lang="ts" setup name="FileIcons">
 import { ref, computed } from 'vue'
 import fileIcon, { imgSuffix, iconMap } from './data'
-import { cutString } from '../../../util'
+import { cutString } from '../../../../../util'
 import { IOssInfo } from 'types'
 
 const props = defineProps<{
@@ -133,3 +133,4 @@ function handelPreview(file: IOssInfo) {
   }
 }
 </style>
+../../../util/aaaaa

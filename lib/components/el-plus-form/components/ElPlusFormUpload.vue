@@ -46,7 +46,7 @@ import word from '../images/icon/word.png'
 import zip from '../images/icon/zip.png'
 import ppt from '../images/icon/ppt.png'
 import { ICRUDConfig, IOssInfo } from 'types'
-import { isPromiseLike, getValue } from '../util'
+import { isPromiseLike, getValue } from '../../../util'
 
 interface IUpAction {
   action: string
@@ -482,3 +482,4 @@ watch(
   }
 }
 </style>
+../util/aaaaa

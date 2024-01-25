@@ -31,11 +31,13 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, inject } from 'vue'
 import ElPlusFormBtn from './ElPlusFormBtn.vue'
 import ElPlusFormUpbtn from './ElPlusFormUpbtn.vue'
 import { ElMessageBox } from 'element-plus'
-import { IBtnBack } from 'types'
+import { IBtnBack, ICRUDConfig } from 'types'
+
+const defaultConf = inject('defaultConf') as ICRUDConfig
 
 const props = defineProps<{
   field?: string
@@ -106,12 +108,23 @@ const initBtnList = () => {
 }
 // 执行一次vif的处理
 const handelItemVIf = (formItem: any): Boolean => {
+  let _vif = true
   if (typeof formItem.vif === 'function') {
-    return Boolean(runFnGetData(formItem.vif))
+    _vif = Boolean(runFnGetData(formItem.vif))
   } else if (typeof formItem.vif === 'boolean') {
-    return formItem.vif
+    _vif = formItem.vif
   }
-  return true
+  if (_vif) {
+    // 这里最终处理一下auth权限问题
+    if (formItem?.auth) {
+      if (!defaultConf.auth) {
+        console.warn('使用auth属性，请在crud注册时传入auth校验方法~')
+      } else {
+        _vif = defaultConf.auth(formItem.auth)
+      }
+    }
+  }
+  return _vif
 }
 // 执行函数,获取相关数据
 const runFnGetData = (fn: Function) => {

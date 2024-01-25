@@ -234,7 +234,14 @@ export function handelListColumn(columnList: Array<IColumnItem> | undefined, def
         case 'btns':
           if (!item.minWidth && item.btns && item.btns.length >= 2) {
             let labelLength = 0
-            item.btns.map((item: any) => (labelLength += typeof item.label === 'string' ? item.label.length : 4))
+            // 这里判断最多按钮数量
+            for (let i = 0; i < item.btns.length && i < (item.limit || 3); i++) {
+              if (item.btns[i] && typeof item.btns[i].label === 'string') {
+                labelLength += (item.btns[i].label as string).length
+              } else {
+                labelLength += 4
+              }
+            }
             item.width = item.width || labelLength * 24 + 'px'
           }
           item.align = item.align || 'left'
@@ -264,39 +271,24 @@ export function handelListColumn(columnList: Array<IColumnItem> | undefined, def
  * @param tbName
  */
 export function handelVIf(item: IColumnItem, defaultConf: ICRUDConfig, tbName: string) {
-  if (tbName) {
-    if (item.vif !== undefined && item.vif !== null) {
-      if (typeof item.vif === 'function') {
-        item._vif = item.vif(item)
-      } else {
-        item._vif = !!item.vif
-      }
+  if (item.vif !== undefined && item.vif !== null) {
+    if (typeof item.vif === 'function') {
+      item._vif = item.vif(item)
     } else {
-      item._vif = true
+      item._vif = !!item.vif
     }
-    item.__vif = item.scShow && item._vif
   } else {
-    // 这里初始化一下vif
-    if (item.vif !== undefined && item.vif !== null) {
-      if (typeof item.vif === 'function') {
-        item._vif = item.vif(item)
-      } else {
-        item._vif = !!item.vif
-      }
-    } else {
-      item._vif = true
-    }
-    // 这里最终处理一下auth权限问题
-    if (item.auth) {
-      if (!defaultConf.auth) {
-        console.warn('使用auth属性，请在crud注册时传入auth校验方法~')
-      } else {
-        item._vif = defaultConf.auth(item.auth)
-      }
-    }
-    item.__vif = item._vif
+    item._vif = true
   }
-
+  // 这里最终处理一下auth权限问题
+  if (item.auth) {
+    if (!defaultConf.auth) {
+      console.warn('使用auth属性，请在crud注册时传入auth校验方法~')
+    } else {
+      item._vif = defaultConf.auth(item.auth)
+    }
+  }
+  item.__vif = tbName ? item.scShow && item._vif : item._vif
   // 这里要判断下下级显示状态, 如果下级全部隐藏了，那么本级也应该隐藏
   if (item.children && item.children.every((info) => !info.__vif)) {
     item.__vif = false

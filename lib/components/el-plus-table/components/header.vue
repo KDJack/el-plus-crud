@@ -9,7 +9,7 @@
                 <ElPlusFormBtn v-if="Object.keys(formConfig?.formDesc || {}).length" type="primary" icon="ele-Search" :loading="loading" :desc="{ label: '查询', on: { click: handelSearch }, size }" />
                 <ElPlusFormBtn v-if="Object.keys(formConfig?.formDesc || {}).length" :desc="{ label: '重置', on: { click: handelReset }, size }" />
                 <ElPlusTableSettingColumn ref="settingColumnRef" v-if="tbName" :tbName="tbName" :column="column || []" :size="size" />
-                <ElPlusFormBtn type="primary" v-if="exportConf" :desc="{ label: '导出Excel', size, disabled: exportConf?.disabled, mask: true, on: { click: handelDownload } }" />
+                <ElPlusFormBtn type="primary" v-if="getVIf(exportConf) && exportConf" :desc="{ label: '导出Excel', size, disabled: exportConf?.disabled, mask: true, on: { click: handelDownload } }" />
                 <template v-for="(item, i) in headerBtns" :key="i">
                   <template v-if="getVIf(item)">
                     <template v-if="item.customize">
@@ -234,6 +234,14 @@ function getVIf(item: any) {
       return item.vif(item)
     }
     return !!item.vif
+  }
+  // 这里最终处理一下auth权限问题
+  if (item?.auth) {
+    if (!defaultConf.auth) {
+      console.warn('使用auth属性，请在crud注册时传入auth校验方法~')
+    } else {
+      return defaultConf.auth(item.auth)
+    }
   }
   return true
 }

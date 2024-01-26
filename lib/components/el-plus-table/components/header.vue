@@ -229,7 +229,7 @@ function handelReset() {
  * @param item
  */
 function getVIf(item: any) {
-  if (item.vif) {
+  if (item?.vif) {
     if (typeof item.vif === 'function') {
       return item.vif(item)
     }

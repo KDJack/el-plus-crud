@@ -247,9 +247,9 @@ async function handelUploadSuccess(response: any, file: any) {
  */
 function getFileIcon(file?: any): string {
   const fileUrl = file.shareUrl || file.furl || file.url
-  const suffix = (file?.suffix || fileUrl.substring(fileUrl.lastIndexOf('.')) || '') as string
+  const suffix = (file?.suffix || fileUrl.substring(fileUrl.lastIndexOf('.')) || '').toLocaleLowerCase()
   if (suffix) {
-    if (fileTypes.imageSuffixes.indexOf(suffix.toLocaleLowerCase()) >= 0) {
+    if (fileTypes.imageSuffixes.indexOf(suffix) >= 0) {
       return fileUrl
     }
     for (let i = 0; i < fileTypes.suffixTypes.length; i++) {
@@ -286,7 +286,7 @@ function handelListChange(item: any, type: 0 | 1) {
       fsize: item.size,
       uid: item.uid,
       mimeType: item.raw?.type,
-      suffix: (item.raw as any).suffix,
+      suffix: (item.raw as any).suffix?.toLocaleLowerCase() || '',
       busId: props.desc.busId,
       busType: props.desc.busType
     })
@@ -304,7 +304,7 @@ function handelListChange(item: any, type: 0 | 1) {
  * @param file
  */
 function handelPreview(file: any) {
-  if (fileTypes.imageSuffixes.indexOf(file.raw?.suffix || file.suffix) >= 0) {
+  if (fileTypes.imageSuffixes.indexOf((file.raw?.suffix || file.suffix || '').toLocaleLowerCase()) >= 0) {
     previewIndex.value = previewList.value.findIndex((item) => item === (file.raw?.shareUrl || file.furl))
     if (previewIndex.value < 0) {
       previewIndex.value = 0
@@ -350,7 +350,7 @@ function validateFile(file: any, types: Array<any>, maxSize: number) {
   }
   // 开始校验文件类型
   if (types && types.length > 0) {
-    if (types.every((type) => type !== file.suffix)) {
+    if (types.every((type) => type !== (file.suffix || '').toLocaleLowerCase())) {
       return '上传文件类型错误，请重新选择~'
     }
   }
@@ -364,7 +364,7 @@ watch(
       // 这里初始化一下
       if (typeof data === 'string') {
         if (data !== '') {
-          currentValue.value = [{ url: data, furl: data, suffix: data.substring(data.lastIndexOf('.')) }]
+          currentValue.value = [{ url: data, furl: data, suffix: data.substring(data.lastIndexOf('.')).toLocaleLowerCase() }]
         } else {
           currentValue.value = []
         }
@@ -375,7 +375,7 @@ watch(
               item.url = getFileIcon(item)
               item.furl = getFileIcon(item)
             }
-            item.suffix = item.suffix || item.url?.substring(item.url.lastIndexOf('.'))
+            item.suffix = (item.suffix || item.url?.substring(item.url?.lastIndexOf('.') || 0) || '').toLocaleLowerCase()
             item.previewUrl = item.furl || item.url
             return item
           }) || []

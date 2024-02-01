@@ -8,6 +8,11 @@
     </div> -->
     <EleTabletHeader ref="tableHeaderRef" v-if="Object.keys(tableConfig?.toolbar || {}).length || tableConfig.tbName" v-model="toolFormData" :tbName="tableConfig.tbName" :column="tableConfig?.column || []" :size="size" :isShowRefresh="isShowRefresh" :loading="compLoading" :toolbar="tableConfig.toolbar" :isDialog="isDialog" @query="handelTopQuery" :queryDataFn="getListQueryData" />
 
+    <!-- tabTop插槽 -->
+    <template v-if="useSlots().tabTop">
+      <slot name="tabTop"></slot>
+    </template>
+
     <!-- 中部的Tabs -->
     <div class="table-tabs-panel" v-if="tableConfig.tabConf">
       <el-radio-group v-model="tableTabVal" size="default" @change="handelTabChange">

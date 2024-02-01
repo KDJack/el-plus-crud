@@ -255,6 +255,7 @@ const computedRules = computed(() => {
             case 'cascader':
             case 'tselect':
             case 'linkuser':
+            case 'link':
             case 'radio':
             case 'checkbox':
               rules = 'select'

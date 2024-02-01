@@ -37,7 +37,6 @@ export default {
 <script lang="ts" setup>
 import { cloneDeep } from 'lodash'
 import { ref, reactive, watch, onMounted, computed } from 'vue'
-import { getEvents } from '../mixins'
 import { IBtnBack, ITableConfig } from 'types'
 
 interface ILinkItem {
@@ -55,7 +54,7 @@ const props = defineProps<{
   disabled?: boolean
 }>()
 
-const onEvents = ref(getEvents(props))
+const onEvents = ref(props.desc?.on || {})
 
 const emits = defineEmits(['update:modelValue', 'change', 'input', 'validateThis'])
 
@@ -169,7 +168,7 @@ function submit() {
 
   // 触发外部change事件
   if (onEvents.value.change) {
-    onEvents.value.change(props.formData || {}, null, currentValue.value)
+    onEvents.value.change(cloneDeep(selectData))
   }
 
   isShowDialog.value = false

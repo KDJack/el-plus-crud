@@ -78,6 +78,7 @@ function getPlaceholder(desc: { [key: string]: any }) {
     case 'validCode':
     case 'tag':
     case 'textarea':
+    case 'percentinput':
       return { placeholder: desc?.placeholder || '请输入' + (desc?._label || '') }
     case 'switch':
       return {}

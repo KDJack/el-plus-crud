@@ -29,6 +29,9 @@ const rowIndex = ref(props.scope?.$index || 0)
 const cells = computed(() => {
   const _cells = [] as any
 
+  // 如果是合并行，并且数据中存在isSumRow，则表示合计行，取消操作按钮
+  if (props.desc.label === '操作' && props.scope?.row?.isSumRow) return []
+
   // 判断有没有nodes
   if (props.desc.nodes) {
     props.desc.nodes.map((item, i) => {

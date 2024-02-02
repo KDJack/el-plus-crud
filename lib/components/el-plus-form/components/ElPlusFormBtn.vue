@@ -27,9 +27,9 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { ref, computed, useAttrs, watch, inject, useSlots } from 'vue'
+import { ref, computed, useAttrs, watch, inject } from 'vue'
 import { cloneDeep } from 'lodash'
-import { IBtnBack, ICRUDConfig } from 'types'
+import { IBtnBack, ICRUDConfig } from '../../../../types'
 
 const defaultConf = inject('defaultConf') as ICRUDConfig
 

@@ -29,7 +29,7 @@ import { cloneDeep } from 'lodash'
 import { isPromiseLike } from '../../util'
 import { computed, ref, useSlots } from 'vue'
 import ElPlusForm, { IFormProps } from './ElPlusForm.vue'
-import { IFormDesc, IFormGroupConfig } from 'types'
+import { IFormDesc, IFormGroupConfig } from '../../../types'
 
 const emits = defineEmits(['update:show', 'update:modelValue', 'before-validate', 'before-request', 'request-success', 'request-error', 'request-end', 'request'])
 const props = defineProps<{

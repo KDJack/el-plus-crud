@@ -51,7 +51,7 @@ import { cloneDeep, debounce } from 'lodash'
 import * as validates from './util/validate'
 import { typeList } from './components/index'
 import ElPlusFormBtn from './components/ElPlusFormBtn.vue'
-import { ICRUDConfig, IFormBack, IFormDesc, IFormDescItem } from 'types'
+import { ICRUDConfig, IFormBack, IFormDesc, IFormDescItem } from '../../../types'
 
 // IFormProps定义
 export interface IFormProps {

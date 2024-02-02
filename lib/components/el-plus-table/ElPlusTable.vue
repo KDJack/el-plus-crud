@@ -107,7 +107,7 @@ import { handelListColumn } from '../../util'
 import { cloneDeep, debounce } from 'lodash'
 import { Loading } from '@element-plus/icons-vue'
 import type { TableColumnCtx } from 'element-plus'
-import { ICRUDConfig, ITableConfig, ITableTabItem, ITreeProps } from 'types'
+import { ICRUDConfig, ITableConfig, ITableTabItem, ITreeProps } from '../../../types'
 
 interface SpanMethodProps {
   row: any

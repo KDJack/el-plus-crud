@@ -37,7 +37,7 @@ export default {
 <script lang="ts" setup>
 import { cloneDeep } from 'lodash'
 import { ref, reactive, watch, onMounted, computed } from 'vue'
-import { IBtnBack, ITableConfig } from 'types'
+import { IBtnBack, ITableConfig } from '../../../../types'
 
 interface ILinkItem {
   label: string

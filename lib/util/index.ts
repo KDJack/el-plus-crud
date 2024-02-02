@@ -1,5 +1,5 @@
 import { cloneDeep } from 'lodash'
-import { ICRUDConfig, IColumnItem } from 'types'
+import { ICRUDConfig, IColumnItem } from '../../types'
 
 /**
  * 裁剪长度

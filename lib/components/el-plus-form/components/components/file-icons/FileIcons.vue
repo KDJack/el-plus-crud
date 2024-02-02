@@ -15,7 +15,7 @@
 import { ref, computed } from 'vue'
 import fileIcon, { imgSuffix, iconMap } from './data'
 import { cutString } from '../../../../../util'
-import { IOssInfo } from 'types'
+import { IOssInfo } from '../../../../../../types'
 
 const props = defineProps<{
   files: Array<IOssInfo>

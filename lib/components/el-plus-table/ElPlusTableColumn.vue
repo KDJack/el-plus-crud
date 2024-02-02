@@ -27,7 +27,7 @@ export default {
 
 <script lang="ts" setup>
 import { computed } from 'vue'
-import { IColumnItem } from 'types'
+import { IColumnItem } from '../../../types'
 import ColumnItem from './components/columnItem.vue'
 import { cloneDeep } from 'lodash'
 

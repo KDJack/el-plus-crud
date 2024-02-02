@@ -35,7 +35,7 @@ import { ref, computed, watch, onMounted, inject } from 'vue'
 import ElPlusFormBtn from './ElPlusFormBtn.vue'
 import ElPlusFormUpbtn from './ElPlusFormUpbtn.vue'
 import { ElMessageBox } from 'element-plus'
-import { IBtnBack, ICRUDConfig } from 'types'
+import { IBtnBack, ICRUDConfig } from '../../../../types'
 
 const defaultConf = inject('defaultConf') as ICRUDConfig
 

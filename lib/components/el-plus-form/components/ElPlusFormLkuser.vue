@@ -74,7 +74,7 @@ import { ref, reactive, nextTick, watch, onMounted, computed, inject, onBeforeMo
 import { Share, UserFilled } from '@element-plus/icons-vue'
 import { cloneDeep } from 'lodash'
 import { getAttrs } from '../mixins'
-import { ICRUDConfig } from 'types'
+import { ICRUDConfig } from '../../../../types'
 
 const globalData = inject('globalData') as any
 const defaultConf = inject('defaultConf') as ICRUDConfig

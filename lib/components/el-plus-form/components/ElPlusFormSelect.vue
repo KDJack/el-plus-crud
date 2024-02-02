@@ -23,7 +23,7 @@ import { ref, reactive, computed, onBeforeMount, useAttrs, watch, inject } from 
 import { ElMessage } from 'element-plus'
 import { getAttrs } from '../mixins'
 import { isEqual, isPromiseLike } from '../../../util'
-import { ICRUDConfig } from 'types'
+import { ICRUDConfig } from '../../../../types'
 
 const defaultConf = inject('defaultConf') as ICRUDConfig
 const globalData = inject('globalData') as any

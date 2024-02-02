@@ -19,9 +19,9 @@ export default {
 <script lang="ts" setup>
 import { ref, computed, onBeforeMount, useAttrs, watch } from 'vue'
 import { Upload } from '@element-plus/icons-vue'
-import { ElMessage, ElMessageBox, UploadRawFile } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { getAttrs } from '../mixins'
-import { IBtnBack } from 'types'
+import { IBtnBack } from '../../../../types'
 
 const props = defineProps<{
   field?: string
@@ -42,7 +42,7 @@ const uploadAttr = {
   showFileList: false,
   listType: 'text',
   accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel',
-  beforeUpload: async (file: UploadRawFile) => {
+  beforeUpload: async (file: any) => {
     isLoading.value = true
     let confirmText = props.desc?.confirm || ''
     if (confirmText && typeof props.desc?.confirm === 'function') {
@@ -91,7 +91,7 @@ const btnShowText = computed(() => {
  * 文件上传前的处理
  * @param file
  */
-function handelBeforeUpload(file: UploadRawFile) {
+function handelBeforeUpload(file: any) {
   return new Promise((resolve, reject) => {
     isLoading.value = true
     const suffix = file.name.substring(file.name.lastIndexOf('.'))

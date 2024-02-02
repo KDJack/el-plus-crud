@@ -28,7 +28,7 @@ export default {
 import { ref, computed, useAttrs } from 'vue'
 import ElPlusForm from './ElPlusForm.vue'
 import { ElMessage } from 'element-plus'
-import { IFormBack } from 'types'
+import { IFormBack } from '../../../types'
 
 const emits = defineEmits(['update:show', 'update:modelValue'])
 const props = withDefaults(defineProps<{ modelValue?: { [key: string]: any } | {}; show?: boolean; title?: string; tableRef?: any; success?: Function; successTip?: string | ((data?: any) => string) }>(), {

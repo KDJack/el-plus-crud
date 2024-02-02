@@ -20,7 +20,7 @@
 <script lang="ts" setup>
 import { ref, onMounted, inject, reactive } from 'vue'
 import { ElMessage } from 'element-plus'
-import { ICRUDConfig, IColumnItem } from 'types'
+import { ICRUDConfig, IColumnItem } from '../../../../types'
 
 const defaultConf = inject('defaultConf') as ICRUDConfig
 

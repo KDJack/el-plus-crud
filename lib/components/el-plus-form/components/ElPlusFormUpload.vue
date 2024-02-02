@@ -32,7 +32,7 @@ export default {
 <script lang="ts" setup>
 import { ref, computed, useAttrs, onBeforeMount, watch, inject } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
-import { ElMessage, UploadRequestOptions, UploadUserFile } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 
 import * as fileTypes from '../data/file'
@@ -45,7 +45,7 @@ import txt from '../images/icon/txt.png'
 import word from '../images/icon/word.png'
 import zip from '../images/icon/zip.png'
 import ppt from '../images/icon/ppt.png'
-import { ICRUDConfig, IOssInfo } from 'types'
+import { ICRUDConfig, IOssInfo } from '../../../../types'
 import { isPromiseLike, getValue } from '../../../util'
 
 interface IUpAction {
@@ -268,7 +268,7 @@ function getFileIcon(file?: any): string {
  * @param file
  * @param fileList
  */
-function handelUploadRemove(file: UploadUserFile) {
+function handelUploadRemove(file: any) {
   handelListChange(file, 0)
 }
 
@@ -326,7 +326,7 @@ function handleOutOfLimit() {
  * 处理自定义上传
  * @param param
  */
-function handelRequest(param: UploadRequestOptions) {
+function handelRequest(param: any) {
   param.action = upAction.value
   const uploadFn = props.desc?.uploadFn || defaultConf.upload?.uploadFn
   return uploadFn(param)

@@ -5,10 +5,10 @@ import ElPlusFormDialog from './components/el-plus-form/ElPlusFormDialog.vue'
 import ElPlusFormGroup from './components/el-plus-form/ElPlusFormGroup.vue'
 import ElPlusTable from './components/el-plus-table/ElPlusTable.vue'
 import defaultConf from './config'
-import { ICRUDConfig } from '../types'
+import * as all from '../types'
 
 export default {
-  install: (app: App, config?: ICRUDConfig, format?: { [key: string]: Function }, globalData?: { [key: string]: Function }) => {
+  install: (app: App, config?: all.ICRUDConfig, format?: { [key: string]: Function }, globalData?: { [key: string]: Function }) => {
     // 合并配置
     deepMerge(defaultConf, config || {})
     defaultConf.debug && console.log('initConfig: ', defaultConf)

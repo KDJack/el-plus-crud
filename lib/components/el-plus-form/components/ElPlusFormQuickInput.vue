@@ -16,7 +16,7 @@ export default {
 import { ref, useAttrs, watch, onBeforeMount, inject, reactive } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
 import { isEqual } from '../../../util'
-import { ICRUDConfig } from 'types'
+import { ICRUDConfig } from '../../../../types'
 
 const globalData = inject('globalData') as any
 const defaultConf = inject('defaultConf') as ICRUDConfig

@@ -1,4 +1,4 @@
-import { ICRUDConfig } from 'types'
+import { ICRUDConfig } from '../../types'
 
 export default {
   // 是否开始debug调试模式,目前主要时一些console信息打印

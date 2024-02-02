@@ -15,7 +15,7 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { IOssInfo } from 'types'
+import { IOssInfo } from '../../../../types'
 import FileIcons from './components/file-icons/FileIcons.vue'
 
 const props = defineProps<{

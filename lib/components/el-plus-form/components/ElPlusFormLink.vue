@@ -8,7 +8,7 @@
       <div style="width: 100%" class="form-link-dialog">
         <div class="panel-left">
           <!-- 左侧列表 -->
-          <ElPlusTable v-if="tableConfig" ref="multipleTableRef" :tableConfig="tableConfig" :type="multiple ? 'selection' : 'index'" :isIndex="false" :rowKey="vkey" @selection="handelTableSelection" />
+          <ElPlusTable v-if="tableConfig" ref="multipleTableRef" :selectList="selectList" :tableConfig="tableConfig" :type="multiple ? 'selection' : 'index'" :isIndex="false" :rowKey="vkey" @selection="handelTableSelection" />
         </div>
         <div v-if="multiple" class="panel-right">
           <div class="right-title">已选中项：</div>
@@ -65,6 +65,8 @@ emits('update:modelValue', currentValue)
 const selectRef = ref()
 const values = reactive([] as any[])
 const options = reactive([] as any[])
+const selectList = ref([] as any[])
+
 const topAttrs = reactive({
   multiple: true,
   size: props.desc.size,
@@ -94,6 +96,7 @@ function handelVisibleChange(val: any) {
   if (val) {
     selectRef.value.blur()
     isShowDialog.value = true
+    selectList.value = cloneDeep(selectData.map((item) => item.dataItem))
   }
 }
 

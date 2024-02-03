@@ -148,7 +148,7 @@ const props = withDefaults(defineProps<IFormProps>(), {
   // 取消按钮
   cancelBtnText: '取消',
   // 是否显示重置按钮
-  showReset: true,
+  showReset: false,
   // 重置按钮
   resetBtnText: '重置',
   // 是否显示标签

@@ -22,7 +22,8 @@ export default {
 import { ref, reactive, computed, onBeforeMount, useAttrs, watch, inject } from 'vue'
 import { ElMessage } from 'element-plus'
 import { getAttrs } from '../mixins'
-import { isEqual, isPromiseLike } from '../../../util'
+import { isPromiseLike } from '../../../util'
+import { isEqual } from 'lodash'
 import { ICRUDConfig } from '../../../../types'
 
 const defaultConf = inject('defaultConf') as ICRUDConfig

@@ -103,11 +103,10 @@ export default {
 import { ref, reactive, onMounted, computed, watch, nextTick, useSlots, inject, provide } from 'vue'
 import EleTabletHeader from './components/header.vue'
 import ElPlusTableColumn from './ElPlusTableColumn.vue'
-import { handelListColumn } from '../../util'
 import { cloneDeep, debounce } from 'lodash'
 import { Loading } from '@element-plus/icons-vue'
 import type { TableColumnCtx } from 'element-plus'
-import { ICRUDConfig, ITableConfig, ITableTabItem, ITreeProps } from '../../../types'
+import { ICRUDConfig, IColumnItem, ITableConfig, ITableTabItem, ITreeProps } from '../../../types'
 
 interface SpanMethodProps {
   row: any
@@ -334,6 +333,104 @@ const headerColumns = computed(() => {
   }
   return tempList
 })
+
+/**
+ * 处理列表表头，list转Map
+ */
+export function handelListColumn(columnList: Array<IColumnItem> | undefined, defaultConf: ICRUDConfig, tbName: string, headerAlign?: string, minWidth?: string): any[] {
+  const tempColumnList = [] as any[]
+  if (columnList && columnList.length > 0) {
+    // 不影响原有的对象，这里进行拷贝
+    cloneDeep(columnList).map((item: IColumnItem) => {
+      // 如果有子集
+      if (item.children) {
+        // 表头居中
+        item.headerAlign = item.headerAlign || 'center'
+        item.children = handelListColumn(item.children, defaultConf, tbName, 'center', minWidth)
+      } else {
+        // 表头居中
+        item.headerAlign = item.headerAlign || headerAlign || 'left'
+      }
+
+      // 处理下一个单元格显示多个数据
+      // if (item.nodes) {
+      //   const tempList = (handelListColumn(item.nodes, minWidth) as any)[0].children
+      //   item.nodes = tempList || item.nodes
+      // }
+      // 检查type属性,没有type属性的自动补一个text类型
+      if (!item.type) {
+        item.type = 'text'
+      }
+      // 这里判断下type类型，然后进行一下表头和表格的对齐方式
+      switch (item.type) {
+        case 'image':
+          item.width = item.width || '110px'
+          item.align = item.align || 'left'
+          item.headerAlign = item.headerAlign || headerAlign || 'left'
+          break
+        case 'btns':
+          if (!item.minWidth && item.btns && item.btns.length >= 2) {
+            let labelLength = 0
+            // 这里判断最多按钮数量
+            for (let i = 0; i < item.btns.length && i < (item.limit || 3); i++) {
+              if (item.btns[i] && typeof item.btns[i].label === 'string') {
+                labelLength += (item.btns[i].label as string).length
+              } else {
+                labelLength += 4
+              }
+            }
+            item.width = item.width || labelLength * 24 + 'px'
+          }
+          item.align = item.align || 'left'
+          item.headerAlign = item.headerAlign || headerAlign || 'left'
+          item.text = true
+          break
+      }
+      // item.minWidth = item.minWidth || 'auto'
+      item.minWidth = item.minWidth || (item.label !== '操作' ? minWidth : 'auto')
+
+      // 处理下‘操作’
+      item.showOverflowTooltip = item.label !== '操作'
+
+      // 处理vif
+      handelVIf(item, defaultConf, tbName)
+
+      tempColumnList.push(item)
+    })
+  }
+  return tempColumnList
+}
+
+/**
+ * 处理item的vif
+ * @param item
+ * @param defaultConf
+ * @param tbName
+ */
+function handelVIf(item: IColumnItem, defaultConf: ICRUDConfig, tbName: string) {
+  if (item.vif !== undefined && item.vif !== null) {
+    if (typeof item.vif === 'function') {
+      item._vif = item.vif(item)
+    } else {
+      item._vif = !!item.vif
+    }
+  } else {
+    item._vif = true
+  }
+  // 这里最终处理一下auth权限问题
+  if (item.auth) {
+    if (!defaultConf.auth) {
+      console.warn('使用auth属性，请在crud注册时传入auth校验方法~')
+    } else {
+      item._vif = defaultConf.auth(item.auth)
+    }
+  }
+  item.__vif = tbName ? item.scShow && item._vif : item._vif
+  // 这里要判断下下级显示状态, 如果下级全部隐藏了，那么本级也应该隐藏
+  if (item.children && item.children.every((info) => !info.__vif)) {
+    item.__vif = false
+  }
+}
 
 /**
  * 获取一行数据的前缀

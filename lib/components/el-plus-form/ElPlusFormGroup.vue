@@ -1,13 +1,15 @@
 <template>
   <div class="el-plus-form-group">
-    <template v-for="(group, i) in getGroupFowmLayout" :key="i + group.formProps?.fid">
+    <template v-for="(group, i) in groupFormLayout" :key="i + group.formProps?.fid">
       <template v-if="useSlots()['top' + indexList[i]]">
         <slot :name="'top' + indexList[i]"> </slot>
       </template>
-      <slot :name="'title' + indexList[i]">
-        <div class="title-line" v-if="group.title">{{ group.title }}</div>
-      </slot>
-      <ElPlusForm v-model="currentValue" v-bind="group.formProps" isGroupForm :ref="setComponentRef" @reset="handleReset(group.formProps?.fid || '')">
+      <template v-if="useSlots()['title' + indexList[i]]">
+        <slot :name="'title' + indexList[i]">
+          <div class="title-line" v-if="group.title">{{ group.title }}</div>
+        </slot>
+      </template>
+      <ElPlusForm v-model="currentValue" v-bind="group.formProps" isGroupForm :ref="formRefs.set" @reset="handleReset(group.formProps?.fid || '')">
         <template v-if="useSlots()['default' + indexList[i]]">
           <slot :name="'default' + indexList[i]"> </slot>
         </template>
@@ -25,124 +27,79 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { cloneDeep } from 'lodash'
-import { isPromiseLike } from '../../util'
-import { computed, ref, useSlots } from 'vue'
+import { ref, useSlots } from 'vue'
+import { useVModel, computedWithControl, useTemplateRefsList } from '@vueuse/core'
+import { getVIf, isPromiseLike } from '../../util'
 import ElPlusForm, { IFormProps } from './ElPlusForm.vue'
-import { IFormDesc, IFormGroupConfig } from '../../../types'
+import { IFormGroupConfig, IFormConfig, IFormDesc } from '../../../types'
 
-const emits = defineEmits(['update:show', 'update:modelValue', 'before-validate', 'before-request', 'request-success', 'request-error', 'request-end', 'request'])
+const emits = defineEmits(['update:modelValue'])
 const props = defineProps<{
   modelValue: { [key: string]: any } | {}
   // 表单Group项
   formGroup: IFormGroupConfig
   // 提交状态
   isLoading?: boolean
-  // 是否禁用最后一个元素的tab
-  disabledTab?: boolean
 }>()
 
-const formRefs = ref([] as any[])
+// 重新定义当前值
+const currentValue = useVModel(props, 'modelValue', emits)
+// 定义refs
+const formRefs = useTemplateRefsList<InstanceType<typeof ElPlusForm>>()
 
 // 主要记录原来groupFowmLayout下标和group下标的对应
 const indexList = ref([] as number[])
-
-// 重新定义当前值
-const currentValue = computed({
-  get: () => props.modelValue,
-  set(val: any) {
-    emits('update:modelValue', val)
-  }
-})
 
 /**
  * 获取布局，且初始化
  * @param groupItem
  */
-const getGroupFowmLayout = computed(() => {
-  const formConfigList = [] as Array<{
-    title?: string
-    column?: number
-    formProps?: IFormProps
-  }>
-  // 清空refs列表
-  formRefs.value = []
+const groupFormLayout = computedWithControl([() => props.formGroup], () => {
+  const formConfigList = [] as Array<{ title?: string; formProps?: IFormProps }>
   indexList.value = []
 
+  const { column, group, ...otherAttrs } = props.formGroup
+  // 临时ID
   const tempId = new Date().getTime()
-  props.formGroup.group.map((item, i): any => {
-    item.fid = item.fid || `${tempId + i}`
-    item._vif = getVIf.value(item.vif)
-  })
 
-  // 这里首先遍历一遍_vif
-  const tempGroupList = props.formGroup.group.filter((item, i) => {
-    // 这里单独存储下index 的对应关系
-    if (item._vif) indexList.value.push(i)
-    return item._vif
-  })
-
-  const tempFormConfig = cloneDeep(props.formGroup) as any
-  const column = props.formGroup.column || 1
-  // 移除无用
-  delete tempFormConfig.group
-  delete tempFormConfig.column
+  // 首先编译一遍数据
+  const tempGroupList = group
+    .map((item: any, i: number): IFormDesc => ({ ...item, fid: item.fid || `${tempId + i}`, _vif: getVIf(item.vif) }) as IFormDesc)
+    .filter((item: any, i: number) => {
+      // 这里单独存储下index 的对应关系
+      if (item._vif) indexList.value.push(i)
+      return item._vif
+    })
 
   // 表单校验
-  tempFormConfig.beforeValidate = async (postData: any) => {
+  otherAttrs.beforeValidate = async (postData: any) => {
     // 这里处理自带的 beforeValidate
-    if (props.formGroup.beforeValidate) {
-      const result = (props.formGroup.beforeValidate as Function)(postData)
+    if (otherAttrs.beforeValidate) {
+      const result = (otherAttrs.beforeValidate as Function)(postData)
       if (!(isPromiseLike<any>(result) ? await result : result)) return false
     }
     return await Promise.all(formRefs.value.map((tempRef) => tempRef.validate()))
   }
 
-  tempFormConfig.groupFormDesc = {} as IFormDesc
-  tempGroupList.map((item) => {
-    Object.assign(tempFormConfig.groupFormDesc, item.formDesc)
-  })
-  tempFormConfig.disabledTab = props.disabledTab
-
+  // tempFormConfig.groupFormDesc = {} as IFormDesc
+  const lastFormConf = otherAttrs as IFormConfig
+  tempGroupList.map((item: any) => Object.assign(lastFormConf.groupFormDesc, item.formDesc))
   // 遍历
-  tempGroupList.map((groupItem, i) => {
+  tempGroupList.map((groupItem, i: number) => {
     formConfigList.push({
-      title: groupItem.title,
-      formProps: Object.assign({ column: groupItem.column || column }, i === tempGroupList.length - 1 ? tempFormConfig : { showBtns: false }, groupItem || {}) as IFormProps
+      title: groupItem.title as any,
+      formProps: Object.assign({ column: groupItem.column || column }, i === tempGroupList.length - 1 ? lastFormConf : { showBtns: false }, groupItem || {}) as IFormProps
     })
   })
   return formConfigList
 })
 
 /**
- * 获取vif
+ * 重置
+ * @param fid
  */
-const getVIf = computed(() => (vif: boolean | Function | undefined) => {
-  if (typeof vif === 'function') {
-    return vif(props.modelValue)
-  } else if (typeof vif === 'boolean') {
-    return vif
-  }
-  return true
-})
-
-// 设置子组件的ref-重置form的时候需要用到
-function setComponentRef(el: any) {
-  if (!el) return
-  if (!formRefs.value.find((item) => item.fid === el.fid)) {
-    formRefs.value.push(el)
-  }
-}
-
-//重置
-function handleReset(fid: string) {
-  setTimeout(() => {
-    formRefs.value.map((item) => {
-      if (item.fid !== fid) {
-        item.clearValid()
-      }
-    })
-  }, 100)
+async function handleReset(fid: string) {
+  await Promise.all(formRefs.value.map((tempRef) => tempRef.fid !== fid && tempRef.clearValid()))
 }
 
 /**
@@ -163,11 +120,7 @@ async function clearValid() {
  * 获取数据
  */
 function getData() {
-  const tempData = {} as any
-  formRefs.value.map((tempRef) => {
-    Object.assign(tempData, tempRef.getData())
-  })
-  return tempData
+  return formRefs.value.map((tempRef) => tempRef.getData())
 }
 
 defineExpose({ validate, getData, clearValid })

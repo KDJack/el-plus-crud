@@ -10,7 +10,7 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { isEqual } from '../../../util'
+import { isEqual } from 'lodash'
 import { ref, reactive, useAttrs, onBeforeMount, watch, inject } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
 

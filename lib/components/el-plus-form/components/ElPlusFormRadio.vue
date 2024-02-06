@@ -16,7 +16,7 @@ export default {
 <script lang="ts" setup>
 import { ref, reactive, useAttrs, watch, onBeforeMount, inject } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
-import { isEqual } from '../../../util'
+import { isEqual } from 'lodash'
 
 const globalData = inject('globalData') as any
 

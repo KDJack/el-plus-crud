@@ -1,46 +1,106 @@
 import { Ref } from 'vue'
 
-// 基础类型
-export type IBaseObj = IBaseObj
-
 /**
- * 表单回调
+ * 基础类型
  */
-export interface IFormBack {
-  response?: any
-  formData?: IBaseObj
-  callBack: Function
-}
-
-/**
- * 按钮回调data
- */
-export interface IBtnBack {
-  row: IBaseObj
-  callBack?: Function
-  field: string
-  rowIndex: number
-  files?: Array<any>
+export type IBaseObj = {
+  [key: string]: any
 }
 
 /**
  * 通用请求
  */
-export interface IFetch<T> {
+export type IFetch<T> = {
   // 查询数据的方法，入参和返回格式固定
-  (data?: any): Promise<T | null>
+  (data?: any): Promise<T | null> | T
 }
 
 /**
- * 设定如何解析请求结果
+ * 基础的类型
  */
-export interface IFetchMap {
-  // 结果列表key-默认records
-  list?: string
-  // 总数key-默认total
-  total?: string
-  // 当前页key-默认current
-  current?: string
+export type IBaseType<T> = T | Ref<T> | ((data?: any, data2?: any) => T)
+
+/**
+ * 通用基础回调
+ */
+export interface IBaseCallBack {
+  data: IBaseObj
+  callBack: (time?: number) => void
+}
+
+/**
+ * 表单回调
+ */
+export interface IFormBack extends IBaseCallBack {
+  response?: IBaseObj
+}
+
+/**
+ * 按钮回调data
+ */
+export interface IBtnBack extends IBaseCallBack {
+  field?: string
+  rowIndex?: number
+}
+
+/**
+ * option描述
+ */
+export interface IBaseOptionItem {
+  l?: string
+  v?: string | number
+  label?: string
+  value?: string | number
+  children?: Array<IBaseOptionItem>
+}
+
+/**
+ * 基础描述对象
+ */
+export interface IBaseDescItem {
+  type?: IBaseType<string>
+  label?: IBaseType<string>
+  prop?: IBaseType<string>
+  format?: IBaseType<string>
+  vif?: IBaseType<boolean>
+  style?: IBaseType<IBaseObj>
+  attrs?: IBaseType<IBaseObj>
+  // 事件
+  on?: { [key: string]: Function }
+  // 权限
+  auth?: IBaseType<string>
+}
+
+/**
+ * 基础内部使用对象
+ */
+export interface IBaseDescItemIn {
+  // 内部使用属性
+  _vif?: boolean
+  // 内部接口
+  _type?: string
+  _tip?: string
+  _disabled?: boolean
+  _attrs?: IBaseObj
+  _label?: string
+  _prop?: IBaseObj
+  _options?: Array<IBaseOptionItem>
+}
+
+/**
+ * 基础的descItem
+ */
+export type IDescItem = {
+  limit?: number
+  vshow?: IBaseType<boolean>
+  required?: IBaseType<boolean>
+  width?: IBaseType<string>
+  // 查看详情
+  linkId?: IBaseType<string>
+  linkType?: IBaseType<string>
+  linkLabel?: IBaseType<string>
+  // 其他字符串
+  [key: string]: any
 }
 
 /**
@@ -48,34 +108,6 @@ export interface IFetchMap {
  */
 export interface IFormDesc {
   [key: string]: IFormDescItem
-}
-
-/**
- * 基础的descItem
- */
-export type IDescItem = {
-  type?: string
-  label?: string | ((data?: any) => string)
-  prop?: string | ((data?: any) => string)
-  width?: string
-  format?: string | ((data?: any) => string)
-  vif?: boolean | ((data?: any) => boolean)
-  vshow?: boolean | ((data?: any) => boolean)
-  limit?: number
-  required?: boolean | Ref<boolean> | ((data?: any) => boolean)
-  style?: IBaseObj | ((data?: any) => IBaseObj)
-  // 事件
-  on?: { [key: string]: Function }
-  // 查看详情
-  linkId?: string | ((val: any, formData: any) => string)
-  linkType?: string | ((val: any, formData: any) => string)
-  linkLabel?: string | ((val: any, formData: any) => string)
-  // 内部使用属性
-  _vif?: boolean
-  // 权限
-  auth?: string
-  // 其他字符串
-  [key: string]: any
 }
 
 /**
@@ -89,8 +121,7 @@ export interface IFormDescItem extends IDescItem {
   tip?: string | ((data?: any) => string)
   size?: string
   placeholder?: string
-  attrs?: IBaseObj | ((data?: any) => IBaseObj)
-  options?: Ref<Array<IFormDescItemOptionItem>> | Array<IFormDescItemOptionItem> | (() => Array<IFormDescItemOptionItem>) | IFetch<Array<IFormDescItemOptionItem>> | string
+  options?: IBaseType<Array<IBaseOptionItem>> | IFetch<Array<IBaseOptionItem>> | string
   default?: string | boolean | number
   defaultItem?: { value: string | number; label: string; dataItem?: IBaseObj }
   rules?: string | Array<any>
@@ -114,7 +145,7 @@ export interface IFormDescItem extends IDescItem {
   _attrs?: IBaseObj
   _label?: string
   _prop?: IBaseObj
-  _options?: Array<IFormDescItemOptionItem>
+  _options?: Array<IBaseOptionItem>
   // 其他属性
   // 级联下拉是否只选中最后一级
   checkStrictly?: boolean
@@ -127,32 +158,25 @@ export interface IFormDescItem extends IDescItem {
 }
 
 /**
- * option描述
- */
-export interface IFormDescItemOptionItem {
-  l?: string
-  v?: string | number
-  label?: string
-  value?: string | number
-  children?: Array<IFormDescItemOptionItem>
-}
-
-/**
  * 表单配置
  */
 export interface IFormConfig {
   // 表单描述对象
   formDesc: IFormDesc
+  // 表单描述对象
+  groupFormDesc: IFormDesc
   // 表单的列数，默认是1
   column?: number
   // 提交前执行
-  beforeRequest?: (data?: any) => any
+  beforeRequest?: (data: T) => T | Promise<T>
+  // 校验前执行
+  beforeValidate?: (data: T) => T | Promise<T>
   // 请求地址
-  requestFn?: (data?: any) => Promise<T>
+  requestFn?: (data?: any) => T | Promise<T>
   // 更新的函数
-  updateFn?: (data?: any) => Promise<T>
+  updateFn?: (data?: any) => T | Promise<T>
   // 请求成功时
-  success?: (data?: IFormBack) => any
+  success?: (data: IFormBack) => any
   // 成功时的提醒文本
   successTip?: string | ((data?: any) => string)
   // 列表的ref
@@ -162,22 +186,7 @@ export interface IFormConfig {
 /**
  * group表单配置
  */
-export interface IFormGroupConfig {
-  // 表单的列数，默认是1
-  column?: number
-  // 提交前执行
-  beforeRequest?: (data: T) => T
-  beforeValidate?: (data: T) => T
-  // 请求地址
-  requestFn?: (data?: any) => Promise<T>
-  // 更新的函数
-  updateFn?: (data?: any) => Promise<T>
-  // 请求成功时
-  success?: (data: IFormBack) => any
-  // 成功时的提醒文本
-  successTip?: string | ((data?: any) => string)
-  // 列表的ref
-  tableRef?: any
+export interface IFormGroupConfig extends Omit<IFormConfig, 'formDesc'> {
   // 分组配置信息
   group: Array<{
     // 小标题
@@ -202,6 +211,17 @@ export interface IFormGroupConfig {
 }
 
 /************************************列表************************************ */
+/**
+ * 设定如何解析列表数据的请求结果
+ */
+export interface IAnalyzeTable {
+  // 结果列表key-默认records
+  list?: string
+  // 总数key-默认total
+  total?: string
+  // 当前页key-默认current
+  current?: string
+}
 
 /**
  * 表格项

@@ -55,7 +55,7 @@ import { ref, computed, onMounted, nextTick, inject } from 'vue'
 import ElPlusTableSettingColumn from './settingColumn.vue'
 import ElPlusFormBtn from '../../el-plus-form/components/ElPlusFormBtn.vue'
 import ElPlusFormUpbtn from '../../el-plus-form/components/ElPlusFormUpbtn.vue'
-import { isMobile, handelBtnType, mapToUrlStr } from '../../../util'
+import { isMobile, mapToUrlStr } from '../../../util'
 import { IBtnBack, ICRUDConfig, IColumnItem, ITableToolbar } from '../../../../types'
 
 const defaultConf = inject('defaultConf') as ICRUDConfig
@@ -88,6 +88,35 @@ const headerBtns = computed(() => {
   }
   return btns
 })
+
+/**
+ * 处理按钮类型
+ * @param item
+ */
+function handelBtnType(item: any): Object {
+  switch (item.type) {
+    case undefined:
+      item.type = 'primary'
+      break
+    case 'add':
+      item.type = 'primary'
+      item.title = item.title || '新增'
+      item.icon = 'ele-Plus'
+      break
+    case 'edit':
+      item.type = 'primary'
+      item.title = item.title || '编辑'
+      item.icon = 'ele-EditPen'
+      break
+    case 'delete':
+    case 'del':
+      item.type = 'danger'
+      item.title = item.title || '删除'
+      item.icon = 'ele-Delete'
+      break
+  }
+  return item
+}
 
 const formConfig = computed(() => {
   const tempConf = props.toolbar?.formConfig

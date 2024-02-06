@@ -43,7 +43,7 @@ const viteConfig = defineConfig(() => {
         formats: ['umd', 'es']
       } as LibraryOptions,
       rollupOptions: {
-        external: ['vue', 'element-plus'],
+        external: ['vue', 'element-plus', '@vueuse/core'],
         output: {
           // entryFileNames: `static/js/[hash].js`,
           // chunkFileNames: `static/js/[hash].js`,

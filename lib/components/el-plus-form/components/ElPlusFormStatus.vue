@@ -15,7 +15,7 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { isEqual } from '../../../util'
+import { isEqual } from 'lodash'
 import { ref, reactive, watch, computed, inject } from 'vue'
 
 const globalData = inject('globalData') as any

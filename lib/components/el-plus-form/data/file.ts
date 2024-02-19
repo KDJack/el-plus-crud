@@ -55,11 +55,11 @@ export const otherSuffixes = ['.rar', '.exe', '.woff', '.ttf', '.7z', '.apk', '.
 /**
  * 能够上传的文件类型
  */
-export const fileTypes = [...imageTypes, ...videoTypes, ...officeTypes, ...textTypes, ...otherTypes]
+export const fileTypes = [...imageTypes, ...videoTypes, ...audioTypes, ...officeTypes, ...textTypes, ...otherTypes]
 /**
  * 能够上传的文件后缀
  */
-export const fileSuffixes = [...imageSuffixes, ...videoSuffixes, ...officeSuffixes, ...textSuffixes, ...otherSuffixes]
+export const fileSuffixes = [...imageSuffixes, ...videoSuffixes, ...audioSuffixes, ...officeSuffixes, ...textSuffixes, ...otherSuffixes]
 
 /**
  * 文档后缀对应的类型

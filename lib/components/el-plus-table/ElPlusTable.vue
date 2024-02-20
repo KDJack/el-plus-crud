@@ -103,7 +103,7 @@ export default {
 import { ref, reactive, onMounted, computed, watch, nextTick, useSlots, inject, provide } from 'vue'
 import EleTabletHeader from './components/header.vue'
 import ElPlusTableColumn from './ElPlusTableColumn.vue'
-import { handelListColumn } from '../../util'
+import { handelListColumn, isEqual } from '../../util'
 import { cloneDeep, debounce } from 'lodash'
 import { Loading } from '@element-plus/icons-vue'
 import type { TableColumnCtx } from 'element-plus'
@@ -773,15 +773,16 @@ watch(
   (data) => {
     if (!props.tableConfig.fetch) {
       // console.log('watch modelValue data: ', data)
-      // if (JSON.parse(JSON.stringify(data)) !== JSON.parse(JSON.stringify(tableData.value))) {
-      // 优化代码，这里就直接比较一下length就行了
-      if (data?.length !== tableData.value?.length) {
+      if (!isEqual(data, tableData.value)) {
+        // if (JSON.parse(JSON.stringify(data)) !== JSON.parse(JSON.stringify(tableData.value))) {
+        // 优化代码，这里就直接比较一下length就行了
+        // if (data?.length !== tableData.value?.length) {
         loadingStatus.value = 2
         tableData.value?.splice(0, tableData.value.length, ...(data || []))
       }
     }
-  }
-  // { deep: true }
+  },
+  { deep: true }
 )
 
 watch(

@@ -96,11 +96,10 @@ const styles = computed(() => {
   }
 
   .el-image {
-    margin-left: 10px;
-    margin-bottom: 10px;
+    margin: 5px !important;
   }
   .el-image:first-child {
-    margin-left: 0px;
+    margin-left: 0px !important;
   }
 }
 

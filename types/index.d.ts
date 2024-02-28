@@ -55,23 +55,6 @@ export interface IBaseOptionItem {
 }
 
 /**
- * 基础描述对象
- */
-export interface IBaseDescItem {
-  type?: IBaseType<string>
-  label?: IBaseType<string>
-  prop?: IBaseType<string>
-  format?: IBaseType<string>
-  vif?: IBaseType<boolean>
-  style?: IBaseType<IBaseObj>
-  attrs?: IBaseType<IBaseObj>
-  // 事件
-  on?: { [key: string]: Function }
-  // 权限
-  auth?: IBaseType<string>
-}
-
-/**
  * 基础内部使用对象
  */
 export interface IBaseDescItemIn {
@@ -88,19 +71,21 @@ export interface IBaseDescItemIn {
 }
 
 /**
- * 基础的descItem
+ * 基础描述对象
  */
-export type IDescItem = {
-  limit?: number
-  vshow?: IBaseType<boolean>
-  required?: IBaseType<boolean>
-  width?: IBaseType<string>
-  // 查看详情
-  linkId?: IBaseType<string>
-  linkType?: IBaseType<string>
-  linkLabel?: IBaseType<string>
-  // 其他字符串
-  [key: string]: any
+export interface IBaseDescItem {
+  prop?: string
+  type?: string
+  label?: IBaseType<string>
+  format?: IBaseType<string>
+  vif?: IBaseType<boolean>
+  width?: string
+  style?: IBaseType<IBaseObj>
+  attrs?: IBaseType<IBaseObj>
+  // 事件
+  on?: { [key: string]: Function }
+  // 权限
+  auth?: IBaseType<string>
 }
 
 /**
@@ -113,40 +98,45 @@ export interface IFormDesc {
 /**
  * 表单项描述
  */
-export interface IFormDescItem extends IDescItem {
-  field?: string
-  disabled?: boolean | Ref<boolean> | ((data?: any) => boolean)
+export interface IFormDescItem extends IBaseDescItem, IBaseDescItemIn {
+  colspan?: number
+  size?: string
+  disabled?: IBaseType<boolean>
+
+  isBlank?: boolean
+  // 是否必填
+  required?: IBaseType<boolean>
+  // 数量限制：对于 btn 来说 限制按钮显示个数，对于 文件上传 来说限制文件上传个数
+  limit?: number
+  vshow?: IBaseType<boolean>
   showLabel?: boolean
   labelWidth?: string | number
   tip?: string | ((data?: any) => string)
-  size?: string
   placeholder?: string
   options?: IBaseType<Array<IBaseOptionItem>> | IFetch<Array<IBaseOptionItem>> | string
+  remote?: Function
   default?: string | boolean | number
   defaultItem?: { value: string | number; label: string; dataItem?: IBaseObj }
   rules?: string | Array<any>
-  valueFormat?: Function | string
-  isBlank?: boolean
-  colspan?: number
+  valueFormat?: IBaseType<string>
+
+  // 查看详情
+  linkId?: IBaseType<string>
+  linkType?: IBaseType<string>
+  linkLabel?: IBaseType<string>
+
+  // 文件上传
   upType?: string
   multiple?: boolean
   noTip?: boolean
   maxSize?: number
-  remote?: Function
+
   // 如果是列表
   tableConfig?: ITableConfig
   tableAttr?: IBaseObj
   tableEvent?: IBaseObj
 
-  // 内部接口
-  _type?: string
-  _tip?: string
-  _disabled?: boolean
-  _attrs?: IBaseObj
-  _label?: string
-  _prop?: IBaseObj
-  _options?: Array<IBaseOptionItem>
-  // 其他属性
+  // 其他表单属性
   // 级联下拉是否只选中最后一级
   checkStrictly?: boolean
   // key的前缀-方便同一个表单中，存在多个daterange等组件
@@ -155,6 +145,9 @@ export interface IFormDescItem extends IDescItem {
   startTimeKey?: string
   // 结束时间key
   endTimeKey?: string
+
+  // 其他字符串
+  [key: string]: any
 }
 
 /**
@@ -168,19 +161,19 @@ export interface IFormConfig {
   // 表单的列数，默认是1
   column?: number
   // 提交前执行
-  beforeRequest?: (data: T) => T | Promise<T>
+  beforeRequest?: IFetch<T>
   // 校验前执行
-  beforeValidate?: (data: T) => T | Promise<T>
+  beforeValidate?: IFetch<T>
   // 请求地址
-  requestFn?: (data?: any) => T | Promise<T>
+  requestFn?: IFetch<T>
   // 更新的函数
-  updateFn?: (data?: any) => T | Promise<T>
+  updateFn?: IFetch<T>
   // 请求成功时
   success?: (data: IFormBack) => any
   // 成功时的提醒文本
-  successTip?: string | ((data?: any) => string)
+  successTip?: IBaseType<string>
   // 列表的ref
-  tableRef?: any
+  tableRef?: Ref<any>
 }
 
 /**
@@ -226,7 +219,7 @@ export interface IAnalyzeTable {
 /**
  * 表格项
  */
-export interface IColumnItem extends IDescItem {
+export interface IColumnItem extends IBaseDescItem {
   minWidth?: string
   color?: string | Array<string>
   align?: string

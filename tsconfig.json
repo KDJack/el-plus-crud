@@ -66,6 +66,7 @@
   "include": [
     // list
     "types/*.d.ts",
+    "types/**/*.d.ts",
     "lib/**/*.ts",
     "lib/**/*.vue",
     "lib/**/*.tsx",

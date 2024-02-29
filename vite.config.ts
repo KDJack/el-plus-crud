@@ -4,6 +4,8 @@ import { LibraryOptions, defineConfig } from 'vite'
 import dts from 'vite-plugin-dts'
 import vueSetupExtend from 'vite-plugin-vue-setup-extend'
 
+import AutoImport from 'unplugin-auto-import/vite'
+
 const pathResolve = (dir: string) => {
   return resolve(__dirname, '.', dir)
 }
@@ -22,6 +24,11 @@ const viteConfig = defineConfig(() => {
         outDir: ['./dist'],
         //指定使用的tsconfig.json为我们整个项目根目录下,如果不配置,你也可以在components下新建tsconfig.json
         tsconfigPath: './tsconfig.json'
+      }),
+      AutoImport({
+        // 可以自定义文件生成的位置，默认是根目录下，使用ts的建议放src目录下
+        dts: 'types/auto-imports.d.ts',
+        imports: ['vue']
       })
     ],
     root: process.cwd(),

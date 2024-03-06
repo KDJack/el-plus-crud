@@ -45,7 +45,7 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { ref, computed, useAttrs, nextTick, onMounted, watch, inject, Ref } from 'vue'
+import { ref, computed, useAttrs, nextTick, onMounted, watch, inject, Ref, useSlots } from 'vue'
 import { castArray, isMobile, time, isPromiseLike } from '../../util'
 import { cloneDeep, debounce } from 'lodash'
 import * as validates from './util/validate'
@@ -187,6 +187,8 @@ const fieldRefs_ = ref([] as Array<any>)
 const innerIsLoading = ref(false)
 
 let oldFormData = null as any
+
+const indexList = ref([] as number[])
 
 const size = computed(() => props.size || defaultConf.size)
 // 组件名称列表
@@ -817,14 +819,15 @@ watch(
 watch(
   () => props.modelValue,
   (data) => {
-    if (!oldFormData || (isOpenListen.value && data && JSON.stringify(data) !== JSON.stringify(oldFormData))) {
+    // && JSON.stringify(data) !== JSON.stringify(oldFormData)
+    if (!oldFormData || (isOpenListen.value && data)) {
       // 检查联动
-      if (JSON.stringify(data) !== JSON.stringify(oldFormData)) {
-        if (!oldFormData) {
-          oldFormData = cloneDeep(data)
-        }
-        initFormAttrs()
+      // if (JSON.stringify(data) !== JSON.stringify(oldFormData)) {
+      if (!oldFormData) {
+        oldFormData = cloneDeep(data)
       }
+      initFormAttrs()
+      // }
     }
   },
   { deep: true }

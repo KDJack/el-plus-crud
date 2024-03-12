@@ -230,7 +230,7 @@ onMounted(async () => {})
   .panel-left {
     // flex: 1;
     min-width: 60%;
-    height: 500px;
+    // height: 500px;
     display: flex;
     flex-direction: column;
 

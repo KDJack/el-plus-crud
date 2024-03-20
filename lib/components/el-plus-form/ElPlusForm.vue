@@ -533,13 +533,10 @@ const handelValToForm = (desc: IFormDescItem, field: string, val: any) => {
     if (val && val.length === 2) {
       const startTimeKey = desc.startTimeKey ? desc.startTimeKey : desc.propPrefix ? desc.propPrefix + 'StartTime' : 'startTime'
       const endTimeKey = desc.endTimeKey ? desc.endTimeKey : desc.propPrefix ? desc.propPrefix + 'EndTime' : 'endTime'
-      result[startTimeKey] = val[0]
-      if (typeof val[1] === 'string') {
-        result[endTimeKey] = new Date(val[1]).getTime()
-      } else {
-        result[endTimeKey] = val[1]
-      }
-      result[endTimeKey] = result[endTimeKey] + (24 * 60 * 60 - 1) * 1000
+      // 获取0点数据
+      result[startTimeKey] = new Date(new Date(val[0]).setHours(0, 0, 0, 0))
+      // 获取每天结束时间
+      result[endTimeKey] = new Date(new Date(val[1]).setHours(0, 0, 0, 0) + 24 * 60 * 60 * 1000 - 1)
       // 再处理一下时间戳
       result[startTimeKey] = time(result[startTimeKey], desc.valueFormat)
       result[endTimeKey] = time(result[endTimeKey], desc.valueFormat)

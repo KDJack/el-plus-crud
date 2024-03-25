@@ -524,7 +524,7 @@ async function getListQueryData() {
     // 封装查询条件
     // ...route.query,
     // ...topQueryData.value,
-    ...tableHeaderRef.value.getData(),
+    ...(tableHeaderRef.value?.getData() || {}),
     ...(typeof props.tableConfig.queryMap === 'function' ? await props.tableConfig.queryMap() : props.tableConfig.queryMap),
     t_: new Date().getTime()
   } as any

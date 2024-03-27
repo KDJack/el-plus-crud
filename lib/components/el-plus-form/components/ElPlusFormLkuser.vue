@@ -4,7 +4,7 @@
       <el-option v-for="option in options" :key="option.value" v-bind="option" />
     </el-select>
     <!-- 弹框 -->
-    <el-dialog :width="desc.dialogWidth || '900px'" :title="desc.placeholder || '选择' + desc.label" draggable :closeOnClickModal="false" showCancel v-model="isShowDialog" append-to-body destroy-on-close>
+    <el-dialog :width="desc.dialogWidth || '900px'" :title="desc.placeholder || '选择' + desc.label" draggable :closeOnClickModal="false" showCancel v-model="isShowDialog" append-to-body destroy-on-close @close="close">
       <div style="width: 100%" class="form-link-user-dialog">
         <div class="panel-left">
           <!-- 搜索 -->
@@ -97,7 +97,7 @@ const props = defineProps<{
 
 const onEvents = ref(getEvents(props))
 
-const emits = defineEmits(['update:modelValue', 'change', 'input', 'validateThis'])
+const emits = defineEmits(['update:modelValue', 'change', 'input', 'validateThis', 'close'])
 
 const currentValue = ref((props.modelValue || []) as any[])
 emits('update:modelValue', currentValue)
@@ -324,6 +324,15 @@ function addAndRemove(item: ILinkItem, isRemove: boolean = false) {
  */
 function cancel() {
   isShowDialog.value = false
+}
+
+/**
+ * 关闭弹框
+ */
+function close() {
+  init()
+  // 返回组织架构层级
+  goIndex(-1)
 }
 
 /**

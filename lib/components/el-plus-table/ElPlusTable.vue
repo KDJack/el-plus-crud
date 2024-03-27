@@ -52,7 +52,6 @@
         lazy
         :load="loadExpandData"
         :size="size"
-        :row-class-name="initRowClassName"
         @select="handelTableSelect"
         @select-all="handelTableSelectAll"
         @expand-change="handelTableExpandChange"
@@ -432,12 +431,12 @@ async function loadExpandData(row: any, treeNode: any, resolve: any) {
  * 初始化每行的颜色
  * @param data
  */
-function initRowClassName(data: any) {
-  if (haveClassRowList.length > data.rowIndex) {
-    return haveClassRowList[data.rowIndex * 1]
-  }
-  return ''
-}
+// function initRowClassName(data: any) {
+//   if (haveClassRowList.length > data.rowIndex) {
+//     return haveClassRowList[data.rowIndex * 1]
+//   }
+//   return ''
+// }
 
 /**
  * 处理单个选中的情况
@@ -525,7 +524,7 @@ async function getListQueryData() {
     // 封装查询条件
     // ...route.query,
     // ...topQueryData.value,
-    ...tableHeaderRef.value.getData(),
+    ...(tableHeaderRef.value?.getData() || {}),
     ...(typeof props.tableConfig.queryMap === 'function' ? await props.tableConfig.queryMap() : props.tableConfig.queryMap),
     t_: new Date().getTime()
   } as any

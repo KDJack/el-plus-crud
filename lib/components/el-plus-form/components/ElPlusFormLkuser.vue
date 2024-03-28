@@ -123,6 +123,18 @@ const selectUser = reactive([] as Array<ILinkItem>)
 const selectOptions = reactive([] as any[])
 const selectAttrs = ref({})
 
+// 左边列表idkey namekey
+const lIdKey = ref(props.desc?.lIdKey || 'id')
+const lNameKey = ref(props.desc?.lNameKey || 'name')
+// 右边列表idkey namekey
+const rIdKey = ref(props.desc?.rIdKey || 'userId')
+const rNameKey = ref(props.desc?.rNameKey || 'nickname')
+
+// 查询左边列表idKey
+const lQueryIdKey = ref(props.desc?.lQueryIdKey || 'deptId')
+// 组织架构列表
+const deptDataList = ref((props.desc?.deptDataList || []) as any[])
+
 /**
  * 处理自定义请求
  * @param param
@@ -142,15 +154,20 @@ const multipleTableRef = ref()
 const tableData = computed(() => {
   const tempList = [] as ILinkItem[]
   // 遍历组织架构数据
-  let tempData = cloneDeep(globalData[defaultConf.form?.linkUser?.deptListKey || ''])
+  let tempData = [] as any[]
+  if (deptDataList.value.length) {
+    tempData = deptDataList.value
+  } else {
+    tempData = cloneDeep(globalData[defaultConf.form?.linkUser?.deptListKey || ''])
+  }
   if (deptTreeIndex.value && deptTreeIndex.value.length > 0) {
     deptTreeIndex.value.map((item) => {
       tempData = tempData[item].children || []
     })
   }
-  tempData.map((item: any) => tempList.push({ type: 2, label: item.name, value: item.id }))
+  tempData.map((item: any) => tempList.push({ type: 2, label: item[lNameKey.value], value: item[lIdKey.value] }))
   // 遍历用户数据
-  tableUserData.value.map((item) => tempList.push({ type: 1, label: item.nickname, value: item.userId }))
+  tableUserData.value.map((item) => tempList.push({ type: 1, label: item[rNameKey.value], value: item[rIdKey.value] }))
 
   // 这里默认选中
   nextTick(() => {
@@ -228,7 +245,7 @@ function handelSelectChange(val: any) {
 async function selectRemote(nickname: string) {
   if (nickname.length > 0) {
     return ((await defaultConf.form?.linkUser?.getUserList({ nickname, current: 1, size: 10, enabled: 1 })) as any).records?.map((item: any) => {
-      return { value: item.userId, label: item.nickname }
+      return { value: item[rIdKey.value], label: item[rNameKey.value] }
     })
   }
   return []
@@ -240,7 +257,7 @@ async function selectRemote(nickname: string) {
  */
 async function goInto(item: ILinkItem, index: number) {
   // 查询机构用户
-  tableUserData.value = (await defaultConf.form?.linkUser?.getUserList({ deptId: item.value, size: 999 })).records as any[]
+  tableUserData.value = (await defaultConf.form?.linkUser?.getUserList({ [lQueryIdKey.value]: item.value, size: 999 })).records as any[]
   deptTreeIndex.value.push(index)
   deptTreeItems.value.push(item)
 }
@@ -251,7 +268,7 @@ async function goInto(item: ILinkItem, index: number) {
  */
 async function goIndex(index: number) {
   // 查询机构用户
-  tableUserData.value = index >= 0 ? ((await defaultConf.form?.linkUser?.getUserList({ deptId: deptTreeItems.value[index].value, size: 999 })).records as any[]) : []
+  tableUserData.value = index >= 0 ? ((await defaultConf.form?.linkUser?.getUserList({ [lQueryIdKey.value]: deptTreeItems.value[index].value, size: 999 })).records as any[]) : []
   deptTreeIndex.value.splice(index + 1)
   deptTreeItems.value.splice(index + 1)
 }
@@ -463,6 +480,10 @@ onMounted(async () => {
       padding: 0 10px;
       margin-bottom: 20px;
       cursor: pointer;
+      span {
+        line-height: 24px;
+        color: var(--el-color-primary);
+      }
     }
   }
 

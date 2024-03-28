@@ -60,7 +60,7 @@ import { IBtnBack, ICRUDConfig, IColumnItem, ITableToolbar } from '../../../../t
 
 const defaultConf = inject('defaultConf') as ICRUDConfig
 
-const emits = defineEmits(['query'])
+const emits = defineEmits(['query', 'reset'])
 const props = withDefaults(
   defineProps<{
     modelValue?: { [key: string]: any } | {}
@@ -219,6 +219,7 @@ function handelSearch() {
  */
 function handelReset() {
   elPlusFormRef.value.clear()
+  emits('reset')
   nextTick(() => {
     elPlusFormRef.value?.submit()
   })

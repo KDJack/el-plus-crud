@@ -6,7 +6,7 @@
         {{ item[tableConfig.showSelectNameKey || 'name'] }}
       </el-tag>
     </div> -->
-    <EleTabletHeader ref="tableHeaderRef" v-if="Object.keys(tableConfig?.toolbar || {}).length || tableConfig.tbName" v-model="toolFormData" :tbName="tableConfig.tbName" :column="tableConfig?.column || []" :size="size" :isShowRefresh="isShowRefresh" :loading="compLoading" :toolbar="tableConfig.toolbar" :isDialog="isDialog" @query="handelTopQuery" :queryDataFn="getListQueryData" />
+    <EleTabletHeader ref="tableHeaderRef" v-if="Object.keys(tableConfig?.toolbar || {}).length || tableConfig.tbName" v-model="toolFormData" :tbName="tableConfig.tbName" :column="tableConfig?.column || []" :size="size" :isShowRefresh="isShowRefresh" :loading="compLoading" :toolbar="tableConfig.toolbar" :isDialog="isDialog" @query="handelTopQuery" :queryDataFn="getListQueryData" @reset="handelHeaderReset" />
 
     <!-- tabTop插槽 -->
     <template v-if="useSlots().tabTop">
@@ -118,7 +118,7 @@ interface SpanMethodProps {
 const defaultConf = inject('defaultConf') as ICRUDConfig
 const format = inject('format') as any
 
-const emits = defineEmits(['getUrlConsumerIds', 'selection', 'select', 'selectAll', 'update:modelValue', 'tabChange', 'queryChange', 'expandChange', 'inited'])
+const emits = defineEmits(['getUrlConsumerIds', 'selection', 'select', 'selectAll', 'update:modelValue', 'tabChange', 'queryChange', 'expandChange', 'inited', 'headerReset'])
 const props = withDefaults(
   defineProps<{
     tableConfig: ITableConfig
@@ -749,6 +749,14 @@ async function handelTopQuery() {
   }
   if (tempQueryData) emits('queryChange', tempQueryData)
   reload()
+}
+
+/**
+ * 处理顶部重置
+ */
+
+function handelHeaderReset() {
+  emits('headerReset', toolFormData)
 }
 
 /**

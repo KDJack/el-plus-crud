@@ -87,6 +87,8 @@ const multipleTableRef = ref()
 
 // 存储的值
 const selectData = reactive([] as ILinkItem[])
+// 存储历史选中-取消后要还原
+const selectOldData = reactive([] as ILinkItem[])
 
 /**
  * 处理点击事件
@@ -97,6 +99,8 @@ function handelVisibleChange(val: any) {
     selectRef.value.blur()
     isShowDialog.value = true
     selectList.value = cloneDeep(selectData.map((item) => item.dataItem))
+    // 这里存储一下老数据
+    selectOldData.splice(0, selectOldData.length, ...selectData)
   }
 }
 
@@ -149,6 +153,8 @@ function handelTagRemove(item: ILinkItem) {
  */
 function cancel() {
   isShowDialog.value = false
+  // 这里重置一下老数据
+  selectData.splice(0, selectData.length, ...selectOldData)
 }
 
 /**
@@ -200,6 +206,27 @@ watch(
       tempConfig.maxHeight = 400
     }
     tableConfig.value = tempConfig
+  },
+  { deep: true, immediate: true }
+)
+
+watch(
+  () => props.modelValue,
+  () => {
+    selectData.splice(0, selectData.length)
+    values.splice(0, values.length)
+    // 这里默认选中
+    if (props.modelValue && Array.isArray(props.modelValue)) {
+      const [ids, names] = props.modelValue as Array<string[]>
+      if (ids.length > 0 && ids.length === names.length) {
+        ids.map((id, i) => {
+          // 构建选中数据
+          selectData.push({ label: names[i], value: id, dataItem: { [props.desc.lkey]: names[i], [vkey.value]: id } })
+          values.push(id)
+        })
+      }
+    }
+    options.splice(0, options.length, ...selectData)
   },
   { deep: true, immediate: true }
 )

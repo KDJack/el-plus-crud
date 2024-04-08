@@ -1,6 +1,5 @@
 <template>
   <div class="el-plus-form-switch">
-    {{ props.modelValue + '-' + currentValue }}
     <el-switch v-if="isInit" v-bind="attrs" :disabled="disabled" v-on="onEvents" :loading="props.loading || localLoading" v-model="currentValue" :before-change="handelBeforeChange" />
   </div>
 </template>

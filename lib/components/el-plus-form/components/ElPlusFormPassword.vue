@@ -18,6 +18,7 @@ export default {
 import { ref, useAttrs, useSlots, onBeforeMount, inject } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
 import { ICRUDConfig } from '../../../../types'
+import { useVModel } from '@vueuse/core'
 
 const defaultConf = inject('defaultConf') as ICRUDConfig
 
@@ -30,8 +31,7 @@ const props = defineProps<{
   disabled?: boolean
 }>()
 const emits = defineEmits(['update:modelValue'])
-const currentValue = ref(props.modelValue)
-emits('update:modelValue', currentValue)
+const currentValue = useVModel(props, 'modelValue', emits)
 
 const slots = ref(Object.assign({}, useSlots(), props.desc.slots))
 const attrs = ref({} as any)

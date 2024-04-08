@@ -24,6 +24,7 @@ import { ElMessage } from 'element-plus'
 import { getAttrs } from '../mixins'
 import { isEqual, isPromiseLike } from '../../../util'
 import { ICRUDConfig } from '../../../../types'
+import { useVModel } from '@vueuse/core'
 
 const defaultConf = inject('defaultConf') as ICRUDConfig
 const globalData = inject('globalData') as any
@@ -42,9 +43,7 @@ const props = withDefaults(
   }
 )
 const emits = defineEmits(['update:modelValue'])
-
-const currentValue = ref(props.modelValue || (props.desc.multiple ? [] : ''))
-emits('update:modelValue', currentValue)
+const currentValue = useVModel(props, 'modelValue', emits)
 
 const attrs = ref({} as any)
 const options = reactive([] as any[])
@@ -124,6 +123,7 @@ onBeforeMount(async () => {
   tempAttr.remote = !!props.desc.remote
   attrs.value = await getAttrs(props, tempAttr)
   attrs.value.remote = !!props.desc.remote
+  delete attrs.value.disabled
   isInit.value = true
 })
 

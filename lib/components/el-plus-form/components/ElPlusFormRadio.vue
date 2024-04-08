@@ -17,6 +17,7 @@ export default {
 import { ref, reactive, useAttrs, watch, onBeforeMount, inject } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
 import { isEqual } from '../../../util'
+import { useVModel } from '@vueuse/core'
 
 const globalData = inject('globalData') as any
 
@@ -29,8 +30,7 @@ const props = defineProps<{
 }>()
 
 const emits = defineEmits(['update:modelValue'])
-const currentValue = ref(props.modelValue)
-emits('update:modelValue', currentValue)
+const currentValue = useVModel(props, 'modelValue', emits)
 
 const options = reactive([] as any[])
 const isInit = ref(false)

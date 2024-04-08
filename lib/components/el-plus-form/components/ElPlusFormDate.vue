@@ -12,6 +12,7 @@ export default {
 <script lang="ts" setup>
 import { ref, useAttrs, onBeforeMount } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
+import { useVModel } from '@vueuse/core'
 
 const props = defineProps<{
   modelValue?: string | number | '' | null
@@ -25,8 +26,7 @@ const emits = defineEmits(['update:modelValue'])
 const isInit = ref(false)
 const attrs = ref({} as any)
 const onEvents = ref(getEvents(props))
-const currentValue = ref(props.modelValue)
-emits('update:modelValue', currentValue)
+const currentValue = useVModel(props, 'modelValue', emits)
 
 onBeforeMount(async () => {
   attrs.value = await getAttrs(props, { valueFormat: 'YYYY-MM-DD HH:mm:ss', editable: false, ...useAttrs() })

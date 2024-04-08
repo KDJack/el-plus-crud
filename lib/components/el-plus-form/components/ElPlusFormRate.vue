@@ -12,6 +12,7 @@ export default {
 <script lang="ts" setup>
 import { ref, watch, useAttrs, onBeforeMount } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
+import { useVModel } from '@vueuse/core'
 
 const emits = defineEmits(['update:modelValue', 'validateThis'])
 const props = defineProps<{
@@ -22,8 +23,7 @@ const props = defineProps<{
   disabled?: boolean
 }>()
 
-const currentValue = ref(props.modelValue)
-emits('update:modelValue', currentValue)
+const currentValue = useVModel(props, 'modelValue', emits)
 
 const attrs = ref({} as any)
 const onEvents = ref(getEvents(props))

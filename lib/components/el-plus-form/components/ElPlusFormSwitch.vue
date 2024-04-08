@@ -1,5 +1,6 @@
 <template>
   <div class="el-plus-form-switch">
+    {{ props.modelValue + '-' + currentValue }}
     <el-switch v-if="isInit" v-bind="attrs" :disabled="disabled" v-on="onEvents" :loading="props.loading || localLoading" v-model="currentValue" :before-change="handelBeforeChange" />
   </div>
 </template>
@@ -15,6 +16,7 @@ export default {
 import { ref, useAttrs, onBeforeMount } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
 import { ElMessageBox } from 'element-plus'
+import { useVModel } from '@vueuse/core'
 
 const emits = defineEmits(['update:modelValue'])
 const props = defineProps<{
@@ -27,9 +29,7 @@ const props = defineProps<{
 }>()
 
 const localLoading = ref(false)
-
-const currentValue = ref(props.modelValue)
-emits('update:modelValue', currentValue)
+const currentValue = useVModel(props, 'modelValue', emits)
 
 const isInit = ref(false)
 const attrs = ref({} as any)

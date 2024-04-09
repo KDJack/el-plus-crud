@@ -72,7 +72,7 @@ const topAttrs = reactive({
   size: props.desc.size,
   collapseTags: true,
   collapseTagsTooltip: true,
-  clearable: true,
+  clearable: false,
   placeholder: props.desc.placeholder || '请选择' + props.desc.label
 })
 
@@ -255,7 +255,7 @@ onMounted(async () => {})
   box-sizing: border-box;
 
   .panel-left {
-    // flex: 1;
+    flex: 1;
     min-width: 60%;
     // height: 500px;
     display: flex;

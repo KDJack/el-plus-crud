@@ -19,7 +19,7 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { ref, reactive, computed, onBeforeMount, useAttrs, watch, inject } from 'vue'
+import { ref, reactive, computed, onBeforeMount, useAttrs, watch, inject, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
 import { getAttrs } from '../mixins'
 import { isEqual, isPromiseLike } from '../../../util'
@@ -76,11 +76,13 @@ const onEvents = computed(() => {
   if (props.desc?.on) {
     Object.keys(props.desc.on).map((key: string) => {
       tempOn[key] = () => {
-        props.desc.on[key](
-          props.formData || {},
-          options.find((item) => item.value === currentValue.value),
-          props.rowIndex
-        )
+        nextTick(() => {
+          props.desc.on[key](
+            props.formData || {},
+            options.find((item) => item.value === currentValue.value),
+            props.rowIndex
+          )
+        })
       }
     })
   }

@@ -1,3 +1,5 @@
+import { nextTick } from 'vue'
+
 export interface IMixinsProps {
   modelValue?: any
   field?: string
@@ -55,7 +57,9 @@ export const getEvents = (props: IMixinsProps) => {
   if (props.desc?.on) {
     Object.keys(props.desc.on).map((key: string) => {
       tempOn[key] = (val: any) => {
-        props.desc.on[key](props.formData, props.rowIndex, val)
+        nextTick(() => {
+          props.desc.on[key](props.formData, props.rowIndex, val)
+        })
       }
     })
   }

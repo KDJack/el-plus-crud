@@ -192,7 +192,9 @@ function getEvents(props: any) {
   if (props.desc?.on) {
     Object.keys(props.desc.on).map((key: string) => {
       tempOn[key] = (val: any) => {
-        props.desc.on[key](props.formData || {}, props.rowIndex, val)
+        nextTick(() => {
+          props.desc.on[key](props.formData || {}, props.rowIndex, val)
+        })
       }
     })
   }

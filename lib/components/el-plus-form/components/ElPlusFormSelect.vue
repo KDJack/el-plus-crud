@@ -1,7 +1,7 @@
 <template>
   <el-select v-if="isInit" class="el-plus-form-select" :class="desc.class" :style="desc.style" :disabled="disabled" v-bind="attrs" v-model="currentValue" :loading="loading" v-on="onEvents">
     <template v-for="(option, i) in options" :key="i">
-      <el-option v-if="option" v-bind="option">
+      <el-option v-if="option && option.value" v-bind="option">
         <div class="el-plus-form-select-options">
           <span>{{ option.label || option.l }}</span>
           <div v-if="desc.optionTip">{{ tip(option) }}</div>
@@ -50,6 +50,7 @@ const options = reactive([] as any[])
 const oldQuery = ref(null) as any
 const tempAttr = { clearable: true, ...useAttrs() } as any
 const isInit = ref(false)
+const isClear = ref(false)
 
 if (props.desc.allowCreate) {
   tempAttr.filterable = true
@@ -86,6 +87,17 @@ const onEvents = computed(() => {
       }
     })
   }
+  // 这里要判断下数据清空
+  const clearFn = () => {
+    isClear.value = true
+    props.desc?.on?.clear && typeof props.desc?.on?.clear === 'function' && props.desc.on.clear()
+    oldQuery.value = null
+    // 这里重新查询一次
+    if (props.desc.remote) {
+      queryOptionsFn('')
+    }
+  }
+  tempOn.clear = clearFn
   return tempOn
 })
 
@@ -109,7 +121,7 @@ async function queryOptionsFn(query: string) {
     options.splice(0, options.length, ...(await props.desc.remote(query)))
     if (query === '') {
       // 判断是否有默认选项
-      if (props.desc.defaultItem) {
+      if (!isClear.value && props.desc.defaultItem) {
         // 这里需要判断下默认值是否已经出现在了options中，如果存在，则需要删除
         const index = options.findIndex((item) => item.value === props.desc.defaultItem.value)
         if (index >= 0) {

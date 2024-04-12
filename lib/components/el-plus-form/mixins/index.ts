@@ -90,7 +90,7 @@ function getPlaceholder(desc: { [key: string]: any }) {
     case 'select':
     case 'category':
     case 'cascader':
-      return { placeholder: desc?.placeholder || '请选择' + (desc.remote ? (desc.initLoad !== false ? '（默认查10个，其余请输入搜索）' : '或输入进行搜索') : desc?._label || '') }
+      return { placeholder: desc?.placeholder || '请选择' + (desc.remote ? '（可输入进行搜索）' : desc?._label || '') }
     case 'data':
     case 'datetime':
     case 'datas':

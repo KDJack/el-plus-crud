@@ -17,6 +17,7 @@ export default {
 <script lang="ts" setup>
 import { isEqual } from '../../../util'
 import { ref, reactive, watch, computed, inject } from 'vue'
+import { useVModel } from '@vueuse/core'
 
 const globalData = inject('globalData') as any
 const format = inject('format') as any
@@ -29,8 +30,7 @@ const props = defineProps<{
 }>()
 
 const emits = defineEmits(['update:modelValue'])
-const currentValue = ref(props.modelValue)
-emits('update:modelValue', currentValue)
+const currentValue = useVModel(props, 'modelValue', emits)
 
 const options = reactive([] as any[])
 const formatValue = ref('' as any)

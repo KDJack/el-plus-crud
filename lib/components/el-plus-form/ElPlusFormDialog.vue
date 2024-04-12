@@ -75,7 +75,7 @@ function dialogSuccess(formBack: IFormBack) {
   } else {
     if (props.tableRef) {
       ElMessage.success(typeof props.successTip === 'function' ? props.successTip() : props.successTip)
-      props.tableRef.reload()
+      typeof props.tableRef?.reload === 'function' && props.tableRef?.reload()
       currentShow.value = false
       setTimeout(() => {
         formBack.callBack()

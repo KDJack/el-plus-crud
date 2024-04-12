@@ -9,7 +9,7 @@
                 <ElPlusFormBtn v-if="Object.keys(formConfig?.formDesc || {}).length" type="primary" icon="ele-Search" :loading="loading" :desc="{ label: '查询', on: { click: handelSearch }, size }" />
                 <ElPlusFormBtn v-if="Object.keys(formConfig?.formDesc || {}).length" :desc="{ label: '重置', on: { click: handelReset }, size }" />
                 <ElPlusTableSettingColumn ref="settingColumnRef" v-if="tbName" :tbName="tbName" :column="column || []" :size="size" />
-                <ElPlusFormBtn type="primary" v-if="getVIf(exportConf) && exportConf" :desc="{ label: '导出Excel', size, disabled: exportConf?.disabled, mask: true, on: { click: handelDownload } }" />
+
                 <template v-for="(item, i) in headerBtns" :key="i">
                   <template v-if="getVIf(item)">
                     <template v-if="item.customize">
@@ -19,6 +19,12 @@
                       <ElPlusFormUpbtn v-if="item.elType === 'upload'" :desc="item" :loading="loading" />
                       <ElPlusFormBtn v-else :desc="item" :loading="loading" />
                     </template>
+                  </template>
+                </template>
+                <!-- 导出按钮放最后 -->
+                <template v-if="exportConf && exportConf.length">
+                  <template v-for="(expBtn, i) in exportConf" :key="i">
+                    <ElPlusFormBtn type="primary" v-if="getVIf(expBtn)" :desc="expBtn" />
                   </template>
                 </template>
               </div>
@@ -108,9 +114,22 @@ const formConfig = computed(() => {
   return tempConf
 })
 
+/**
+ * 获取导出的按钮列表
+ */
 const exportConf = computed(() => {
-  const tempExport = props.toolbar?.export || null
-  if (tempExport) {
+  let tempExport = props.toolbar?.export || []
+  if (tempExport && !Array.isArray(tempExport)) {
+    tempExport = [tempExport]
+  }
+  if (tempExport?.length) {
+    tempExport.map((item: any, i) => {
+      item.label = item.label || `导出Excel ${i > 0 ? i : ''}`
+      item.size = props.size
+      item.mask = item.mask ?? true
+      item.on = { click: (btnBack: IBtnBack) => handelDownload(btnBack, i) }
+    })
+    // { label: '导出Excel', size, disabled: exportConf?.disabled, mask: true, on: { click: handelDownload } }
   }
   return tempExport
 })
@@ -124,14 +143,15 @@ function handelQueryData() {
  * 下载
  * @param data
  */
-async function handelDownload({ callBack }: IBtnBack) {
-  if (exportConf.value) {
+async function handelDownload({ callBack }: IBtnBack, index: number) {
+  const tempConf = exportConf.value[index]
+  if (tempConf) {
     // 创建请求
     const xhr = new XMLHttpRequest()
-    let url = exportConf.value.url || ''
-    const method = exportConf.value.method || 'get'
+    let url = tempConf.url || ''
+    const method = tempConf.method || 'get'
 
-    let postData = Object.assign({}, props.queryDataFn ? await props.queryDataFn() : {}, exportConf.value?.data || {})
+    let postData = Object.assign({}, props.queryDataFn ? await props.queryDataFn() : {}, tempConf?.data || {})
     // 提交数据前的处理
     if (props.toolbar?.formConfig?.beforeRequest) {
       postData = await (props.toolbar.formConfig.beforeRequest as Function)(postData)
@@ -143,11 +163,11 @@ async function handelDownload({ callBack }: IBtnBack) {
         delete postData[key]
       }
     }
-    if (exportConf.value.fetch) {
+    if (tempConf.fetch) {
       try {
-        let result = (await exportConf.value.fetch(postData)) as string
-        if (exportConf.value.urlKey) {
-          let tempKeyList = (typeof exportConf.value.urlKey === 'string' ? [exportConf.value.urlKey] : exportConf.value.urlKey) as string[]
+        let result = (await tempConf.fetch(postData)) as string
+        if (tempConf.urlKey) {
+          let tempKeyList = (typeof tempConf.urlKey === 'string' ? [tempConf.urlKey] : tempConf.urlKey) as string[]
           // 循环遍历
           tempKeyList?.map((key) => (result = result[key]))
         }
@@ -156,30 +176,30 @@ async function handelDownload({ callBack }: IBtnBack) {
         callBack && callBack()
       }
     } else {
-      if (!exportConf.value.noQuery && method === 'get') {
+      if (!tempConf.noQuery && method === 'get') {
         url += (url.indexOf('?') >= 0 ? '&' : '?') + mapToUrlStr(postData)
       }
     }
-    if (exportConf.value.beforeRequest && typeof exportConf.value.beforeRequest === 'function') {
-      postData = exportConf.value.beforeRequest(postData)
+    if (tempConf.beforeRequest && typeof tempConf.beforeRequest === 'function') {
+      postData = tempConf.beforeRequest(postData)
     }
     xhr.open(method, url, true)
     // 转换流
     xhr.responseType = 'blob'
     // 是否授权
-    if (exportConf.value.isAuth !== false && defaultConf.token) {
+    if (tempConf.isAuth !== false && defaultConf.token) {
       let token = defaultConf.token
       if (typeof defaultConf.token === 'function') {
         token = defaultConf.token()
       }
-      xhr.setRequestHeader(props.toolbar?.export?.tokenKey || 'Authorization', '' + token)
+      xhr.setRequestHeader(tempConf.tokenKey || 'Authorization', '' + token)
     }
     xhr.onload = function () {
       if (this.status == 200) {
         const aLink = document.createElement('a')
         aLink.href = window.URL.createObjectURL(this.response)
         // 自定义文件名
-        aLink.download = (props.toolbar?.export?.name || new Date().getTime()) + (props.toolbar?.export?.suffix || '.xlsx')
+        aLink.download = (tempConf.name || new Date().getTime()) + (tempConf.suffix || '.xlsx')
         aLink.click()
         window.URL.revokeObjectURL(url)
         setTimeout(() => {
@@ -191,7 +211,7 @@ async function handelDownload({ callBack }: IBtnBack) {
       // 如果错误，则尝试直接打开链接
       const aLink = document.createElement('a')
       aLink.href = url
-      aLink.download = (props.toolbar?.export?.name || new Date().getTime()) + (props.toolbar?.export?.suffix || '.xlsx')
+      aLink.download = (tempConf.name || new Date().getTime()) + (tempConf.suffix || '.xlsx')
       aLink.click()
       setTimeout(() => {
         callBack && callBack()

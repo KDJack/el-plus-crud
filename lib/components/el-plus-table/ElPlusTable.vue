@@ -43,7 +43,6 @@
         ref="elPlusTableRef"
         v-else
         style="width: 100%"
-        height="100%"
         :maxHeight="tableConfig.maxHeight || 'auto'"
         v-bind="tableConfig.tableAttr"
         :class="{ 'big-h-bar': tableConfig?.tableAttr?.bigHBar, 'big-v-bar': tableConfig.tableAttr?.bigVBar }"
@@ -59,9 +58,9 @@
         :span-method="handelSpanMethod"
       >
         <!-- 复选框 -->
-        <el-table-column v-if="type === 'selection'" type="selection" width="55px" :selectable="selectable" header-align="center" align="center" />
+        <el-table-column v-if="type === 'selection'" type="selection" fixed="left" width="55px" :selectable="selectable" header-align="center" align="center" />
         <!-- 下标 -->
-        <el-table-column v-if="isIndex" type="index" width="60" label="序号" :headerAlign="headerAlign" />
+        <el-table-column v-if="isIndex" type="index" width="60" fixed="left" label="序号" :headerAlign="headerAlign" />
         <!-- 首列 -->
         <template v-if="useSlots().firstColumn">
           <slot name="firstColumn" />
@@ -543,9 +542,9 @@ async function getListQueryData() {
     // setQuery(route.path, queryMap)
   }
   // 这里是导出的权限判定-增加登陆信息
-  if (props.tableConfig?.toolbar?.export?.isAuth) {
-    // TODO GET Auth
-  }
+  // if (props.tableConfig?.toolbar?.export?.isAuth) {
+  // TODO GET Auth
+  // }
   return queryMap
 }
 

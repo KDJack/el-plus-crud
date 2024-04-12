@@ -238,6 +238,8 @@ export interface IColumnItem extends IDescItem {
  * 导出项
  */
 export interface IExportConfig {
+  // 按钮名称
+  label?: string
   // 导出的URL接口地址
   url?: string
   // 查询导出URL的fetch
@@ -262,6 +264,8 @@ export interface IExportConfig {
   beforeRequest?: Function
   // 启用禁用状态
   disabled?: boolean
+  // token关键key
+  tokenKey?: string
 }
 
 /**
@@ -275,7 +279,7 @@ export interface ITableToolbar {
   // 顶部查询条件的form
   formConfig?: IFormConfig
   // 顶部导出excel配置
-  export?: IExportConfig
+  export?: IExportConfig | Array<IExportConfig>
 }
 
 /**

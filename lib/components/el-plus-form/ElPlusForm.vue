@@ -364,6 +364,7 @@ const initFormAttrs = debounce(
             // formItem._options = handelKeyValue(formItem, 'options', field)
             // 动态 _label
             formItem._label = handelKeyValue(formItem, 'label', field)
+            if (typeof formItem.label !== 'string') formItem.label = formItem._label
             // 动态 prop
             // formItem._prop = handelKeyValue(formItem, 'prop', field);
             // 动态 _tip

@@ -98,6 +98,17 @@ const onEvents = computed(() => {
     }
   }
   tempOn.clear = clearFn
+  // 这里重写一下失去焦点事件
+  const blurFn = () => {
+    isClear.value = true
+    props.desc?.on?.blur && typeof props.desc?.on?.blur === 'function' && props.desc.on.blur()
+    oldQuery.value = null
+    // 这里重新查询一次
+    if (props.desc.remote && options.length <= 0) {
+      queryOptionsFn('')
+    }
+  }
+  tempOn.blur = blurFn
   return tempOn
 })
 

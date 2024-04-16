@@ -46,7 +46,7 @@ interface ILinkItem {
 }
 
 const props = defineProps<{
-  modelValue?: []
+  modelValue?: Array<Array<any>>
   field?: string
   loading?: boolean
   desc: { [key: string]: any }
@@ -216,8 +216,8 @@ watch(
     selectData.splice(0, selectData.length)
     values.splice(0, values.length)
     // 这里默认选中
-    if (props.modelValue && Array.isArray(props.modelValue)) {
-      const [ids, names] = props.modelValue as Array<string[]>
+    if (props.modelValue && Array.isArray(props.modelValue) && Array.isArray(props.modelValue[0])) {
+      const [ids, names] = (props.modelValue || [[], []]) as Array<string[]>
       if (ids.length > 0 && ids.length === names.length) {
         ids.map((id, i) => {
           // 构建选中数据

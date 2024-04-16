@@ -214,7 +214,7 @@ async function getToken(token: string | Object | Function | undefined, param?: a
 async function handelUploadSuccess(response: any, file: any) {
   if (response && Object.keys(response).length > 0) {
     // 从结果集中获取一下furl
-    const tempUrl = getValue(defaultConf.upload?.actionMap?.objectUrlKey || [], response)
+    const tempUrl = getValue(defaultConf.upload?.actionMap?.objectUrlKey || [], response.request)
     if (tempUrl) file.raw.furl = tempUrl
   }
   // 获取文件上传的token以及上传路径
@@ -281,7 +281,7 @@ function handelListChange(item: any, type: 0 | 1) {
   if (type === 1) {
     currentValue.value.push({
       name: item.name,
-      furl: item.url,
+      furl: item.raw.furl || item.furl || item.url,
       url: props.desc.upType !== 'file' ? getFileIcon(item.raw) : item?.raw?.shareUrl || item.url,
       fsize: item.size,
       uid: item.uid,

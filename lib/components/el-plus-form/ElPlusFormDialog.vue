@@ -4,7 +4,7 @@
     <template #header>
       <slot name="header" />
     </template>
-    <ElPlusForm ref="refElPlusDialogForm" style="padding: 20px" :isDialog="true" v-model="currentValue" :formDesc="formDesc" v-bind="attrs" :success="dialogSuccess" @cancel="currentShow = false">
+    <ElPlusForm ref="refElPlusDialogForm" style="padding: 20px" :isLoading="props.isLoading" :isDialog="true" v-model="currentValue" :formDesc="formDesc" v-bind="attrs" :success="dialogSuccess" @cancel="currentShow = false">
       <template #top>
         <slot name="top" />
       </template>
@@ -31,14 +31,26 @@ import { ElMessage } from 'element-plus'
 import { IFormBack, IFormDesc } from '../../../types'
 
 const emits = defineEmits(['update:show', 'update:modelValue'])
-const props = withDefaults(defineProps<{ modelValue?: { [key: string]: any } | {}; formDesc: IFormDesc; show?: boolean; title?: string; tableRef?: any; success?: Function; successTip?: string | ((data?: any) => string) }>(), {
-  title: '',
-  modelValue: () => {
-    return {}
-  },
-  show: false,
-  successTip: '操作成功!'
-})
+const props = withDefaults(
+  defineProps<{
+    modelValue?: { [key: string]: any } | {}
+    formDesc: IFormDesc
+    show?: boolean
+    title?: string
+    tableRef?: any
+    success?: Function
+    isLoading?: boolean
+    successTip?: string | ((data?: any) => string)
+  }>(),
+  {
+    title: '',
+    modelValue: () => {
+      return {}
+    },
+    show: false,
+    successTip: '操作成功!'
+  }
+)
 
 // 重新定义当前值
 const currentValue = computed({

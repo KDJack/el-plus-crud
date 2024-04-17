@@ -50,8 +50,8 @@ export const account = [{ required: true, trigger: 'blur', validator: validateAc
 /**
  * 校验英文字母加数字
  */
-export const wordnum = [{ trigger: 'blur', validator: validateWordNumber }]
-export const wordnum2 = [{ required: true, trigger: 'blur', validator: validateWordNumber }]
+export const wordnum = [{ required: true, trigger: 'blur', validator: validateWordNumber }]
+export const wordnum2 = [{ trigger: 'blur', validator: validateWordNumber }]
 
 /**
  * 必须是数字且不为空
@@ -136,7 +136,7 @@ function validateValidateCode(rule: any, value: any, callback?: any) {
  * @param callback
  */
 function validateInputNotNull(rule: any, value: any, callback?: any) {
-  if (typeof value === 'undefined' || value === '' || value === null) {
+  if (rule.required && (typeof value === 'undefined' || value === '' || value === null)) {
     callback(new Error('此项必填！'))
   } else {
     callback()
@@ -150,7 +150,7 @@ function validateInputNotNull(rule: any, value: any, callback?: any) {
  * @param callback
  */
 function validateInputNotAllBlank(rule: any, value: any, callback?: any) {
-  if (typeof value === 'undefined' || value === '' || value === null) {
+  if (rule.required && (typeof value === 'undefined' || value === '' || value === null)) {
     callback(new Error('此项必填！'))
   } else {
     if (typeof value === 'number') {
@@ -213,7 +213,7 @@ function validateUpload(rule: any, value: any, callback?: any) {
  * @param callback
  */
 function validateTextarea(rule: any, value: any, callback?: any) {
-  if (typeof value === 'undefined' || value === null || value === '' || value === null) {
+  if (rule.required && (typeof value === 'undefined' || value === '' || value === null)) {
     callback(new Error('此项必填！'))
   } else if (!value.replace(/\n/g, '')) {
     callback(new Error('不能全是换行！'))
@@ -230,7 +230,7 @@ function validateTextarea(rule: any, value: any, callback?: any) {
  * @param callback
  */
 function validateEditor(rule: any, value: any, callback?: any) {
-  if (typeof value === 'undefined' || value === null || value === '' || value === null) {
+  if (rule.required && (typeof value === 'undefined' || value === '' || value === null)) {
     callback(new Error('此项必填！'))
   } else if (!value.replace(/\n/g, '')) {
     callback(new Error('不能全是换行！'))
@@ -322,7 +322,7 @@ export function validatePassword2(rule: any, value: any, callback?: any) {
  * @param callback
  */
 function validateAccount(rule: any, value: any, callback?: any) {
-  if (typeof value === 'undefined' || value === '' || value === null) {
+  if (rule.required && (typeof value === 'undefined' || value === '' || value === null)) {
     callback(new Error('此项必填！'))
   } else if (value && !/^([a-z,A-z,0-9]){4,20}$/.test(value)) {
     callback(new Error('账号为4-20位字母或数字!'))
@@ -338,8 +338,10 @@ function validateAccount(rule: any, value: any, callback?: any) {
  * @param callback
  */
 function validateWordNumber(rule: any, value: any, callback?: any) {
-  if (value && !/^([a-z,A-z,0-9]){16,20}$/.test(value)) {
-    callback(new Error('请输入16-20位字母或数字!'))
+  if (rule.required && (typeof value === 'undefined' || value === '' || value === null)) {
+    callback(new Error('此项必填！'))
+  } else if (value && !/^([a-z,A-z,0-9])+$/.test(value)) {
+    callback(new Error('请输入字母或数字!'))
   } else {
     callback()
   }

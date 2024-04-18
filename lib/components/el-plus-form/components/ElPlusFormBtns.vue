@@ -93,6 +93,7 @@ const handelEvelt = computed(() => {
 // 初始化
 const initBtnList = () => {
   const tempList = [] as any[]
+  limitList.value = []
   if (props.desc.btns.length > 0) {
     props.desc.btns.map((item: any) => {
       if (handelItemVIf(item)) {

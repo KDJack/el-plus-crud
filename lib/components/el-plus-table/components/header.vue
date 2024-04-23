@@ -194,12 +194,17 @@ async function handelDownload({ callBack }: IBtnBack, index: number) {
       }
       xhr.setRequestHeader(tempConf.tokenKey || 'Authorization', '' + token)
     }
+    let fileName = tempConf.name || url.split('?')[0] || `${new Date().getTime()}`
+    if (fileName.length > 0) {
+      fileName = fileName.substring(fileName.lastIndexOf('/') + 1)
+    }
+    const suffix = tempConf.suffix || fileName.indexOf('.') > 0 ? fileName.substring(fileName.lastIndexOf('.')) : '.xlsx'
     xhr.onload = function () {
       if (this.status == 200) {
         const aLink = document.createElement('a')
         aLink.href = window.URL.createObjectURL(this.response)
         // 自定义文件名
-        aLink.download = (tempConf.name || new Date().getTime()) + (tempConf.suffix || '.xlsx')
+        aLink.download = fileName + suffix
         aLink.click()
         window.URL.revokeObjectURL(url)
         setTimeout(() => {
@@ -211,7 +216,7 @@ async function handelDownload({ callBack }: IBtnBack, index: number) {
       // 如果错误，则尝试直接打开链接
       const aLink = document.createElement('a')
       aLink.href = url
-      aLink.download = (tempConf.name || new Date().getTime()) + (tempConf.suffix || '.xlsx')
+      aLink.download = fileName + suffix
       aLink.click()
       setTimeout(() => {
         callBack && callBack()

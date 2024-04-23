@@ -151,7 +151,7 @@ async function handelDownload({ callBack }: IBtnBack, index: number) {
     let url = tempConf.url || ''
     const method = tempConf.method || 'get'
 
-    let postData = Object.assign({}, props.queryDataFn ? await props.queryDataFn() : {}, tempConf?.data || {})
+    let postData = Object.assign({}, props.queryDataFn ? await props.queryDataFn() : {}, tempConf?.data || { size: 1000 })
     // 提交数据前的处理
     if (props.toolbar?.formConfig?.beforeRequest) {
       postData = await (props.toolbar.formConfig.beforeRequest as Function)(postData)

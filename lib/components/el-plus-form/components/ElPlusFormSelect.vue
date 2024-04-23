@@ -135,7 +135,10 @@ function clear() {
   isClear.value = true
   props.desc?.on?.clear && typeof props.desc?.on?.clear === 'function' && props.desc.on.clear()
   oldQuery.value = null
-  options.splice(0, options.length)
+  // 只有远程查询的才清空
+  if (props.desc.remote) {
+    options.splice(0, options.length)
+  }
 }
 
 onBeforeMount(async () => {

@@ -785,6 +785,16 @@ const clear = () => {
 }
 
 /**
+ * 初始化组件
+ */
+function init() {
+  // 清空组件
+  fieldRefs_.value?.map((item) => {
+    if (item?.init && typeof item?.init === 'function') item.init()
+  })
+}
+
+/**
  * 单独校验一下字段
  * @param field
  */
@@ -846,7 +856,7 @@ onMounted(async () => {
 })
 
 // 暴露对外方法
-defineExpose({ fid: props.fid, submit: handleSubmitForm, getData: getFormData, validate: validateForm, reset, clearValid, clear, changeValidImg, refresh })
+defineExpose({ fid: props.fid, submit: handleSubmitForm, getData: getFormData, validate: validateForm, reset, clearValid, clear, changeValidImg, refresh, init })
 </script>
 <style lang="scss">
 .el-plus-form-panel {

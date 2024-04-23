@@ -1,5 +1,5 @@
 <template>
-  <el-dialog class="el-plus-form-dialog" v-model="currentShow" :title="props.title" v-bind="dialogAttrs" @close="handelClosed">
+  <el-dialog class="el-plus-form-dialog" v-model="currentShow" :title="props.title" v-bind="dialogAttrs" @close="handelClosed" @opened="handelOpen">
     <!-- title 插槽 -->
     <template #header>
       <slot name="header" />
@@ -101,5 +101,12 @@ function dialogSuccess(formBack: IFormBack) {
  */
 function handelClosed() {
   refElPlusDialogForm.value?.clear()
+}
+
+/**
+ * 打开弹框
+ */
+function handelOpen() {
+  refElPlusDialogForm.value?.init()
 }
 </script>

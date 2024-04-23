@@ -89,25 +89,30 @@ const onEvents = computed(() => {
     })
   }
   // 这里要判断下数据清空
-  tempOn.clear = clear
-  // 这里重写一下失去焦点事件
-  const blurFn = () => {
+  tempOn.clear = () => {
     isClear.value = true
-    props.desc?.on?.blur && typeof props.desc?.on?.blur === 'function' && props.desc.on.blur()
+    props.desc?.on?.clear && typeof props.desc?.on?.clear === 'function' && props.desc.on.clear()
+    oldQuery.value = null
+    options.splice(0, options.length)
+    // // 这里重新查询一次
+    // if (props.desc.remote) {
+    //   queryOptionsFn('')
+    // }
+  }
+  // 这里重写一下失去焦点事件
+  const focusFn = () => {
+    isClear.value = true
+    props.desc?.on?.focus && typeof props.desc?.on?.focus === 'function' && props.desc.on.focus()
     oldQuery.value = null
     // 这里重新查询一次
     if (props.desc.remote && options.length <= 0) {
       queryOptionsFn('')
     }
   }
-  tempOn.blur = blurFn
+  tempOn.focus = focusFn
+
   return tempOn
 })
-
-// 如果options为空，则默认执行一次查询
-if (options.length <= 0 && props.desc.remote && (props.desc.initLoad ?? true)) {
-  queryOptionsFn('')
-}
 
 // 这里处理下tip
 const tip = computed(() => (optionItem: any) => {
@@ -133,19 +138,6 @@ async function queryOptionsFn(query: string) {
         options.unshift(props.desc.defaultItem)
       }
     }
-  }
-}
-
-/**
- * 清空
- */
-function clear() {
-  isClear.value = true
-  props.desc?.on?.clear && typeof props.desc?.on?.clear === 'function' && props.desc.on.clear()
-  oldQuery.value = null
-  // 这里重新查询一次
-  if (props.desc.remote) {
-    queryOptionsFn('')
   }
 }
 
@@ -193,7 +185,7 @@ watch(
   }
 )
 
-defineExpose({ field: props.field, clear })
+defineExpose({ field: props.field })
 </script>
 <style lang="scss">
 .el-plus-form-select-options {

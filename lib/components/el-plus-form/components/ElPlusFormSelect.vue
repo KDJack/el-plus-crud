@@ -33,6 +33,7 @@ const props = withDefaults(
   defineProps<{
     modelValue?: number | string | Array<string>
     loading?: boolean
+    field?: string
     desc: { [key: string]: any }
     formData?: { [key: string]: any }
     rowIndex?: number
@@ -88,16 +89,7 @@ const onEvents = computed(() => {
     })
   }
   // 这里要判断下数据清空
-  const clearFn = () => {
-    isClear.value = true
-    props.desc?.on?.clear && typeof props.desc?.on?.clear === 'function' && props.desc.on.clear()
-    oldQuery.value = null
-    // 这里重新查询一次
-    if (props.desc.remote) {
-      queryOptionsFn('')
-    }
-  }
-  tempOn.clear = clearFn
+  tempOn.clear = clear
   // 这里重写一下失去焦点事件
   const blurFn = () => {
     isClear.value = true
@@ -144,6 +136,19 @@ async function queryOptionsFn(query: string) {
   }
 }
 
+/**
+ * 清空
+ */
+function clear() {
+  isClear.value = true
+  props.desc?.on?.clear && typeof props.desc?.on?.clear === 'function' && props.desc.on.clear()
+  oldQuery.value = null
+  // 这里重新查询一次
+  if (props.desc.remote) {
+    queryOptionsFn('')
+  }
+}
+
 onBeforeMount(async () => {
   tempAttr.remote = !!props.desc.remote
   attrs.value = await getAttrs(props, tempAttr)
@@ -187,6 +192,8 @@ watch(
     }
   }
 )
+
+defineExpose({ field: props.field, clear })
 </script>
 <style lang="scss">
 .el-plus-form-select-options {

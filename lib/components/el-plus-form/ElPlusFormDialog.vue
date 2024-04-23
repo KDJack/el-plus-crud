@@ -1,5 +1,5 @@
 <template>
-  <el-dialog class="el-plus-form-dialog" v-model="currentShow" :title="props.title" v-bind="dialogAttrs" @closed="handelClosed">
+  <el-dialog class="el-plus-form-dialog" v-model="currentShow" :title="props.title" v-bind="dialogAttrs" @close="handelClosed">
     <!-- title 插槽 -->
     <template #header>
       <slot name="header" />

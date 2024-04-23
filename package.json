@@ -11,6 +11,7 @@
   "scripts": {
     "start": "vite",
     "build": "node build.js && vite build",
+    "sync": "cnpm sync el-plus-crud",
     "build-comp": "node ./build.js",
     "lint-fix": "eslint --fix --ext .js --ext .jsx --ext .vue lib/",
     "preview": "vite preview",

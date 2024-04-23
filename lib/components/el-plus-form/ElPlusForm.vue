@@ -496,7 +496,7 @@ const validateForm = () => {
 // 设置子组件的ref-重置form的时候需要用到
 const setComponentRef = (el: any) => {
   if (!el) return
-  if (fieldRefs_.value.filter((item: any) => item.field === el.field).length <= 0) {
+  if (!fieldRefs_.value.some((item: any) => item.field === el.field)) {
     fieldRefs_.value.push(el)
   }
 }
@@ -770,6 +770,10 @@ const clear = () => {
       } else {
         props.modelValue[key] = null
       }
+    })
+    // 清空组件
+    fieldRefs_.value?.map((item) => {
+      if (item?.clear && typeof item?.clear === 'function') item.clear()
     })
   }
   // 重置校验

@@ -89,16 +89,7 @@ const onEvents = computed(() => {
     })
   }
   // 这里要判断下数据清空
-  tempOn.clear = () => {
-    isClear.value = true
-    props.desc?.on?.clear && typeof props.desc?.on?.clear === 'function' && props.desc.on.clear()
-    oldQuery.value = null
-    options.splice(0, options.length)
-    // // 这里重新查询一次
-    // if (props.desc.remote) {
-    //   queryOptionsFn('')
-    // }
-  }
+  tempOn.clear = clear
   // 这里重写一下失去焦点事件
   const focusFn = () => {
     isClear.value = true
@@ -110,7 +101,6 @@ const onEvents = computed(() => {
     }
   }
   tempOn.focus = focusFn
-
   return tempOn
 })
 
@@ -139,6 +129,13 @@ async function queryOptionsFn(query: string) {
       }
     }
   }
+}
+
+function clear() {
+  isClear.value = true
+  props.desc?.on?.clear && typeof props.desc?.on?.clear === 'function' && props.desc.on.clear()
+  oldQuery.value = null
+  options.splice(0, options.length)
 }
 
 onBeforeMount(async () => {
@@ -185,7 +182,7 @@ watch(
   }
 )
 
-defineExpose({ field: props.field })
+defineExpose({ field: props.field, clear })
 </script>
 <style lang="scss">
 .el-plus-form-select-options {

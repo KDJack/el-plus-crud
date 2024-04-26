@@ -85,7 +85,7 @@
       </el-table>
     </div>
     <div class="bottom-page-static-info" v-if="isPager || tableConfig.statistic">
-      <el-pagination class="page-info" small @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="+pageInfo.current" :page-sizes="[5, 10, 20, 50, 100]" :page-size="pageInfo.size" layout="total, sizes, prev, pager, next, jumper" :total="pageInfo.total" />
+      <el-pagination class="page-info" small @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="+pageInfo.current" :page-sizes="pageSizes || [5, 10, 20, 50, 100]" :page-size="pageInfo.size" layout="total, sizes, prev, pager, next, jumper" :total="pageInfo.total" />
     </div>
     <slot name="bottom"></slot>
   </div>
@@ -131,6 +131,8 @@ const props = withDefaults(
     isPager?: boolean
     // 每页显示条数
     pageSize?: number
+    // 分页选项
+    pageSizes?: number[]
     // 是否在弹框中
     isDialog?: boolean
     // 空占位文本

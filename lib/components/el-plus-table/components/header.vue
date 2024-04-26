@@ -202,9 +202,13 @@ async function handelDownload({ callBack }: IBtnBack, index: number) {
     xhr.onload = function () {
       if (this.status == 200) {
         const aLink = document.createElement('a')
-        aLink.href = window.URL.createObjectURL(this.response)
-        // 自定义文件名
-        aLink.download = fileName + suffix
+        // 优化下载兼容性
+        if ((window.navigator as any).msSaveOrOpenBlob && typeof (window.navigator as any).msSaveOrOpenBlob === 'function') {
+          aLink.href = (window.navigator as any).msSaveOrOpenBlob(this.response, fileName + suffix)
+        } else {
+          aLink.href = window.URL.createObjectURL(this.response)
+          aLink.download = fileName + suffix
+        }
         aLink.click()
         window.URL.revokeObjectURL(url)
         setTimeout(() => {

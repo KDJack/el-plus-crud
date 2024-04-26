@@ -377,10 +377,6 @@ const initFormAttrs = debounce(
             if (formItem.default !== undefined && formItem.default !== null && props.modelValue[field] === undefined) {
               props.modelValue[field] = formItem.default
             }
-            // 这里初始化一下默认选中项
-            if (formItem.defaultItem !== undefined && formItem.defaultItem !== null && props.modelValue[field] === undefined) {
-              props.modelValue[field] = formItem.defaultItem.value
-            }
             // 这里格式化一下数据
             // if (formItem.format) {
             // if (typeof formItem.format === 'string') {

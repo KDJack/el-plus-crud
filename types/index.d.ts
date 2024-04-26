@@ -92,7 +92,7 @@ export interface IFormDescItem extends IDescItem {
   attrs?: IBaseObj | ((data?: any) => IBaseObj)
   options?: Ref<Array<IFormDescItemOptionItem>> | Array<IFormDescItemOptionItem> | (() => Array<IFormDescItemOptionItem>) | IFetch<Array<IFormDescItemOptionItem>> | string
   default?: string | boolean | number
-  defaultItem?: { value: string | number; label: string; dataItem?: IBaseObj }
+  defaultKey?: { value: string; label: string }
   rules?: string | Array<any>
   valueFormat?: Function | string
   isBlank?: boolean

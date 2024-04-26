@@ -25,6 +25,7 @@ import { getAttrs } from '../mixins'
 import { isEqual, isPromiseLike } from '../../../util'
 import { ICRUDConfig } from '../../../../types'
 import { useVModel } from '@vueuse/core'
+import { cloneDeep } from 'lodash'
 
 const defaultConf = inject('defaultConf') as ICRUDConfig
 const globalData = inject('globalData') as any
@@ -35,7 +36,7 @@ const props = withDefaults(
     loading?: boolean
     field?: string
     desc: { [key: string]: any }
-    formData?: { [key: string]: any }
+    formData: { [key: string]: any }
     rowIndex?: number
     disabled?: boolean
   }>(),
@@ -96,7 +97,7 @@ const onEvents = computed(() => {
     props.desc?.on?.focus && typeof props.desc?.on?.focus === 'function' && props.desc.on.focus()
     oldQuery.value = null
     // 这里重新查询一次
-    if (props.desc.remote && options.length <= 0) {
+    if (props.desc.remote) {
       queryOptionsFn('')
     }
   }
@@ -119,15 +120,32 @@ async function queryOptionsFn(query: string) {
     options.splice(0, options.length, ...(await props.desc.remote(query)))
     if (query === '') {
       // 判断是否有默认选项
-      if (!isClear.value && props.desc.defaultItem) {
-        // 这里需要判断下默认值是否已经出现在了options中，如果存在，则需要删除
-        const index = options.findIndex((item) => item.value === props.desc.defaultItem.value)
-        if (index >= 0) {
-          options.splice(index, 1)
-        }
-        options.unshift(props.desc.defaultItem)
+      if (!isClear.value) {
+        initDefault()
       }
     }
+  }
+}
+
+/**
+ * 初始化默认项
+ */
+function initDefault() {
+  if (props.desc.defaultKey) {
+    let defaultValue = props.formData[props.desc.defaultKey.value]
+    if (!Array.isArray(defaultValue)) defaultValue = [defaultValue]
+    let defaultLabel = props.formData[props.desc.defaultKey.label]
+    if (!Array.isArray(defaultLabel)) defaultLabel = [defaultLabel]
+
+    if (defaultValue.length <= 0 || defaultValue.length !== defaultLabel.length) return
+    // 遍历
+    defaultValue.map((val: any, i: number) => {
+      // 这里需要判断下默认值是否已经出现在了options中，如果存在，则需要删除
+      const index = options.findIndex((item) => item.value === val)
+      if (index >= 0) options.splice(index, 1)
+      options.unshift({ value: val, label: defaultLabel[i], dataItem: cloneDeep(props.formData) })
+    })
+    console.log('options: ', options)
   }
 }
 
@@ -146,6 +164,7 @@ onBeforeMount(async () => {
   attrs.value = await getAttrs(props, tempAttr)
   attrs.value.remote = !!props.desc.remote
   delete attrs.value.disabled
+  initDefault()
   isInit.value = true
 })
 
@@ -182,7 +201,8 @@ watch(
         currentValue.value = (val as Array<string>).filter((item) => typeof item !== 'string' || item.length <= (defaultConf.form?.leng?.input || 20))
       }
     }
-  }
+  },
+  { immediate: true, deep: true }
 )
 
 defineExpose({ field: props.field, clear })

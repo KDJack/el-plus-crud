@@ -131,7 +131,7 @@ async function queryOptionsFn(query: string) {
  * 初始化默认项
  */
 function initDefault() {
-  if (props.desc.defaultKey) {
+  if (oldQuery.value === null && props.desc.defaultKey) {
     let defaultValue = props.formData[props.desc.defaultKey.value]
     if (!Array.isArray(defaultValue)) defaultValue = [defaultValue]
     let defaultLabel = props.formData[props.desc.defaultKey.label]
@@ -140,12 +140,15 @@ function initDefault() {
     if (defaultValue.length <= 0 || defaultValue.length !== defaultLabel.length) return
     // 遍历
     defaultValue.map((val: any, i: number) => {
-      // 这里需要判断下默认值是否已经出现在了options中，如果存在，则需要删除
-      const index = options.findIndex((item) => item.value === val)
-      if (index >= 0) options.splice(index, 1)
-      options.unshift({ value: val, label: defaultLabel[i], dataItem: cloneDeep(props.formData) })
+      if (val) {
+        // 这里需要判断下默认值是否已经出现在了options中，如果存在，则需要删除
+        const index = options.findIndex((item) => item.value === val)
+        if (index >= 0) {
+          options.splice(index, 1)
+        }
+        options.unshift({ value: val, label: defaultLabel[i], dataItem: cloneDeep(props.formData) })
+      }
     })
-    console.log('options: ', options)
   }
 }
 
@@ -164,7 +167,6 @@ onBeforeMount(async () => {
   attrs.value = await getAttrs(props, tempAttr)
   attrs.value.remote = !!props.desc.remote
   delete attrs.value.disabled
-  initDefault()
   isInit.value = true
 })
 
@@ -201,8 +203,10 @@ watch(
         currentValue.value = (val as Array<string>).filter((item) => typeof item !== 'string' || item.length <= (defaultConf.form?.leng?.input || 20))
       }
     }
+    // 处理一下默认值
+    initDefault()
   },
-  { immediate: true, deep: true }
+  { immediate: true }
 )
 
 defineExpose({ field: props.field, clear })

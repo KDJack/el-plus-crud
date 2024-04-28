@@ -63,7 +63,6 @@ function handelCheckChange(item: any, isSelect: boolean) {
     // 这里判断一下全选状态
     selectAll.value = isSelect && allIds.value.length === currentValue.value?.length
     emits('validateThis')
-    console.log('validateThis******************')
   })
 }
 

@@ -816,7 +816,7 @@ onMounted(() => {
   }
 })
 
-defineExpose({ reload, tableData, changeSelect, resetSelect, initCol })
+defineExpose({ tableRef: elPlusTableRef, reload, tableData, changeSelect, resetSelect, initCol })
 </script>
 <style lang="scss">
 .dark .el-plus-table-content {

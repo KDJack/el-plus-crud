@@ -1,5 +1,12 @@
 <template>
-  <el-tree ref="treeRef" v-if="isInit" :class="desc.class" :style="desc.style" v-bind="attrs" :disabled="disabled" :default-checked-keys="currentValue" :loading="loading" node-key="id" :data="options" v-on="onEvents" class="el-plus-form-tree" @check-change="handelCheckChange" />
+  <div class="el-plus-form-tree">
+    <template v-if="attrs.showCheckbox && !attrs.noSelectAll">
+      <div class="btns">
+        <el-checkbox v-model="selectAll" @change="handelSelectAll" label="全部勾选" border />
+      </div>
+    </template>
+    <el-tree ref="treeRef" v-if="isInit" :class="desc.class" :style="desc.style" v-bind="attrs" :disabled="disabled" :default-checked-keys="currentValue" :loading="loading" node-key="id" :data="options" v-on="onEvents" class="el-plus-form-tree" @check-change="handelCheckChange" />
+  </div>
 </template>
 <script lang="ts">
 export default {
@@ -11,13 +18,15 @@ export default {
 </script>
 <script lang="ts" setup>
 import { isEqual } from '../../../util'
-import { ref, reactive, useAttrs, onBeforeMount, watch, inject } from 'vue'
+import { ref, reactive, useAttrs, onBeforeMount, watch, inject, nextTick } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
+import { useVModel } from '@vueuse/core'
+import { cloneDeep } from 'lodash'
 
 const globalData = inject('globalData') as any
 
 const props = defineProps<{
-  modelValue?: string
+  modelValue?: Array<string>
   field?: string
   loading?: boolean
   desc: { [key: string]: any }
@@ -25,8 +34,8 @@ const props = defineProps<{
   disabled?: boolean
 }>()
 
-const emits = defineEmits(['update:modelValue'])
-const currentValue = ref(props.modelValue?.split(',') || [])
+const emits = defineEmits(['update:modelValue', 'validateThis'])
+const currentValue = useVModel(props, 'modelValue', emits)
 
 const options = reactive([] as any[])
 const isInit = ref(false)
@@ -34,14 +43,54 @@ const attrs = ref({} as any)
 const onEvents = ref(getEvents(props))
 
 const treeRef = ref()
+const selectAll = ref(false)
+const allIds = ref([] as any[])
 
 onBeforeMount(async () => {
-  attrs.value = await getAttrs(props, { checkStrictly: true, showCheckbox: true, accordion: true, props: { label: 'label', children: 'children' }, ...useAttrs() })
+  attrs.value = await getAttrs(props, { checkStrictly: true, showCheckbox: true, accordion: true, noSelectAll: false, props: { label: 'label', children: 'children' }, ...useAttrs() })
+  if (attrs.value.showCheckbox && !attrs.value.noSelectAll && options.length) {
+    allIds.value = getLoopIds(options)
+  }
   isInit.value = true
 })
 
-function handelCheckChange() {
-  emits('update:modelValue', [...treeRef.value!.getCheckedKeys(!(props.desc.isPId ?? true))].join(','))
+/**
+ * 处理单个checkbox改变
+ */
+function handelCheckChange(item: any, isSelect: boolean) {
+  currentValue.value = treeRef.value!.getCheckedKeys(!(props.desc.isPId ?? true))
+  nextTick(() => {
+    // 这里判断一下全选状态
+    selectAll.value = isSelect && allIds.value.length === currentValue.value?.length
+    emits('validateThis')
+    console.log('validateThis******************')
+  })
+}
+
+/**
+ * 处理权限
+ */
+function handelSelectAll() {
+  let selectIds = [] as any[]
+  if (selectAll.value) selectIds = cloneDeep(allIds.value)
+  currentValue.value = selectIds
+  treeRef.value!.setCheckedKeys(currentValue.value)
+}
+
+/**
+ * 递归获取id
+ */
+function getLoopIds(list: Array<any>) {
+  const tempIds = [] as any[]
+  if (list?.length) {
+    list.map((item) => {
+      if (item[attrs.value.props.children]?.length) {
+        tempIds.push(...getLoopIds(item[attrs.value.props.children]))
+      }
+      tempIds.push(item.id)
+    })
+  }
+  return tempIds
 }
 
 watch(
@@ -59,6 +108,10 @@ watch(
     } else {
       options.splice(0, options.length)
     }
+    // 如果是复选,这里重新获取下所有IDs
+    if (attrs.value.showCheckbox && !attrs.value.noSelectAll) {
+      allIds.value = getLoopIds(options)
+    }
   },
   { immediate: true }
 )
@@ -66,14 +119,19 @@ watch(
 watch(
   () => props.modelValue,
   (val) => {
-    currentValue.value = val?.split(',') || []
-    treeRef.value!.setCheckedKeys(currentValue.value)
+    treeRef.value!.setCheckedKeys(val || [])
   }
 )
 </script>
 <style lang="scss" scoped>
 .el-plus-form-tree {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  .btns {
+    width: 100%;
+    padding-left: 12px;
+    margin-bottom: 8px;
+  }
 }
 </style>
-../util/aaaaa

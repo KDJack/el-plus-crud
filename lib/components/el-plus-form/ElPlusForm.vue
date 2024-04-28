@@ -260,6 +260,7 @@ const computedRules = computed(() => {
             case 'link':
             case 'radio':
             case 'checkbox':
+            case 'tree':
               rules = 'select'
               break
             case 'daterange':
@@ -852,7 +853,7 @@ onMounted(async () => {
 })
 
 // 暴露对外方法
-defineExpose({ fid: props.fid, submit: handleSubmitForm, getData: getFormData, validate: validateForm, reset, clearValid, clear, changeValidImg, refresh, init })
+defineExpose({ fid: props.fid, formRef: refElPlusForm, submit: handleSubmitForm, getData: getFormData, validate: validateForm, reset, clearValid, clear, changeValidImg, refresh, init })
 </script>
 <style lang="scss">
 .el-plus-form-panel {

@@ -6,7 +6,7 @@
         <el-row :gutter="10" v-for="(formList, index) in attrMapToTableList" :key="index" :style="{ marginRight: isTable ? '20px' : 0 }">
           <el-col v-for="(formItem, y) in formList" :key="index + '-' + y + '-' + formItem.field" :xs="24" :sm="24" :md="formItem.colspan && formItem.colspan >= column ? 24 : column >= 2 ? 12 : 24" :lg="formItem.colspan && formItem.colspan >= column ? 24 : Math.floor((24 / column) * (formItem.colspan || 1))" :xl="formItem.colspan && formItem.colspan >= column ? 24 : Math.floor((24 / column) * (formItem.colspan || 1))">
             <div v-if="formItem._vif" class="el-plus-form-column-panel" :style="{ 'justify-content': isTable ? 'flex-end' : 'flex-start' }">
-              <el-form-item style="min-height: 40px; display: flex" :prop="formItem.field" :style="{ width: formItem._attrs?.width || formItem.width || (isTable ? '150px' : '100%') }">
+              <el-form-item style="min-height: 40px; display: flex" :prop="formItem.field" :style="{ width: formItem._attrs?.width || formItem.width || (isTable ? '150px' : '100%'), marginBottom: itemMB }">
                 <template #label>
                   <div v-if="showLabel && formItem.showLabel !== false" class="crud-form-label" :style="{ width: formItem.labelWidth || computedFormAttrs._labelWidth || (isDialog ? '100px' : '120px') }">
                     <span :class="{ required: formItem.required }">
@@ -110,6 +110,8 @@ export interface IFormProps {
   isGroupForm?: boolean
   // 是否禁用最后一个元素的tab
   disabledTab?: boolean
+  // item的底部边距
+  itemMB?: string
   // 比如 beforeValidate, beforeRequest, success, requestError, requestEnd
   // 其他钩子 直接放到attrs里面去了
 }
@@ -168,7 +170,9 @@ const props = withDefaults(defineProps<IFormProps>(), {
   // 唯一标识符。默认为id
   idKey: 'id',
   // 是否禁用最后一个元素的tab
-  disabledTab: false
+  disabledTab: false,
+  // item的底部边距
+  itemMB: '18px'
   // 其他钩子 直接放到attrs里面去了
   // 比如 beforeValidate, beforeRequest, success, requestError, requestEnd
 })
@@ -447,6 +451,7 @@ const btnList = computed(() => {
         label: props.submitBtnText || '提交',
         size: size.value,
         type: 'primary',
+        disabled: props.disabled,
         loading: props.isLoading || innerIsLoading.value,
         on: { click: handleSubmitForm }
       }
@@ -885,7 +890,6 @@ defineExpose({ fid: props.fid, formRef: refElPlusForm, submit: handleSubmitForm,
   }
   .el-plus-form-column-panel {
     & > .el-form-item {
-      margin-bottom: 18px !important;
       // & > .el-form-item__label-wrap {
       & > .el-form-item__label {
         line-height: 40px;

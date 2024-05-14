@@ -424,7 +424,7 @@ async function loadExpandData(row: any, treeNode: any, resolve: any) {
   postData[props.tableConfig?.explan?.idName || 'parentId'] = row.id
   props.tableConfig.fetch &&
     props.tableConfig.fetch(postData).then((pageInfo) => {
-      resolve(pageInfo?.[props.tableConfig?.fetchMap?.list || 'records'])
+      resolve(pageInfo?.[defaultConf.table?.list || props.tableConfig?.fetchMap?.list || 'records'])
     })
 }
 
@@ -531,8 +531,8 @@ async function getListQueryData() {
   } as any
   if (props.isPager) {
     // 封装分页信息
-    queryMap.current = pageInfo.current
-    queryMap.size = pageInfo.size
+    queryMap[defaultConf.table?.page?.current || props.tableConfig?.fetchMap?.page?.current || 'current'] = pageInfo.current
+    queryMap[defaultConf.table?.page?.pageSize || props.tableConfig?.fetchMap?.page?.pageSize || 'size'] = pageInfo.size
   }
   // 这里处理一下列表Tab的查询条件
   if (props.tableConfig?.tabConf && props.tableConfig?.tabConf?.prop) {
@@ -659,16 +659,16 @@ async function loadData(isInit: Boolean) {
     let dataPage = ((await props.tableConfig.fetch(postData)) || {}) as any
     // 这里要进行赋值操作-同时要转换相关key
     if (Array.isArray(dataPage)) {
-      dataPage = { [props.tableConfig?.fetchMap?.list || 'records']: dataPage }
+      dataPage = { [defaultConf.table?.list || props.tableConfig?.fetchMap?.list || 'records']: dataPage }
     }
     try {
       let dataResult = [] as any
       if (props.isPager) {
-        pageInfo.total = dataPage[props.tableConfig?.fetchMap?.total || 'total'] * 1 || 0
-        pageInfo.current = dataPage[props.tableConfig?.fetchMap?.current || 'current'] || 1
-        dataResult = dataPage[props.tableConfig?.fetchMap?.list || 'records'] || null
+        pageInfo.total = dataPage[defaultConf.table?.page?.total || props.tableConfig?.fetchMap?.page?.total || 'total'] * 1 || 0
+        pageInfo.current = dataPage[defaultConf.table?.page?.current || props.tableConfig?.fetchMap?.page?.current || 'current'] || 1
+        dataResult = dataPage[defaultConf.table?.list || props.tableConfig?.fetchMap?.list || 'records'] || null
       } else {
-        dataResult = dataPage[props.tableConfig?.fetchMap?.list || 'records'] || null
+        dataResult = dataPage[defaultConf.table?.list || props.tableConfig?.fetchMap?.list || 'records'] || null
       }
 
       if (props.type !== 'expand' && props.isTempId && Array.isArray(dataResult)) {

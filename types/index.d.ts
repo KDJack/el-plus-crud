@@ -34,13 +34,17 @@ export interface IFetch<T> {
 /**
  * 设定如何解析请求结果
  */
-export interface IFetchMap {
+export interface IFetchTableMap {
   // 结果列表key-默认records
   list?: string
-  // 总数key-默认total
-  total?: string
-  // 当前页key-默认current
-  current?: string
+  page?: {
+    // 总数key-默认total
+    total?: string
+    // 当前页key-默认current
+    current?: string
+    // 最大显示条数
+    pageSize?: string
+  }
 }
 
 /**
@@ -369,7 +373,7 @@ export interface ITableConfig {
   // 调用接口
   fetch?: IFetch<any>
   // 如何去解析数据结果
-  fetchMap?: IFetchMap
+  fetchMap?: IFetchTableMap
   // 列表配置，包含表头，每列信息等
   column?: Array<IColumnItem>
   // 查询条件
@@ -517,6 +521,7 @@ export interface ICRUDConfig {
     // 用户自定义form组件的名称,使用这个，全局注册的名字为el-plus-form-xxx，form中就可以使用xxx进行引入
     comList?: string[]
   }
+  table?: IFetchTableMap
   // 上传组件配置
   upload?: {
     // 类型 minio 或者 七牛 / 阿里云 或者不填，不填则完全依赖 action

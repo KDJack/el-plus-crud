@@ -62,7 +62,7 @@ export type IDescItem = {
   label?: string | ((data?: any) => string)
   prop?: string | ((data?: any) => string)
   width?: string
-  format?: string | ((data?: any) => string)
+  format?: string | ((val?: any, row?: any) => string)
   vif?: boolean | ((data?: any) => boolean)
   vshow?: boolean | ((data?: any) => boolean)
   limit?: number

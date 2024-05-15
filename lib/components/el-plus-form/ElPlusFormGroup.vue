@@ -25,11 +25,12 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { cloneDeep } from 'lodash'
 import { isPromiseLike } from '../../util'
-import { computed, ref, useSlots } from 'vue'
+import { computed, inject, ref, useSlots } from 'vue'
 import ElPlusForm, { IFormProps } from './ElPlusForm.vue'
 import { IFormDesc, IFormGroupConfig } from '../../../types'
+
+const lodash = inject('lodash') as any
 
 const emits = defineEmits(['update:show', 'update:modelValue', 'before-validate', 'before-request', 'request-success', 'request-error', 'request-end', 'request'])
 const props = defineProps<{
@@ -82,7 +83,7 @@ const getGroupFowmLayout = computed(() => {
     return item._vif
   })
 
-  const tempFormConfig = cloneDeep(props.formGroup) as any
+  const tempFormConfig = lodash.cloneDeep(props.formGroup) as any
   const column = props.formGroup.column || 1
   // 移除无用
   delete tempFormConfig.group

@@ -35,9 +35,10 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { cloneDeep } from 'lodash'
-import { ref, reactive, watch, onMounted, computed } from 'vue'
+import { ref, reactive, watch, onMounted, computed, inject } from 'vue'
 import { IBtnBack, ITableConfig } from '../../../../types'
+
+const lodash = inject('lodash') as any
 
 interface ILinkItem {
   label: string
@@ -98,7 +99,7 @@ function handelVisibleChange(val: any) {
   if (val) {
     selectRef.value.blur()
     isShowDialog.value = true
-    selectList.value = cloneDeep(selectData.map((item) => item.dataItem))
+    selectList.value = lodash.cloneDeep(selectData.map((item) => item.dataItem))
     // 这里存储一下老数据
     selectOldData.splice(0, selectOldData.length, ...selectData)
   }
@@ -177,7 +178,7 @@ function submit() {
 
   // 触发外部change事件
   if (onEvents.value.change) {
-    onEvents.value.change(cloneDeep(selectData))
+    onEvents.value.change(lodash.cloneDeep(selectData))
   }
 
   isShowDialog.value = false
@@ -190,7 +191,7 @@ watch(
   (val) => {
     let tempConfig = {} as ITableConfig
     if (val) {
-      tempConfig = cloneDeep(val)
+      tempConfig = lodash.cloneDeep(val)
       if (typeof props.desc.multiple === 'function') {
         multiple.value = props.desc.multiple(props.formData || {})
       } else {

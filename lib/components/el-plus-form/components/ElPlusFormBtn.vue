@@ -28,9 +28,9 @@ export default {
 </script>
 <script lang="ts" setup>
 import { ref, computed, useAttrs, watch, inject } from 'vue'
-import { cloneDeep } from 'lodash'
 import { IBtnBack, ICRUDConfig } from '../../../../types'
 
+const lodash = inject('lodash') as any
 const defaultConf = inject('defaultConf') as ICRUDConfig
 
 const props = defineProps<{
@@ -81,7 +81,7 @@ const onEvents = computed(() => {
         }
       } else {
         events[key] = function () {
-          props.desc?.on[key]({ row: cloneDeep(props.formData || {}), field: props.field, rowIndex: props.rowIndex } as IBtnBack)
+          props.desc?.on[key]({ row: lodash.cloneDeep(props.formData || {}), field: props.field, rowIndex: props.rowIndex } as IBtnBack)
         }
       }
     }

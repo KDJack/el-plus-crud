@@ -6,6 +6,7 @@ import ElPlusFormGroup from './components/el-plus-form/ElPlusFormGroup.vue'
 import ElPlusTable from './components/el-plus-table/ElPlusTable.vue'
 import defaultConf from './config'
 import * as all from '../types'
+import { cloneDeep, debounce } from 'lodash-es'
 
 export default {
   install: (app: App, config?: all.ICRUDConfig, format?: { [key: string]: Function }, globalData?: { [key: string]: Function }) => {
@@ -19,6 +20,9 @@ export default {
 
     // 这里注入defaultConf
     app.provide('defaultConf', defaultConf)
+
+    // 这里注入lodash
+    app.provide('lodash', { cloneDeep, debounce })
 
     // 循环注册表单组件
     components.unshift(ElPlusForm)

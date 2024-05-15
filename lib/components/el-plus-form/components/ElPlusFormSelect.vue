@@ -25,8 +25,8 @@ import { getAttrs } from '../mixins'
 import { isEqual, isPromiseLike } from '../../../util'
 import { ICRUDConfig } from '../../../../types'
 import { useVModel } from '@vueuse/core'
-import { cloneDeep } from 'lodash'
 
+const lodash = inject('lodash') as any
 const defaultConf = inject('defaultConf') as ICRUDConfig
 const globalData = inject('globalData') as any
 
@@ -146,7 +146,7 @@ function initDefault() {
         if (index >= 0) {
           options.splice(index, 1)
         }
-        options.unshift({ value: val, label: defaultLabel[i], dataItem: cloneDeep(props.formData) })
+        options.unshift({ value: val, label: defaultLabel[i], dataItem: lodash.cloneDeep(props.formData) })
       }
     })
   }

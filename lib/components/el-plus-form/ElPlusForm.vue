@@ -47,7 +47,6 @@ export default {
 <script lang="ts" setup>
 import { ref, computed, useAttrs, nextTick, onMounted, watch, inject, Ref, useSlots } from 'vue'
 import { castArray, isMobile, time, isPromiseLike } from '../../util'
-import { cloneDeep, debounce } from 'lodash'
 import * as validates from './util/validate'
 import { typeList } from './components/index'
 import ElPlusFormBtn from './components/ElPlusFormBtn.vue'
@@ -116,6 +115,7 @@ export interface IFormProps {
   // 其他钩子 直接放到attrs里面去了
 }
 
+const lodash = inject('lodash') as any
 const defaultConf = inject('defaultConf') as ICRUDConfig
 
 const emits = defineEmits(['request', 'reset', 'cancel'])
@@ -230,7 +230,7 @@ const computedRules = computed(() => {
         required = (props.formDesc && props.formDesc[field].required) || false
       }
       if (typeof required === 'function') {
-        required = required(cloneDeep(props.modelValue))
+        required = required(lodash.cloneDeep(props.modelValue))
       }
       if (props.formDesc) {
         if (props.formDesc[field].rules) {
@@ -290,7 +290,7 @@ const attrMapToTableList = computed(() => {
   const formLayoutRows = [] as Array<Array<IFormDescItem>>
   if (props.formDesc) {
     initFormAttrs()
-    const tempFormDesc = cloneDeep(props.formDesc)
+    const tempFormDesc = lodash.cloneDeep(props.formDesc)
     let tempData = [] as Array<IFormDescItem>
     for (const key in tempFormDesc) {
       tempData.push({ ...tempFormDesc[key], field: key })
@@ -346,7 +346,7 @@ const attrMapToTableList = computed(() => {
 })
 
 // 整体初始化属性
-const initFormAttrs = debounce(
+const initFormAttrs = lodash.debounce(
   () => {
     if (props.formDesc) {
       Object.keys(props.formDesc).forEach((field) => {
@@ -838,7 +838,7 @@ watch(
       // 检查联动
       // if (JSON.stringify(data) !== JSON.stringify(oldFormData)) {
       if (!oldFormData) {
-        oldFormData = cloneDeep(data)
+        oldFormData = lodash.cloneDeep(data)
       }
       initFormAttrs()
       // }

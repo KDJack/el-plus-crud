@@ -26,10 +26,11 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, inject } from 'vue'
 import { IColumnItem } from '../../../types'
 import ColumnItem from './components/columnItem.vue'
-import { cloneDeep } from 'lodash'
+
+const lodash = inject('lodash') as any
 
 const props = defineProps<{
   item: IColumnItem
@@ -40,7 +41,7 @@ const props = defineProps<{
  * 绑定属性
  */
 const columnAttr = computed(() => {
-  const tempAttr = cloneDeep(props.item)
+  const tempAttr = lodash.cloneDeep(props.item)
   delete tempAttr.children
   return tempAttr
 })

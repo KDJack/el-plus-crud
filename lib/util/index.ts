@@ -1,4 +1,3 @@
-import { cloneDeep } from 'lodash'
 import { ICRUDConfig, IColumnItem } from '../../types'
 
 /**
@@ -156,7 +155,7 @@ export function getUID(): string {
 export function getValue(keys: string | Array<string>, obj: any) {
   if (!obj || !keys || keys.length <= 0) return null
   if (Array.isArray(keys)) {
-    let tempObj = cloneDeep(obj) as any
+    let tempObj = JSON.parse(JSON.stringify(obj)) as any
     for (let i = 0; i < keys.length; i++) {
       tempObj = tempObj[Array.isArray(tempObj) ? parseInt(keys[i]) : keys[i]]
       if (tempObj === undefined || tempObj === null) return null
@@ -204,7 +203,7 @@ export function handelListColumn(columnList: Array<IColumnItem> | undefined, def
   const tempColumnList = [] as any[]
   if (columnList && columnList.length > 0) {
     // 不影响原有的对象，这里进行拷贝
-    cloneDeep(columnList).map((item: IColumnItem) => {
+    JSON.parse(JSON.stringify(columnList)).map((item: IColumnItem) => {
       // 如果有子集
       if (item.children) {
         // 表头居中

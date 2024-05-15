@@ -72,10 +72,10 @@ export default {
 <script lang="ts" setup>
 import { ref, reactive, nextTick, watch, onMounted, computed, inject, onBeforeMount, useAttrs } from 'vue'
 import { Share, UserFilled } from '@element-plus/icons-vue'
-import { cloneDeep } from 'lodash'
 import { getAttrs } from '../mixins'
 import { ICRUDConfig } from '../../../../types'
 
+const lodash = inject('lodash') as any
 const globalData = inject('globalData') as any
 const defaultConf = inject('defaultConf') as ICRUDConfig
 
@@ -158,7 +158,7 @@ const tableData = computed(() => {
   if (deptDataList.value.length) {
     tempData = deptDataList.value
   } else {
-    tempData = cloneDeep(globalData[defaultConf.form?.linkUser?.deptListKey || ''])
+    tempData = lodash.cloneDeep(globalData[defaultConf.form?.linkUser?.deptListKey || ''])
   }
   if (deptTreeIndex.value && deptTreeIndex.value.length > 0) {
     deptTreeIndex.value.map((item) => {

@@ -102,7 +102,6 @@ import { ref, reactive, onMounted, computed, watch, nextTick, useSlots, inject, 
 import EleTabletHeader from './components/header.vue'
 import ElPlusTableColumn from './ElPlusTableColumn.vue'
 import { handelListColumn, isEqual } from '../../util'
-import { cloneDeep, debounce } from 'lodash'
 import { Loading } from '@element-plus/icons-vue'
 import type { TableColumnCtx } from 'element-plus'
 import { ICRUDConfig, ITableConfig, ITableTabItem, ITreeProps } from '../../../types'
@@ -114,6 +113,7 @@ interface SpanMethodProps {
   columnIndex: number
 }
 
+const lodash = inject('lodash') as any
 const defaultConf = inject('defaultConf') as ICRUDConfig
 const format = inject('format') as any
 
@@ -231,7 +231,7 @@ const haveClassRowList = reactive([])
 const loadingStatus = ref(0)
 
 // 保存所有的选中行
-const allSelectRowList = reactive((cloneDeep(props.selectList) || []) as any[])
+const allSelectRowList = reactive((lodash.cloneDeep(props.selectList) || []) as any[])
 // 记录树形展开的数组的下标
 const treeIndexList = reactive([] as any[][])
 
@@ -448,7 +448,7 @@ function handelTableSelect(selection: any[], item: any) {
   checkAndRemove(item, !selection.some((i) => i[props.rowKey] === item[props.rowKey]))
   // 通知父类
   emits('select', selection, item)
-  emits('selection', cloneDeep(allSelectRowList))
+  emits('selection', lodash.cloneDeep(allSelectRowList))
 }
 
 /**
@@ -463,7 +463,7 @@ function handelTableSelectAll(selection: any[]) {
   })
   // 通知父类
   emits('selectAll', selection, isRemove)
-  emits('selection', cloneDeep(allSelectRowList))
+  emits('selection', lodash.cloneDeep(allSelectRowList))
 }
 
 /**
@@ -704,7 +704,7 @@ async function loadData(isInit: Boolean) {
   localLoading.value = false
 }
 
-const noticeInited = debounce(
+const noticeInited = lodash.debounce(
   () => {
     emits('inited', tableData.value)
   },

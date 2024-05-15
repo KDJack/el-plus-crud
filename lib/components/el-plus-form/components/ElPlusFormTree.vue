@@ -21,8 +21,8 @@ import { isEqual } from '../../../util'
 import { ref, reactive, useAttrs, onBeforeMount, watch, inject, nextTick } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
 import { useVModel } from '@vueuse/core'
-import { cloneDeep } from 'lodash'
 
+const lodash = inject('lodash') as any
 const globalData = inject('globalData') as any
 
 const props = defineProps<{
@@ -71,7 +71,7 @@ function handelCheckChange(item: any, isSelect: boolean) {
  */
 function handelSelectAll() {
   let selectIds = [] as any[]
-  if (selectAll.value) selectIds = cloneDeep(allIds.value)
+  if (selectAll.value) selectIds = lodash.cloneDeep(allIds.value)
   currentValue.value = selectIds
   treeRef.value!.setCheckedKeys(currentValue.value)
 }

@@ -203,7 +203,7 @@ export function handelListColumn(columnList: Array<IColumnItem> | undefined, def
   const tempColumnList = [] as any[]
   if (columnList && columnList.length > 0) {
     // 不影响原有的对象，这里进行拷贝
-    JSON.parse(JSON.stringify(columnList)).map((item: IColumnItem) => {
+    columnList.map((item: IColumnItem) => {
       // 如果有子集
       if (item.children) {
         // 表头居中

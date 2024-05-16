@@ -246,7 +246,7 @@ const treeProps = (props.tableConfig?.explan?.treeProps || { children: 'children
 
 // 处理后的列显示
 const headerColumns = computed(() => {
-  const tempList = handelListColumn(props.tableConfig?.column, defaultConf, props.tableConfig?.tbName || '', props.headerAlign, props.isDialog ? 'auto' : props.colMinWidth)
+  const tempList = handelListColumn(lodash.cloneDeep(props.tableConfig?.column), defaultConf, props.tableConfig?.tbName || '', props.headerAlign, props.isDialog ? 'auto' : props.colMinWidth)
   // 这里重构一下合并行算法
   // 获取所有列
   const allColumn = getColumList(tempList)
@@ -653,7 +653,7 @@ async function loadData(isInit: Boolean) {
   let postData = await getListQueryData()
   // 这里处理一下外部数据格式化
   if (props.tableConfig?.toolbar?.formConfig?.beforeRequest) {
-    postData = props.tableConfig?.toolbar?.formConfig?.beforeRequest(JSON.parse(JSON.stringify(postData))) || postData
+    postData = props.tableConfig?.toolbar?.formConfig?.beforeRequest(lodash.cloneDeep(postData)) || postData
   }
   try {
     let dataPage = ((await props.tableConfig.fetch(postData)) || {}) as any
@@ -746,7 +746,7 @@ async function handelTopQuery() {
   // topQueryData.value = cloneDeep(tableHeaderRef.value.getData())
   let tempQueryData = await getListQueryData()
   if (props.tableConfig?.toolbar?.formConfig?.beforeRequest) {
-    tempQueryData = props.tableConfig?.toolbar?.formConfig?.beforeRequest(JSON.parse(JSON.stringify(tempQueryData))) || tempQueryData
+    tempQueryData = props.tableConfig?.toolbar?.formConfig?.beforeRequest(lodash.cloneDeep(tempQueryData)) || tempQueryData
   }
   if (tempQueryData) emits('queryChange', tempQueryData)
   reload()

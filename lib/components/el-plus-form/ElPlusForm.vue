@@ -1,5 +1,5 @@
 <template>
-  <div :style="formLayout">
+  <div :style="formLayout" class="crud-form-panel">
     <slot name="top" :formData="props.modelValue"></slot>
     <div :style="{ display: 'flex', justifyContent: isDialog ? 'center' : '' }">
       <el-form class="el-plus-form-panel" ref="refElPlusForm" :model="props.modelValue" @submit.prevent="handleSubmitForm" v-bind="computedFormAttrs">
@@ -8,10 +8,9 @@
             <div v-if="formItem._vif" class="el-plus-form-column-panel" :style="{ 'justify-content': isTable ? 'flex-end' : 'flex-start' }">
               <el-form-item style="min-height: 40px; display: flex" :prop="formItem.field" :style="{ width: formItem._attrs?.width || formItem.width || (isTable ? '150px' : '100%'), marginBottom: itemMB }">
                 <template #label>
-                  <div v-if="showLabel && formItem.showLabel !== false" class="crud-form-label" :style="{ width: formItem.labelWidth || computedFormAttrs._labelWidth || (isDialog ? '100px' : '120px') }">
-                    <span :class="{ required: formItem.required }">
-                      {{ formItem._label }}
-                    </span>
+                  <div v-if="showLabel && formItem.showLabel !== false" class="crud-form-label" :style="{ width: formItem.labelWidth || computedFormAttrs._labelWidth || (isDialog ? '100px' : '120px'), justifyContent: computedFormAttrs.labelPosition === 'right' ? 'flex-end' : 'flex-start' }">
+                    <span class="required-dot">{{ formItem.required ? '*' : ' ' }}</span>
+                    <span>{{ formItem._label }}</span>
                   </div>
                 </template>
                 <component style="min-width: 80px; width: 100%; flex: 1" :is="formItem._type" :formData="props.modelValue" :disabled="formItem._disabled ?? disabled ?? false" v-bind="formItem._attrs" :desc="formItem" :ref="setComponentRef" :field="formItem.field" v-model="props.modelValue[formItem.field || '']" :isTable="isTable" @validateThis="() => handelValidateThis(formItem.field || '')"></component>
@@ -209,7 +208,7 @@ const computedFormAttrs = computed(() => {
     // validateOnRuleChange: false,
     disabled: props.disabled || innerIsLoading.value,
     rules: computedRules,
-    labelPosition: isMobile() ? 'top' : 'right',
+    labelPosition: isMobile() ? 'top' : props.formAttrs?.labelPosition || 'right',
     style: {
       width: props.maxWidth || (props.isTable ? '100%' : props.isDialog ? '80%' : '1000px'),
       paddingRight: props.isTable ? '0' : '20px'
@@ -861,57 +860,68 @@ onMounted(async () => {
 defineExpose({ fid: props.fid, formRef: refElPlusForm, submit: handleSubmitForm, getData: getFormData, validate: validateForm, reset, clearValid, clear, changeValidImg, refresh, init })
 </script>
 <style lang="scss">
-.el-plus-form-panel {
-  .el-plus-form--inline .el-plus-form-btns {
-    width: auto;
-  }
+.crud-form-panel {
+  .el-plus-form-panel {
+    .el-plus-form--inline .el-plus-form-btns {
+      width: auto;
+    }
 
-  .el-form--inline .el-form-item {
-    margin-right: 12px !important;
-  }
+    .el-form--inline .el-form-item {
+      margin-right: 12px !important;
+    }
 
-  .el-plus-form-col--break {
-    clear: both;
-  }
+    .el-plus-form-col--break {
+      clear: both;
+    }
 
-  .el-plus-form-tip {
-    color: #909399;
-    line-height: 1.5em;
-    margin-top: 3px;
-    margin-left: 12px;
-  }
+    .el-plus-form-tip {
+      color: #909399;
+      line-height: 1.5em;
+      margin-top: 3px;
+      margin-left: 12px;
+    }
 
-  .el-plus-form-tip code {
-    padding: 2px 4px;
-    font-size: 90%;
-    color: #c7254e;
-    background-color: #f9f2f4;
-    border-radius: 4px;
-  }
-  .el-plus-form-column-panel {
-    & > .el-form-item {
-      // & > .el-form-item__label-wrap {
-      & > .el-form-item__label {
-        line-height: 40px;
-        margin-bottom: 0;
-        width: auto !important;
-        &::before {
-          content: '' !important;
-        }
-        .crud-form-label {
-          text-align: right;
-          .required {
-            &::before {
-              content: '*';
+    .el-plus-form-tip code {
+      padding: 2px 4px;
+      font-size: 90%;
+      color: #c7254e;
+      background-color: #f9f2f4;
+      border-radius: 4px;
+    }
+    .el-plus-form-column-panel {
+      & > .el-form-item {
+        // & > .el-form-item__label-wrap {
+        & > .el-form-item__label {
+          line-height: 40px;
+          margin-bottom: 0;
+          width: auto !important;
+          position: relative;
+          display: flex;
+          &::before {
+            content: '' !important;
+          }
+          .crud-form-label {
+            // text-align: left;
+            display: flex;
+            box-sizing: border-box;
+            .required-dot {
+              display: inline-block;
+              width: 10px;
               color: var(--el-color-danger);
-              margin-right: 4px;
             }
           }
         }
+        // }
       }
-      // }
+    }
+  }
+  .el-form--label-top {
+    .el-form-item {
+      flex-direction: column;
+      .crud-form-label {
+        width: 100% !important;
+      }
     }
   }
 }
 </style>
-./util/aaaaa

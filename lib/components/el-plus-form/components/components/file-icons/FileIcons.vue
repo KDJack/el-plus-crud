@@ -133,4 +133,3 @@ function handelPreview(file: IOssInfo) {
   }
 }
 </style>
-../../../util/aaaaa

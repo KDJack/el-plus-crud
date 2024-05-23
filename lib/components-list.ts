@@ -12,6 +12,7 @@ import ElPlusFormDaterange from './components/el-plus-form/components/ElPlusForm
 import ElPlusFormDatetime from './components/el-plus-form/components/ElPlusFormDatetime.vue'
 import ElPlusFormDatetimerange from './components/el-plus-form/components/ElPlusFormDatetimerange.vue'
 import ElPlusFormFile from './components/el-plus-form/components/ElPlusFormFile.vue'
+import ElPlusFormFormula from './components/el-plus-form/components/ElPlusFormFormula.vue'
 import ElPlusFormImage from './components/el-plus-form/components/ElPlusFormImage.vue'
 import ElPlusFormInput from './components/el-plus-form/components/ElPlusFormInput.vue'
 import ElPlusFormLink from './components/el-plus-form/components/ElPlusFormLink.vue'
@@ -53,6 +54,7 @@ export default [
    ElPlusFormDatetime,
    ElPlusFormDatetimerange,
    ElPlusFormFile,
+   ElPlusFormFormula,
    ElPlusFormImage,
    ElPlusFormInput,
    ElPlusFormLink,

@@ -1,15 +1,18 @@
 <template>
   <div class="el-plus-form-formula">
     <div class="formula-text-panel">
-      <el-button style="width: 100%" @click="isShowDialog = true">请点击进行编辑</el-button>
+      <el-button class="formula-btn" @click="handelOpenPanel" type="warning" plain text>{{ modelValue?.value || '点击进行编辑' }}</el-button>
     </div>
 
     <!-- 弹框 -->
     <el-dialog class="el-plus-form-formula-dialog" :width="desc.dialogWidth || '800px'" :title="desc.title || desc.placeholder || '请编辑' + desc.label" draggable :closeOnClickModal="false" showCancel v-model="isShowDialog" append-to-body destroy-on-close>
+      <div class="show-panel">
+        <h2>{{ currentValue }}</h2>
+      </div>
       <div class="title-tip">{{ desc.tip || '请在下面输入框中输入您的公式，输入@符号，可以调出引用项' }}</div>
-      <div ref="formulaRef" class="formula-input" :contenteditable="disabled ? 'false' : 'plaintext-only'" v-bind="attrs" style="ime-mode: disabled" @keydown.stop="onKeydown" @keyup="onKeyup" @blur="setValue"></div>
+      <div ref="formulaRef" class="formula-input" :contenteditable="disabled ? 'false' : 'plaintext-only'" v-bind="attrs" style="ime-mode: disabled" @keydown.stop="onKeydown" @keyup.stop="onKeyup"></div>
       <!-- 联想提示词 -->
-      <div class="formula-input-selection" v-show="showSelection" ref="selection" @click.stop>
+      <div class="formula-input-selection" v-if="showSelection" ref="selection" @click.stop>
         <el-input v-model="filter" ref="inputRef" placeholder="输入关键字筛选"></el-input>
         <div class="options" v-if="displayOptions.length">
           <span class="option" v-for="(item, i) in displayOptions" :key="i" @click="handelOptionClick(item)">
@@ -20,8 +23,8 @@
       </div>
       <template #footer>
         <div>
-          <el-button type="primary">确定</el-button>
-          <el-button>取消</el-button>
+          <el-button type="primary" @click="handelConfirm">确定</el-button>
+          <el-button @click="isShowDialog = false">取消</el-button>
         </div>
       </template>
     </el-dialog>
@@ -36,16 +39,14 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { ref, watch, useAttrs, onBeforeMount, inject, computed, reactive } from 'vue'
-import { getAttrs, getEvents } from '../mixins'
+import { ref, watch, useAttrs, onBeforeMount, inject, computed, reactive, onUnmounted, nextTick } from 'vue'
+import { getAttrs } from '../mixins'
 import { isEqual, isPromiseLike } from '../../../util'
-import { ICRUDConfig } from '../../../../types'
 
-const defaultConf = inject('defaultConf') as ICRUDConfig
 const globalData = inject('globalData') as any
 
 const props = defineProps<{
-  modelValue?: string | null
+  modelValue?: { value: string; domStr: string } | null
   field?: string
   desc: { [key: string]: any }
   formData?: { [key: string]: any }
@@ -57,44 +58,55 @@ const options = reactive([] as any[])
 const attrs = ref({} as any)
 const isInit = ref(false)
 const isShowDialog = ref(false)
-const onEvents = ref(getEvents(props))
 const showSelection = ref(false)
 const filter = ref('')
 const formulaRef = ref()
 const inputRef = ref()
+const currentValue = ref('--')
 
-const currentValue = ref()
-emits('update:modelValue', currentValue)
+const displayOptions = computed(() => options.filter(({ label }) => label.includes(filter.value)))
 
-const displayOptions = computed(() => {
-  return options.filter(({ label }) => label.includes(filter.value))
-})
+/**
+ * 打开面板
+ */
+function handelOpenPanel() {
+  isShowDialog.value = true
+  nextTick(() => {
+    currentValue.value = props.modelValue?.value || '--'
+    if (formulaRef.value) {
+      formulaRef.value.innerHTML = props.modelValue?.domStr || ''
+    }
+  })
+}
 
 /**
  * 处理选项点击
  * @param item
  */
 function handelOptionClick(item: any) {
-  const { label, value } = item
   showSelection.value = false
-  const res = `<div contenteditable="false">${label}<span>${value}</span></div>`
-  resetDisplay('@', res)
+  const res = `<div contenteditable="false">${item.label}<span>${item.value}</span></div>`
+  refreshHtml('@', res)
+  refreshValue()
 }
 
 /**
- * 重新渲染
+ * 重新渲染Html
  * @param from
  * @param to
  */
-function resetDisplay(from: any, to = '') {
-  let text = formulaRef.value.innerHTML
-  if (text.includes(from)) {
+function refreshHtml(from: any, to = '') {
+  let text = formulaRef.value?.innerHTML || ''
+  if (text && text.includes(from)) {
     text = text.replace(new RegExp(from, 'g'), to)
-    formulaRef.value.innerHTML = text
+    formulaRef.value.innerHTML = text + '&nbsp;'
   }
-  // this.setValue()
 }
 
+/**
+ * 监听按键按下
+ * @param e
+ */
 function onKeydown(e: any) {
   const { key } = e
   switch (key) {
@@ -107,159 +119,99 @@ function onKeydown(e: any) {
       openSelection()
       break
     default:
+      break
   }
 }
 
+/**
+ * 监听键盘抬起
+ */
 function onKeyup() {
-  const target = formulaRef.value
-  const originStr = target.innerHTML
+  const originStr = formulaRef.value?.innerHTML || ''
   let list = str2dom(originStr)
   list = list.map((v: any) =>
     isHTML(v)
       ? dom2str(v)
       : v.data
           .split('')
-          .filter((i: any) => '0123456789+-*/@.()'.includes(i))
+          .filter((i: any) => '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ+-*/=@.,><():""'.includes(i))
           .join('')
   )
   const filteredStr = list.join('')
-  if (originStr !== filteredStr) {
-    const index = getDiffIndex(originStr, filteredStr)
-    formulaRef.value.innerHTML = filteredStr
-    setFocus(formulaRef.value, index)
-  }
+  if (originStr !== filteredStr) formulaRef.value.innerHTML = filteredStr
+  refreshValue()
 }
 
+/**
+ * 是否是Html标签
+ * @param v
+ */
 function isHTML(v: any) {
   return Object.prototype.toString.call(v) === '[object HTMLDivElement]'
 }
 
-function setFocus(el: HTMLElement, index: number) {
-  const range = document.createRange()
-  const sel = window.getSelection() as any
-  let nodeIndex = 0
-  let offsetIndex = 0
-
-  const list = str2dom(el.innerHTML)
-  for (let i = 0; i < list.length; i++) {
-    const v = list[i] as any
-    if (isHTML(v)) {
-      index -= dom2str(v).length
-    } else {
-      if (index > v.length) {
-        index -= v.length
-      } else {
-        offsetIndex = index
-        break
-      }
-    }
-    nodeIndex++
-  }
-
-  range.selectNodeContents(el)
-  range.collapse(false)
-  el.childNodes[nodeIndex] && range.setStart(el.childNodes[nodeIndex], offsetIndex)
-  range.collapse(true)
-  sel.removeAllRanges()
-  sel.addRange(range)
-}
-
+/**
+ * 字符串转Dom
+ * @param v
+ */
 function str2dom(v: any) {
   const objE = document.createElement('div')
   objE.innerHTML = v
   return [...objE.childNodes]
 }
 
+/**
+ * Dom转字符串
+ * @param node
+ */
 function dom2str(node: any) {
-  let tmpNode = document.createElement('div') as any
-  tmpNode.appendChild(node)
-  let str = tmpNode.innerHTML
+  let tmpNode = document.createElement('div') as HTMLDivElement | null
+  tmpNode?.appendChild(node)
+  let str = tmpNode?.innerHTML
   tmpNode = node = null
   return str
 }
 
-function getDiffIndex(s1: any, s2: any) {
-  const l1 = s1.split('')
-  const l2 = s2.split('')
-  const max = Math.max(l1.length, l2.length)
-  let index = 0
-  for (let i = 0; i < max; i++) {
-    if (l1[i] == l2[i]) {
-      index++
-    } else {
-      break
-    }
-  }
-  return index
-}
-
-function getHTMLList({ text, prefix, suffix }: any) {
-  return text
-    .replace(new RegExp(prefix, 'g'), ',')
-    .replace(new RegExp(suffix, 'g'), ',')
-    .split(',')
-    .filter((v: any) => !!v)
-}
-
+/**
+ * 添加监听
+ */
 function addEventListener() {
   // 添加全局click监听
   window.addEventListener('click', removeSelection)
-  // 监听滚定事件 定位下拉框
-  if (attrs.value.scrollWrapperClassName) {
-    const el = getParentNode(formulaRef.value, attrs.value.scrollWrapperClassName)
-    el && el.addEventListener('scroll', attrs.value.throttleSetSelectionStyle)
-  }
-}
-
-function removeEventListener() {
-  // 解绑全局click监听关闭选项弹框
-  window.removeEventListener('click', removeSelection)
-  // 解绑全局滚动监听
-  if (attrs.value.scrollWrapperClassName) {
-    const el = getParentNode(formulaRef.value, attrs.value.scrollWrapperClassName)
-    el && el.addEventListener('scroll', attrs.value.throttleSetSelectionStyle)
-  }
-}
-
-// 更新 v-model
-function setValue() {
-  console.log('formulaRef.value: ', formulaRef.value.innerHTML)
-
-  const vars = {}
-  let tempVal = ''
-  const text = formulaRef.value.innerHTML.replace(/\sdata-spm-anchor-id=".*?"/g, '')
-  const list = getHTMLList({
-    text,
-    prefix: '<div contenteditable="false">',
-    suffix: '</div>'
-  })
-  list.forEach((item: any) => {
-    const [v1, v2] = getHTMLList({
-      text: item,
-      prefix: '<span>',
-      suffix: '</span>'
-    })
-    if (v2) {
-      tempVal += v2
-      vars[v2] = v1
-    } else {
-      tempVal += v1
-    }
-  })
-  emits('update:modelValue', tempVal)
 }
 
 /**
- * 获取父类节点
- * @param el
- * @param className
+ * 移出监听
  */
-function getParentNode(el: any, className: string) {
-  if (!el) return null
-  do {
-    el = el.parentNode
-  } while (el && !el.className.includes(className))
-  return el
+function removeEventListener() {
+  // 解绑全局click监听关闭选项弹框
+  window.removeEventListener('click', removeSelection)
+}
+
+/**
+ * 确定
+ */
+function handelConfirm() {
+  emits('update:modelValue', { value: currentValue.value, domStr: formulaRef.value?.innerHTML || '' })
+  isShowDialog.value = false
+}
+
+/**
+ * 刷新值
+ * @param str
+ */
+function refreshValue() {
+  let str = formulaRef.value.innerHTML
+  const yzList =
+    str.match(/<span[^>]*>([\s\S]*?)<\/span>/g)?.map((item: any) => {
+      const tempItem = item.match(/<span[^>]*>([\s\S]*?)<\/span>/) || []
+      return tempItem[1]
+    }) || []
+  const divList = str.match(/<div[^>]*>([\s\S]*?)<\/div>/g) || []
+  divList.map((item: any, i: number) => {
+    str = str.replace(item, '${' + yzList[i] + '}')
+  })
+  currentValue.value = str.replaceAll('&nbsp;', '')
 }
 
 /**
@@ -268,7 +220,7 @@ function getParentNode(el: any, className: string) {
  */
 function removeSelection(e: any) {
   showSelection.value = false
-  e && resetDisplay('@')
+  e && refreshHtml('@')
 }
 
 /**
@@ -278,9 +230,6 @@ function openSelection() {
   filter.value = ''
   showSelection.value = true
   setTimeout(() => {
-    // append to body
-    // document.body.appendChild(this.$refs.selection)
-    // setSelectionStyle()
     // 绑定监听
     addEventListener()
     // 焦点到下拉框filter input中
@@ -289,7 +238,8 @@ function openSelection() {
 }
 
 onBeforeMount(async () => {
-  attrs.value = await getAttrs(props, { autocomplete: 'new-password', maxlength: defaultConf.form?.leng?.input || 0, clearable: true, ...useAttrs() })
+  removeEventListener()
+  attrs.value = await getAttrs(props, { clearable: true, ...useAttrs() })
   isInit.value = true
 })
 
@@ -318,19 +268,28 @@ watch(
 )
 
 watch(
-  () => currentValue.value,
-  (val: any) => {
-    if (attrs.value.allowCreate) {
-      if (val && Array.isArray(val) && (val as Array<any>).some((item) => typeof item === 'string' && item.length > (defaultConf.form?.leng?.input || 20))) {
-        currentValue.value = (val as Array<string>).filter((item) => typeof item !== 'string' || item.length <= (defaultConf.form?.leng?.input || 20))
-      }
+  () => props.modelValue,
+  (data) => {
+    currentValue.value = data?.value || '--'
+    if (formulaRef.value) {
+      formulaRef.value.innerHTML = data?.domStr || ''
     }
   },
   { immediate: true }
 )
+
+onUnmounted(() => {
+  removeEventListener()
+})
 </script>
 <style lang="scss">
 .el-plus-form-formula-dialog {
+  .show-panel {
+    text-align: center;
+    margin-bottom: 20px;
+    color: var(--el-color-danger);
+    min-height: 25px;
+  }
   .title-tip {
     margin-bottom: 20px;
   }
@@ -338,11 +297,18 @@ watch(
     border-radius: 4px;
     border: 1px solid #dcdfe6;
     padding: 10px 15px;
+    min-height: 50px;
+    box-sizing: border-box;
     white-space: nowrap;
     outline: none;
     transition: border 0.3s;
     overflow: scroll;
     -ms-overflow-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    line-height: 30px;
+    font-size: 16px;
+    font-weight: bold;
 
     &::-webkit-scrollbar {
       display: none;
@@ -356,7 +322,7 @@ watch(
     }
 
     &.error {
-      border: 1px solid #f24f18;
+      border: 1px solid var(--el-color-warning);
     }
 
     &:empty::before {
@@ -374,11 +340,11 @@ watch(
     }
 
     &:focus {
-      border: 1px solid #f24f18;
+      border: 1px solid var(--el-color-warning);
     }
 
     div {
-      color: #f24f18;
+      color: var(--el-color-warning);
       padding: 0 3px;
 
       span {
@@ -426,7 +392,6 @@ watch(
         display: inline-block;
       }
     }
-
     .empty {
       text-align: center;
       padding: 20px 0;
@@ -434,20 +399,26 @@ watch(
   }
 }
 </style>
-<style lang="scss" scoped>
+<style lang="scss">
 .el-plus-form-formula {
   width: 100%;
 
   .formula-text-panel {
     display: flex;
-  }
-
-  .input {
-  }
-
-  > .hint {
-    color: #f24f18;
-    font-size: 12px;
+    .formula-btn {
+      width: 100%;
+      padding: 0 !important;
+      span {
+        flex: 1;
+        width: 100%;
+        text-align: left;
+        display: block;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        word-break: break-all;
+        white-space: nowrap;
+      }
+    }
   }
 }
 </style>

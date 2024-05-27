@@ -890,7 +890,6 @@ defineExpose({ fid: props.fid, formRef: refElPlusForm, submit: handleSubmitForm,
     }
     .el-plus-form-column-panel {
       & > .el-form-item {
-        // & > .el-form-item__label-wrap {
         & > .el-form-item__label {
           line-height: 40px;
           margin-bottom: 0;

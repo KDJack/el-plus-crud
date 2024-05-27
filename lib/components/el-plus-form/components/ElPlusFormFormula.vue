@@ -194,6 +194,9 @@ function removeEventListener() {
 function handelConfirm() {
   emits('update:modelValue', { value: currentValue.value, domStr: formulaRef.value?.innerHTML || '' })
   isShowDialog.value = false
+  nextTick(() => {
+    emits('validateThis')
+  })
 }
 
 /**

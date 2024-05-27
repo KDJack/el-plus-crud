@@ -64,5 +64,6 @@ watch(
 <style lang="scss" scoped>
 .ElPlusFormRadio-panel {
   display: flex;
+  flex-wrap: wrap;
 }
 </style>

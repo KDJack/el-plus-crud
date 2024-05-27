@@ -76,5 +76,6 @@ watch(
 <style lang="scss" scoped>
 .ElPlusFormCheckbox-panel {
   display: flex;
+  flex-wrap: wrap;
 }
 </style>

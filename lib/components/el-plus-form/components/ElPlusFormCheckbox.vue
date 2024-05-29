@@ -1,9 +1,12 @@
 <template>
-  <el-checkbox-group v-if="isInit" class="ElPlusFormCheckbox-panel" v-bind="attrs" :disabled="disabled" v-on="onEvents" v-model="currentValue">
-    <el-checkbox v-for="option of options" :key="option.value" :label="option.value" v-bind="option.attrs">
-      {{ option.text || option.label }}
-    </el-checkbox>
-  </el-checkbox-group>
+  <template v-if="isInit">
+    <el-checkbox-group v-if="options?.length" class="ElPlusFormCheckbox-panel" v-bind="attrs" :disabled="disabled" v-on="onEvents" v-model="currentValue">
+      <el-checkbox v-for="option of options" :key="option.value" :label="option.value" v-bind="option.attrs">
+        {{ option.text || option.label }}
+      </el-checkbox>
+    </el-checkbox-group>
+    <div v-else class="null-tip">暂无选项</div>
+  </template>
 </template>
 <script lang="ts">
 export default {
@@ -77,5 +80,8 @@ watch(
 .ElPlusFormCheckbox-panel {
   display: flex;
   flex-wrap: wrap;
+}
+.null-tip {
+  color: #999;
 }
 </style>

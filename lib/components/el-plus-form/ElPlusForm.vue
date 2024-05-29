@@ -643,9 +643,9 @@ const handleSubmitForm = async () => {
           postData[field] = formItem.valueFormat(postData[field], postData)
         }
         // 处理带有true或者false值
-        if (postData[field] === true || postData[field] === false) {
-          postData[field] = +postData[field]
-        }
+        // if (postData[field] === true || postData[field] === false) {
+        //   postData[field] = +postData[field]
+        // }
       }
     }
 

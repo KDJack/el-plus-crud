@@ -14,7 +14,7 @@
       <!-- 联想提示词 -->
       <div class="formula-input-selection" v-if="showSelection" ref="selection" @click.stop>
         <el-input v-model="filter" ref="inputRef" placeholder="输入关键字筛选"></el-input>
-        <div class="options" v-if="displayOptions.length">
+        <div class="options" v-if="displayOptions?.length">
           <span class="option" v-for="(item, i) in displayOptions" :key="i" @click="handelOptionClick(item)">
             {{ item.label }}
           </span>
@@ -62,9 +62,15 @@ const showSelection = ref(false)
 const filter = ref('')
 const formulaRef = ref()
 const inputRef = ref()
-const currentValue = ref('--')
+const currentValue = ref('=')
+const oldStr = ref('')
 
-const displayOptions = computed(() => options.filter(({ label }) => label.includes(filter.value)))
+const displayOptions = computed(() => {
+  if (filter.value) {
+    return options.filter(({ label }) => label.includes(filter.value))
+  }
+  return options
+})
 
 /**
  * 打开面板
@@ -72,9 +78,10 @@ const displayOptions = computed(() => options.filter(({ label }) => label.includ
 function handelOpenPanel() {
   isShowDialog.value = true
   nextTick(() => {
-    currentValue.value = props.modelValue?.value || '--'
+    currentValue.value = props.modelValue?.value || '='
     if (formulaRef.value) {
-      formulaRef.value.innerHTML = props.modelValue?.domStr || ''
+      formulaRef.value.innerHTML = props.modelValue?.domStr || '='
+      oldStr.value = formulaRef.value?.innerHTML
     }
   })
 }
@@ -85,7 +92,7 @@ function handelOpenPanel() {
  */
 function handelOptionClick(item: any) {
   showSelection.value = false
-  const res = `<div contenteditable="false">${item.label}<span>${item.value}</span></div>`
+  const res = `<div contenteditable="true">${item.label}<span>${item.value}</span></div>`
   refreshHtml('@', res)
   refreshValue()
 }
@@ -115,7 +122,7 @@ function onKeydown(e: any) {
       e.preventDefault()
       break
     case '@':
-    case 'Process': // 中文输入法的 @
+      // case 'Process': // 中文输入法的 @
       openSelection()
       break
     default:
@@ -126,50 +133,56 @@ function onKeydown(e: any) {
 /**
  * 监听键盘抬起
  */
-function onKeyup() {
-  const originStr = formulaRef.value?.innerHTML || ''
-  let list = str2dom(originStr)
-  list = list.map((v: any) =>
-    isHTML(v)
-      ? dom2str(v)
-      : v.data
-          .split('')
-          .filter((i: any) => '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ+-*/=@.,><():""'.includes(i))
-          .join('')
-  )
-  const filteredStr = list.join('')
-  if (originStr !== filteredStr) formulaRef.value.innerHTML = filteredStr
+function onKeyup(e: any) {
+  // 先找一下光标位置
+  const oldList = oldStr.value.split(/<div\b[^>]*>(.*?)<\/div>/g) || []
+  let nowList = formulaRef.value?.innerHTML?.split(/<div\b[^>]*>(.*?)<\/div>/g) || []
+  let diffIndex = -1
+  // 这里只判断项数一样的情况
+  if (oldList.length === nowList.length) {
+    for (let i = 0; i < oldList.length; i++) {
+      // 第i项不一样-判断并处理一下
+      if (oldList[i] !== nowList[i]) {
+        diffIndex = i
+        break
+      }
+    }
+  }
+  // 如果第i项是标签
+  if (diffIndex >= 0 && oldList[diffIndex].indexOf('</span>') > 0) {
+    // 这里单独处理下退格键
+    if (e.key === 'Backspace') {
+      nowList.splice(diffIndex, 1)
+    } else {
+      nowList[diffIndex] = oldList[diffIndex]
+    }
+    // 这里恢复一下list的div标签
+    nowList = nowList.map((str: string) => {
+      if (str.indexOf('</span>') > 0) return `<div contenteditable="true">${str}</div>`
+      return str
+    })
+    formulaRef.value.innerHTML = nowList.join('')
+    if (e.key === 'Backspace') {
+      setFocus(formulaRef.value, diffIndex - 1)
+    }
+  }
   refreshValue()
 }
 
 /**
- * 是否是Html标签
- * @param v
+ * 设置光标高亮
+ * @param el
+ * @param index
  */
-function isHTML(v: any) {
-  return Object.prototype.toString.call(v) === '[object HTMLDivElement]'
-}
-
-/**
- * 字符串转Dom
- * @param v
- */
-function str2dom(v: any) {
-  const objE = document.createElement('div')
-  objE.innerHTML = v
-  return [...objE.childNodes]
-}
-
-/**
- * Dom转字符串
- * @param node
- */
-function dom2str(node: any) {
-  let tmpNode = document.createElement('div') as HTMLDivElement | null
-  tmpNode?.appendChild(node)
-  let str = tmpNode?.innerHTML
-  tmpNode = node = null
-  return str
+function setFocus(el: any, index: number) {
+  const range = document.createRange()
+  const sel = window.getSelection()
+  range.selectNodeContents(el)
+  range.collapse(false)
+  el.childNodes[index] && range.setStart(el.childNodes[index], 0)
+  range.collapse(true)
+  sel?.removeAllRanges()
+  sel?.addRange(range)
 }
 
 /**
@@ -204,6 +217,7 @@ function handelConfirm() {
  * @param str
  */
 function refreshValue() {
+  oldStr.value = formulaRef.value.innerHTML
   let str = formulaRef.value.innerHTML
   const yzList =
     str.match(/<span[^>]*>([\s\S]*?)<\/span>/g)?.map((item: any) => {
@@ -273,9 +287,9 @@ watch(
 watch(
   () => props.modelValue,
   (data) => {
-    currentValue.value = data?.value || '--'
+    currentValue.value = data?.value || '='
     if (formulaRef.value) {
-      formulaRef.value.innerHTML = data?.domStr || ''
+      formulaRef.value.innerHTML = data?.domStr || '='
     }
   },
   { immediate: true }

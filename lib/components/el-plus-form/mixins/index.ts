@@ -45,6 +45,10 @@ export const getAttrs = async (props: IMixinsProps, customAttrs?: { [key: string
       attrs.type = props.desc.elType
     }
   }
+
+  if (['input', 'switch', 'number'].indexOf(props.desc.type) >= 0) {
+    delete attrs.label
+  }
   return attrs
 }
 

@@ -46,7 +46,7 @@ export const getAttrs = async (props: IMixinsProps, customAttrs?: { [key: string
     }
   }
 
-  if (['input', 'switch', 'number'].indexOf(props.desc.type) >= 0) {
+  if (['input', 'switch', 'number', 'nbinput'].indexOf(props.desc.type) >= 0) {
     delete attrs.label
   }
   return attrs

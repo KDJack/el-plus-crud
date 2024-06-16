@@ -214,7 +214,7 @@ async function getToken(token: string | Object | Function | undefined, param?: a
 async function handelUploadSuccess(response: any, file: any) {
   if (response && Object.keys(response).length > 0) {
     // 从结果集中获取一下furl
-    const tempUrl = getValue(defaultConf.upload?.actionMap?.objectUrlKey || [], response.request)
+    const tempUrl = getValue(defaultConf.upload?.actionMap?.objectUrlKey || [], response.request || response)
     if (tempUrl) file.raw.furl = tempUrl
   }
   // 获取文件上传的token以及上传路径

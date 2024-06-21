@@ -1,5 +1,5 @@
 <template>
-  <el-input style="display: flex" v-bind="attrs" v-on="onEvents" v-model.number="currentText" @focus="handelFocus" @blur="handelBlur" onkeypress="return( /[\d]/.test(String.fromCharCode(event.keyCode)))">
+  <el-input style="display: flex" v-bind="attrs" v-on="onEvents" v-model="currentText" @focus="handelFocus" @blur="handelBlur" onkeypress="return event.target.value === '' || event.target.value === undefined || event.target.value?.indexOf('.') >= 0 ? /[-\d]/.test(String.fromCharCode(event.keyCode)): /[-\d\.]/.test(String.fromCharCode(event.keyCode))">
     <template v-for="(item, key, index) of slots" #[key] :key="index">
       <slot :name="key" />
     </template>
@@ -128,18 +128,18 @@ function handelValChange(val: any, oldVal: any) {
       ElMessage.warning(`${props.desc?.label || ''}最少不能低于${numBindAttr.value.min}`)
       nextTick(() => {
         currentText.value = numBindAttr.value.min
-        currentValue.value = +(currentText.value / 100).toFixed(2)
+        currentValue.value = +(currentText.value / 100).toFixed(4)
         change && change()
       })
     } else if (val > numBindAttr.value.max) {
       ElMessage.warning(`${props.desc?.label || ''}最多不能大于${numBindAttr.value.max}`)
       nextTick(() => {
         currentText.value = numBindAttr.value.max
-        currentValue.value = +(currentText.value / 100).toFixed(2)
+        currentValue.value = +(currentText.value / 100).toFixed(4)
         change && change()
       })
     } else {
-      currentValue.value = +(val / 100).toFixed(2)
+      currentValue.value = +(val / 100).toFixed(4)
       change && change()
     }
   }

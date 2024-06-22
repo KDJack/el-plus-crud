@@ -1,5 +1,5 @@
 <template>
-  <el-input style="display: flex" v-bind="attrs" v-on="onEvents" v-model.number="currentText" @focus="handelFocus" @blur="handelBlur" onkeypress="return( /[\d]/.test(String.fromCharCode(event.keyCode)))">
+  <el-input style="display: flex" v-bind="attrs" v-on="onEvents" v-model="currentText" @focus="handelFocus" @blur="handelBlur" onkeypress="return event.target.value === '' || event.target.value === undefined || event.target.value?.indexOf('.') >= 0 ? /[-\d]/.test(String.fromCharCode(event.keyCode)): /[-\d\.]/.test(String.fromCharCode(event.keyCode))">
     <template v-for="(item, key, index) of slots" #[key] :key="index">
       <slot :name="key" />
     </template>
@@ -15,7 +15,7 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { ref, watch, useAttrs, useSlots, onBeforeMount, nextTick, computed } from 'vue'
+import { ref, useAttrs, useSlots, onBeforeMount, nextTick, computed } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
 import { ElMessage } from 'element-plus'
 
@@ -81,14 +81,17 @@ function handelBlur() {
 const numBindAttr = computed(() => {
   let min = 0
   let max = 100
+  let precision = 4
+
   let tempAttrs = props.desc?.attrs || props.desc
   if (props.desc?.attrs && typeof props.desc.attrs === 'function') {
     tempAttrs = props.desc.attrs(props.formData || {})
   }
 
-  const { min: min_, max: max_ } = (tempAttrs || {}) as any
+  const { min: min_, max: max_, precision: precision_ } = (tempAttrs || {}) as any
   if (min_ !== undefined && min_ !== null && min_ !== '') min = min_
   if (max_ !== undefined && max_ !== null && max_ !== '') max = max_
+  if (precision_ !== undefined && precision_ !== null && precision_ !== '' && precision_ >= 2) precision = precision_
 
   // 这里判断一下，最小和最大值的大小
   if (min > max) {
@@ -96,7 +99,7 @@ const numBindAttr = computed(() => {
   } else if (max < min) {
     max = min
   }
-  return { min, max }
+  return { min, max, precision }
 })
 
 // 判断一下初始值
@@ -128,18 +131,21 @@ function handelValChange(val: any, oldVal: any) {
       ElMessage.warning(`${props.desc?.label || ''}最少不能低于${numBindAttr.value.min}`)
       nextTick(() => {
         currentText.value = numBindAttr.value.min
-        currentValue.value = +(currentText.value / 100).toFixed(2)
+        currentValue.value = +(currentText.value / 100).toFixed(numBindAttr.value.precision)
         change && change()
       })
     } else if (val > numBindAttr.value.max) {
       ElMessage.warning(`${props.desc?.label || ''}最多不能大于${numBindAttr.value.max}`)
       nextTick(() => {
         currentText.value = numBindAttr.value.max
-        currentValue.value = +(currentText.value / 100).toFixed(2)
+        currentValue.value = +(currentText.value / 100).toFixed(numBindAttr.value.precision)
         change && change()
       })
     } else {
-      currentValue.value = +(val / 100).toFixed(2)
+      if (val.indexOf('.') > 0 && val.length - val.indexOf('.') > numBindAttr.value.precision - 2) {
+        currentText.value = (+val).toFixed(numBindAttr.value.precision - 2)
+      }
+      currentValue.value = +(val / 100).toFixed(numBindAttr.value.precision)
       change && change()
     }
   }

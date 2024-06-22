@@ -161,6 +161,13 @@ async function clearValid() {
 }
 
 /**
+ * 清空表单
+ */
+async function clear() {
+  return await Promise.all(formRefs.value.map((tempRef) => tempRef.clear()))
+}
+
+/**
  * 获取数据
  */
 function getData() {
@@ -171,7 +178,7 @@ function getData() {
   return tempData
 }
 
-defineExpose({ validate, getData, clearValid })
+defineExpose({ validate, getData, clearValid, clear })
 </script>
 <style lang="scss">
 .el-plus-form-group {

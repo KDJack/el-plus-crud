@@ -1,5 +1,5 @@
 <template>
-  <el-input style="display: flex" v-bind="attrs" v-on="onEvents" v-model="currentText" @focus="handelFocus" @blur="handelBlur" onkeypress="return event.target.value === '' || event.target.value === undefined || event.target.value?.indexOf('.') >= 0 ? /[-\d]/.test(String.fromCharCode(event.keyCode)): /[-\d\.]/.test(String.fromCharCode(event.keyCode))">
+  <el-input style="display: flex" v-bind="attrs" :disabled="disabled" v-on="onEvents" v-model="currentText" @focus="handelFocus" @blur="handelBlur" onkeypress="return event.target.value === '' || event.target.value === undefined || event.target.value?.indexOf('.') >= 0 ? /[-\d]/.test(String.fromCharCode(event.keyCode)): /[-\d\.]/.test(String.fromCharCode(event.keyCode))">
     <template v-for="(item, key, index) of slots" #[key] :key="index">
       <slot :name="key" />
     </template>
@@ -15,7 +15,7 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { ref, useAttrs, useSlots, onBeforeMount, nextTick, computed } from 'vue'
+import { ref, useAttrs, useSlots, onBeforeMount, nextTick, computed, watch } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
 import { ElMessage } from 'element-plus'
 
@@ -23,6 +23,7 @@ const props = defineProps<{
   modelValue?: number | null
   field: string
   desc: { [key: string]: any }
+  disabled?: boolean
   formData: { [key: string]: any }
 }>()
 const emits = defineEmits(['update:modelValue', 'validateThis'])
@@ -81,7 +82,7 @@ function handelBlur() {
 const numBindAttr = computed(() => {
   let min = 0
   let max = 100
-  let precision = 4
+  let precision = 5
 
   let tempAttrs = props.desc?.attrs || props.desc
   if (props.desc?.attrs && typeof props.desc.attrs === 'function') {
@@ -144,10 +145,32 @@ function handelValChange(val: any, oldVal: any) {
     } else {
       if (val.indexOf('.') > 0 && val.length - val.indexOf('.') > numBindAttr.value.precision - 2) {
         currentText.value = (+val).toFixed(numBindAttr.value.precision - 2)
+      } else {
+        currentText.value = val
       }
       currentValue.value = +(val / 100).toFixed(numBindAttr.value.precision)
       change && change()
     }
   }
 }
+
+/**
+ * 清空数据
+ */
+function clear() {
+  currentText.value = null
+  currentValue.value = null
+  isDoChange.value = false
+}
+
+watch(
+  () => props.modelValue,
+  (val: any) => {
+    if (val !== undefined && val !== null && val !== '') {
+      handelValChange((val * 100).toFixed(numBindAttr.value.precision - 2), null)
+    }
+  }
+)
+
+defineExpose({ clear, field: props.field })
 </script>

@@ -228,7 +228,7 @@ function refreshValue() {
   divList.map((item: any, i: number) => {
     str = str.replace(item, '${' + yzList[i] + '}')
   })
-  currentValue.value = str.replaceAll('&nbsp;', '')
+  currentValue.value = str.replaceAll('&nbsp;', '').replaceAll('&lt;', '<').replaceAll('&gt;', '>')
 }
 
 /**
@@ -306,6 +306,7 @@ onUnmounted(() => {
     margin-bottom: 20px;
     color: var(--el-color-danger);
     min-height: 25px;
+    word-break: break-all;
   }
   .title-tip {
     margin-bottom: 20px;

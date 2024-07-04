@@ -66,7 +66,7 @@
           <slot name="firstColumn" />
         </template>
         <!-- 一级或多级列 -->
-        <ElPlusTableColumn v-for="(item, i) in headerColumns" :key="i" :item="item" :size="size"></ElPlusTableColumn>
+        <ElPlusTableColumn v-for="(item, i) in headerColumns" :key="item.__id + '-' + item.label + '-' + i" :item="item" :size="size"></ElPlusTableColumn>
 
         <!-- 空 -->
         <template v-if="!compLoading && loadingStatus === 2" #empty>
@@ -253,17 +253,23 @@ const headerColumns = computed(() => {
   // 查询是否有合并行属性
   needSpanCellIndex.value = []
 
+  let value = undefined as any
+  let first = 0
+  let count = 1
+
+  let prefixStr = ''
+
   const tempColList = allColumn
     .map((item, i) => {
       // 合并行
       if (item.isRowSpan) {
         needSpanCellIndex.value.push(i)
-        let value = undefined as any
-        let first = 0
-        let count = 1
+        value = undefined as any
+        first = 0
+        count = 1
         // 这里修改data数据
         tableData.value?.map((row, j) => {
-          let prefixStr = item.rsProps?.length ? getPrefixStr(row, item.rsProps) : ''
+          prefixStr = item.rsProps?.length ? getPrefixStr(row, item.rsProps) : ''
           if (value !== prefixStr + row[item.prop]) {
             if (count > 1 && j > 0) {
               // 这里要设置之前的数据合并行数
@@ -290,9 +296,9 @@ const headerColumns = computed(() => {
   if (tempColList.length) {
     // 这里开始合并列-遍历行数据
     tableData.value?.map((row, j) => {
-      let value = undefined as any
-      let first = 0
-      let count = 1
+      value = undefined as any
+      first = 0
+      count = 1
       // 遍历表头
       tempColList.map((val: number, i: number) => {
         // 不存在时才添加
@@ -365,8 +371,9 @@ const summaryList = computed(() => {
     const propList = props.tableConfig.summaryConf.prop.split(',')
     const labelList = props.tableConfig.summaryConf?.label?.split(',') || []
     // 遍历
+    let value = ''
     propList.map((prop, i: number) => {
-      let value = ''
+      value = ''
       if (props.tableConfig.summaryConf?.sumFn) {
         value = props.tableConfig.summaryConf?.sumFn(tableData.value, allSelectRowList)
       } else {
@@ -408,9 +415,9 @@ async function handelTabChange(val: string | number | boolean) {
   await emits('tabChange', val, initCol)
 
   // 这里触发下initCol
-  nextTick(() => {
+  setTimeout(() => {
     initCol()
-  })
+  }, 100)
 }
 
 /**

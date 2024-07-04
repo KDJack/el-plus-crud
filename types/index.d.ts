@@ -147,6 +147,8 @@ export interface IFormDescItemOptionItem {
 export interface IFormConfig {
   // 表单描述对象
   formDesc: IFormDesc
+  // 描述desc的排序
+  descOrders?: string[]
   // 表单的列数，默认是1
   column?: number
   // 提交前执行

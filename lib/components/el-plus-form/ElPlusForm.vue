@@ -7,8 +7,8 @@
           <el-col v-for="(formItem, y) in formList" :key="index + '-' + y + '-' + formItem.field" :xs="24" :sm="24" :md="formItem.colspan && formItem.colspan >= column ? 24 : column >= 2 ? 12 : 24" :lg="formItem.colspan && formItem.colspan >= column ? 24 : Math.floor((24 / column) * (formItem.colspan || 1))" :xl="formItem.colspan && formItem.colspan >= column ? 24 : Math.floor((24 / column) * (formItem.colspan || 1))">
             <div v-if="formItem._vif" class="el-plus-form-column-panel" :style="{ 'justify-content': isTable ? 'flex-end' : 'flex-start' }">
               <el-form-item style="min-height: 40px; display: flex" :prop="formItem.field" :style="{ width: formItem._attrs?.width || formItem.width || (isTable ? '150px' : '100%'), marginBottom: itemMB }">
-                <template #label>
-                  <div v-if="showLabel && formItem.showLabel !== false" class="crud-form-label" :style="{ width: formItem.labelWidth || computedFormAttrs._labelWidth || (isDialog ? '100px' : '120px'), justifyContent: computedFormAttrs.labelPosition === 'right' ? 'flex-end' : 'flex-start' }">
+                <template #label v-if="showLabel && formItem.showLabel !== false">
+                  <div class="crud-form-label" :style="{ width: formItem.labelWidth || computedFormAttrs._labelWidth || (isDialog ? '100px' : '120px'), justifyContent: computedFormAttrs.labelPosition === 'right' ? 'flex-end' : 'flex-start' }">
                     <span class="required-dot">{{ formItem.required ? '*' : ' ' }}</span>
                     <span>{{ formItem._label }}</span>
                   </div>
@@ -59,6 +59,8 @@ export interface IFormProps {
   formDesc?: IFormDesc | null
   // group的desc列表-主要针对group表单最后一个表单使用
   groupFormDesc?: IFormDesc | null
+  // 描述desc的排序
+  descOrders?: string[]
   // 表单数据
   modelValue?: { [key: string]: any }
   // 表单自身属性
@@ -291,8 +293,14 @@ const attrMapToTableList = computed(() => {
     initFormAttrs()
     const tempFormDesc = lodash.cloneDeep(props.formDesc)
     let tempData = [] as Array<IFormDescItem>
-    for (const key in tempFormDesc) {
-      tempData.push({ ...tempFormDesc[key], field: key })
+    if (props.descOrders?.length) {
+      props.descOrders.map((key) => {
+        tempData.push({ ...tempFormDesc[key], field: key })
+      })
+    } else {
+      for (const key in tempFormDesc) {
+        tempData.push({ ...tempFormDesc[key], field: key })
+      }
     }
     // 这里处理一下layout的布局-渲染
     let rowItemList = [] as Array<IFormDescItem>

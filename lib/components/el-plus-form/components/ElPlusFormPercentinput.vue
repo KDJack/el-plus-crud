@@ -26,7 +26,7 @@ const props = defineProps<{
   disabled?: boolean
   formData: { [key: string]: any }
 }>()
-const emits = defineEmits(['update:modelValue', 'validateThis'])
+const emits = defineEmits(['update:modelValue', 'change', 'input', 'validateThis'])
 const slots = ref(Object.assign({}, useSlots(), props.desc.slots))
 const attrs = ref({} as any)
 const onEvents = ref(getEvents(props))
@@ -63,7 +63,7 @@ function handelBlur() {
           nextTick(() => {
             currentText.value = null
             currentValue.value = null
-            change && change()
+            emits('change', currentValue.value)
           })
         }
       })
@@ -112,10 +112,11 @@ if (currentText.value !== undefined && currentText.value !== null) {
   }
 }
 
-const change = onEvents.value.change
-if (change) {
+if (onEvents.value.change) {
+  const tempChange = onEvents.value.change
   onEvents.value.change = (val: any, oldVal: any) => {
     handelValChange(val, oldVal)
+    tempChange(val)
   }
 } else {
   onEvents.value.change = handelValChange
@@ -133,14 +134,14 @@ function handelValChange(val: any, oldVal: any) {
       nextTick(() => {
         currentText.value = numBindAttr.value.min
         currentValue.value = +(currentText.value / 100).toFixed(numBindAttr.value.precision)
-        change && change()
+        emits('change', currentValue.value)
       })
     } else if (val > numBindAttr.value.max) {
       ElMessage.warning(`${props.desc?.label || ''}最多不能大于${numBindAttr.value.max}`)
       nextTick(() => {
         currentText.value = numBindAttr.value.max
         currentValue.value = +(currentText.value / 100).toFixed(numBindAttr.value.precision)
-        change && change()
+        emits('change', currentValue.value)
       })
     } else {
       if (val.indexOf('.') > 0 && val.length - val.indexOf('.') > numBindAttr.value.precision - 2) {
@@ -149,7 +150,7 @@ function handelValChange(val: any, oldVal: any) {
         currentText.value = val
       }
       currentValue.value = +(val / 100).toFixed(numBindAttr.value.precision)
-      change && change()
+      emits('change', currentValue.value)
     }
   }
 }

@@ -201,9 +201,10 @@ export function handelBtnType(item: any): Object {
  */
 export function handelListColumn(columnList: Array<IColumnItem> | undefined, defaultConf: ICRUDConfig, tbName: string, headerAlign?: string, minWidth?: string): any[] {
   const tempColumnList = [] as any[]
+  const nowTime = new Date().getTime()
   if (columnList && columnList.length > 0) {
     // 不影响原有的对象，这里进行拷贝
-    columnList.map((item: IColumnItem) => {
+    columnList.map((item: IColumnItem, i: number) => {
       // 如果有子集
       if (item.children) {
         // 表头居中
@@ -256,6 +257,9 @@ export function handelListColumn(columnList: Array<IColumnItem> | undefined, def
 
       // 处理vif
       handelVIf(item, defaultConf, tbName)
+
+      // 设定id
+      item.__id = `${nowTime + i}`
 
       tempColumnList.push(item)
     })

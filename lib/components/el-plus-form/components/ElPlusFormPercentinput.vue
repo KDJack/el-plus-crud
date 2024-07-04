@@ -20,7 +20,7 @@ import { getAttrs, getEvents } from '../mixins'
 import { ElMessage } from 'element-plus'
 
 const props = defineProps<{
-  modelValue?: number | null
+  modelValue?: string | number | null
   field: string
   desc: { [key: string]: any }
   disabled?: boolean

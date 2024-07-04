@@ -21,7 +21,7 @@ import { ICRUDConfig } from '../../../../types'
 const defaultConf = inject('defaultConf') as ICRUDConfig
 
 const props = defineProps<{
-  modelValue?: string | null
+  modelValue?: string | number | null
   field?: string
   desc: { [key: string]: any }
   formData?: { [key: string]: any }
@@ -44,10 +44,10 @@ onBeforeMount(async () => {
 
 watch(
   () => props.modelValue,
-  (data: string | null | undefined) => {
+  (data: string | number | null | undefined) => {
     // 这里要截取一下字符串长度
-    if (data && data.length > attrs.value.maxlength) {
-      data = data.substring(0, attrs.value.maxlength)
+    if (data && `${data}`.length > attrs.value.maxlength) {
+      data = `${data}`.substring(0, attrs.value.maxlength)
     }
     currentValue.value = data
   },

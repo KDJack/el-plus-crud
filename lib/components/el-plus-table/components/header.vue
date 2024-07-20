@@ -169,10 +169,11 @@ async function handelDownload({ callBack }: IBtnBack, index: number) {
         if (tempConf.urlKey) {
           let tempKeyList = (typeof tempConf.urlKey === 'string' ? [tempConf.urlKey] : tempConf.urlKey) as string[]
           // 循环遍历
-          tempKeyList?.map((key) => (result = result[key]))
+          tempKeyList?.map((key: any) => (result = result[key]))
         }
         url = result
-      } finally {
+      } catch (e) {
+        console.log('e: ', e)
         callBack && callBack()
       }
     } else {
@@ -199,15 +200,35 @@ async function handelDownload({ callBack }: IBtnBack, index: number) {
       fileName = fileName.substring(fileName.lastIndexOf('/') + 1)
     }
     const suffix = tempConf.suffix || fileName.indexOf('.') > 0 ? fileName.substring(fileName.lastIndexOf('.')) : '.xlsx'
+    if (!fileName.endsWith(suffix)) {
+      fileName = fileName + suffix
+    }
     xhr.onload = function () {
       if (this.status == 200) {
+        if (!tempConf.name) {
+          try {
+            if (xhr.getResponseHeader('Content-Disposition')) {
+              fileName = xhr.getResponseHeader('Content-Disposition') as string
+              if (fileName.indexOf('filename') > 0) {
+                const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
+                const matches = filenameRegex.exec(fileName)
+                if (matches != null && matches[1]) {
+                  fileName = decodeURIComponent(matches[1].replace(/['"]/g, '')).replace(/utf\-8|'/g, '')
+                }
+              }
+            }
+          } catch (e) {
+            // 未获取到 Content-Disposition
+          }
+        }
+
         const aLink = document.createElement('a')
         // 优化下载兼容性
         if ((window.navigator as any).msSaveOrOpenBlob && typeof (window.navigator as any).msSaveOrOpenBlob === 'function') {
-          aLink.href = (window.navigator as any).msSaveOrOpenBlob(this.response, fileName + suffix)
+          aLink.href = (window.navigator as any).msSaveOrOpenBlob(this.response, fileName)
         } else {
           aLink.href = window.URL.createObjectURL(this.response)
-          aLink.download = fileName + suffix
+          aLink.download = fileName
         }
         aLink.click()
         window.URL.revokeObjectURL(url)
@@ -220,7 +241,7 @@ async function handelDownload({ callBack }: IBtnBack, index: number) {
       // 如果错误，则尝试直接打开链接
       const aLink = document.createElement('a')
       aLink.href = url
-      aLink.download = fileName + suffix
+      aLink.download = fileName
       aLink.click()
       setTimeout(() => {
         callBack && callBack()

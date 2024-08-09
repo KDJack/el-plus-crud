@@ -561,9 +561,9 @@ async function getListQueryData() {
  * 处理下请求参数
  * @param queryMap
  */
-function handelQueryData(queryMap: object) {
+function handelQueryData(queryMap: any) {
   if (!queryMap) return {}
-  const tempMap = {}
+  const tempMap = {} as any
   Object.keys(queryMap).map((key) => {
     if (queryMap[key] !== undefined && queryMap[key] !== null && queryMap[key] !== '') {
       tempMap[key] = queryMap[key]

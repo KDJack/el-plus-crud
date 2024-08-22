@@ -774,6 +774,13 @@ function initCol() {
   tableHeaderRef.value?.initCol()
 }
 
+/**
+ * 清空查询条件
+ */
+function resetQuery() {
+  tableHeaderRef.value?.resetQuery()
+}
+
 // 监听父类数据变更
 // watch(
 //   () => props.modelValue,
@@ -823,7 +830,7 @@ onMounted(() => {
   }
 })
 
-defineExpose({ tableRef: elPlusTableRef, reload, tableData, changeSelect, resetSelect, initCol })
+defineExpose({ tableRef: elPlusTableRef, reload, tableData, changeSelect, resetSelect, initCol, resetQuery })
 </script>
 <style lang="scss">
 .dark .el-plus-table-content {

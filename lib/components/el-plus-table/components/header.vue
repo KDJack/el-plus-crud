@@ -336,7 +336,7 @@ onMounted(() => {
   })
 })
 
-defineExpose({ getData: () => elPlusFormRef.value?.getData(), initCol })
+defineExpose({ getData: () => elPlusFormRef.value?.getData(), initCol, resetQuery: handelReset })
 </script>
 <style lang="scss">
 .el-plus-table-header-info {

@@ -1,13 +1,13 @@
 <template>
-  <div class="ele-form-upload-image" :class="{ 'ele-form-upload-file': desc.upType === 'file' }" v-if="isInit">
+  <div class="ele-form-upload-image" :class="{ 'ele-form-upload-file': !!desc.upType }" v-if="isInit">
     <el-upload class="ele-image-upload" v-bind="attrs" v-on="onEvents" :disabled="disabled" :fileList="currentValue || []" :class="{ 'over-limit': currentValue?.length >= attrs.limit, 'upload-disabled': attrs.disabled }">
       <div class="upload-panel-icon">
         <i v-if="desc.icon" :class="desc.icon" :style="{ fontSize: desc.fontSize || '14px', color: desc.color || '#C0C4CC' }"></i>
         <el-icon v-else :style="{ fontSize: desc.fontSize || '14px', color: desc.color || '#C0C4CC' }"><Plus /></el-icon>
-        <div class="el-upload__text2" v-if="desc.upType === 'file' && desc.text2">
+        <div class="el-upload__text2" v-if="!!desc.upType && desc.text2">
           {{ desc.text2 }}
         </div>
-        <div class="el-upload__text" v-if="desc.upType === 'file'">
+        <div class="el-upload__text" v-if="!!desc.upType">
           {{ desc.text || '拖拽/点击上传' }}
         </div>
       </div>
@@ -99,12 +99,12 @@ onBeforeMount(async () => {
   }
   attrs.value = await getAttrs(props, {
     drag: true,
-    listType: props.desc.upType === 'file' ? 'text' : 'picture-card',
+    listType: !!props.desc.upType ? 'text' : 'picture-card',
     multiple: !!props.desc.multiple,
     limit: props.desc.multiple ? props.desc.limit || 20 : 1,
     autoUpload: props.desc.autoUpload ?? true,
-    accept: props.desc.accept || fileTypes[`${props.desc.upType || 'image'}Types`].join(','),
-    maxSize: props.desc.maxSize || (props.desc.upType === 'file' ? defaultConf.upload?.maxFSize : defaultConf.upload?.maxISize),
+    accept: props.desc.accept || (fileTypes as any)[`${props.desc.upType || 'image'}Types`].join(','),
+    maxSize: props.desc.maxSize || (!!props.desc.upType ? defaultConf.upload?.maxFSize : defaultConf.upload?.maxISize),
     beforeUpload: handelUploadBefore,
     onRemove: handelUploadRemove,
     onSuccess: handelUploadSuccess,
@@ -130,7 +130,7 @@ onBeforeMount(async () => {
  */
 async function handelUploadBefore(file: any) {
   file.suffix = (file.name as string).substring(file.name.lastIndexOf('.'))
-  const message = validateFile(file, fileTypes[`${props.desc.upType || 'image'}Suffixes`], attrs.value.maxSize)
+  const message = validateFile(file, (fileTypes as any)[`${props.desc.upType || 'image'}Suffixes`], attrs.value.maxSize)
   if (message !== true) {
     ElMessage.warning(message)
     return false
@@ -233,7 +233,7 @@ async function handelUploadSuccess(response: any, file: any) {
     file.raw.previewUrl = file.raw.furl
     file.raw.shareUrl = file.raw.furl
   }
-  if (props.desc.upType !== 'file') {
+  if (!props.desc.upType) {
     file.url = getFileIcon(file.raw)
   } else {
     file.url = file.raw.furl
@@ -282,7 +282,7 @@ function handelListChange(item: any, type: 0 | 1) {
     currentValue.value.push({
       name: item.name,
       furl: item.raw.furl || item.furl || item.url,
-      url: props.desc.upType !== 'file' ? getFileIcon(item.raw) : item?.raw?.shareUrl || item.url,
+      url: !props.desc.upType ? getFileIcon(item.raw) : item?.raw?.shareUrl || item.url,
       fsize: item.size,
       uid: item.uid,
       mimeType: item.raw?.type,
@@ -371,7 +371,7 @@ watch(
       } else {
         currentValue.value =
           data?.map((item: IOssInfo) => {
-            if (props.desc.upType !== 'file') {
+            if (!props.desc.upType) {
               item.url = getFileIcon(item)
               item.furl = getFileIcon(item)
             }

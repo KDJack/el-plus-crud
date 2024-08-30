@@ -268,7 +268,7 @@ function handelSearch() {
  * 处理重置
  */
 function handelReset() {
-  elPlusFormRef.value.clear()
+  elPlusFormRef.value?.clear()
   emits('reset')
   nextTick(() => {
     elPlusFormRef.value?.submit()

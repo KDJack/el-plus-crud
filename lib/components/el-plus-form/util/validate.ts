@@ -40,7 +40,7 @@ export const password = [{ required: true, trigger: 'blur', validator: validateP
 /**
  * 校验密码
  */
-export const password2 = [{ trigger: 'blur', validator: validatePassword }]
+export const password2 = [{ trigger: 'blur', validator: validatePassword2 }]
 
 /**
  * 校验账户

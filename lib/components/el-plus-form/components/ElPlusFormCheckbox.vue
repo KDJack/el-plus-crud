@@ -1,9 +1,11 @@
 <template>
   <template v-if="isInit">
     <el-checkbox-group v-if="options?.length" class="ElPlusFormCheckbox-panel" v-bind="attrs" :disabled="disabled" v-on="onEvents" v-model="currentValue">
-      <el-checkbox v-for="option of options" :key="option.value" :label="option.value" v-bind="option.attrs">
-        {{ option.text || option.label }}
-      </el-checkbox>
+      <template v-for="option of options" :key="option.value">
+        <el-checkbox :label="option.value" :value="option.value">
+          {{ option.text || option.label }}
+        </el-checkbox>
+      </template>
     </el-checkbox-group>
     <div v-else class="null-tip">暂无选项</div>
   </template>

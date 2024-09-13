@@ -46,7 +46,7 @@ export const getAttrs = async (props: IMixinsProps, customAttrs?: { [key: string
     }
   }
 
-  if (['area', 'input', 'switch', 'number', 'nbinput', 'checkbox', 'date', 'daterange', 'datetime', 'percentinput'].indexOf(props.desc.type) >= 0) {
+  if (['area', 'input', 'switch', 'number', 'nbinput', 'checkbox', 'date', 'daterange', 'datetime', 'percentinput', 'textarea'].indexOf(props.desc.type) >= 0) {
     delete attrs.label
   }
   return attrs

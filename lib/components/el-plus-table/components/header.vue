@@ -71,15 +71,15 @@ const props = withDefaults(
   defineProps<{
     modelValue?: { [key: string]: any } | {}
     column: Array<IColumnItem> | null
-    tbName: string
-    toolbar: ITableToolbar | null
+    tbName?: string
+    toolbar?: ITableToolbar
     isDialog: boolean
     loading: boolean
     isShowRefresh: boolean
     size: string
     queryDataFn?: Function
   }>(),
-  { tbName: '', toolbar: null, isDialog: false, loading: false, isShowRefresh: true, size: 'default' }
+  { tbName: '', isDialog: false, loading: false, isShowRefresh: true, size: 'default' }
 )
 
 const elPlusFormRef = ref()

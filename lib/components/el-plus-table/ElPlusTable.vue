@@ -792,7 +792,7 @@ function resetQuery() {
 // )
 watch(
   () => props.modelValue,
-  (data) => {
+  (data: any) => {
     if (!props.tableConfig.fetch) {
       // console.log('watch modelValue data: ', data)
       if (!isEqual(data, tableData.value)) {

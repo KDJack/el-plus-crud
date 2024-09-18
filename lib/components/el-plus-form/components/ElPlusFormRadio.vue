@@ -1,6 +1,6 @@
 <template>
   <el-radio-group v-if="isInit" class="ElPlusFormRadio-panel" v-bind="attrs" :disabled="disabled" v-on="onEvents" v-model="currentValue">
-    <el-radio v-for="option of options" :key="option.value" :label="option.value">
+    <el-radio v-for="option of options" :key="option.value" :value="option.value">
       {{ option.l || option.label }}
     </el-radio>
   </el-radio-group>
@@ -44,7 +44,7 @@ onBeforeMount(async () => {
 
 watch(
   () => props.desc.options,
-  async (data) => {
+  async (data: any) => {
     if (typeof data === 'string') {
       // 从全局数据中获取options
       options.splice(0, options.length, ...(globalData[data] || []))

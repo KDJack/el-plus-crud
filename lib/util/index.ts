@@ -101,7 +101,7 @@ function formatTime(date: Date, format: string) {
     S: date.getMilliseconds(), // 毫秒
     a: date.getHours() < 12 ? '上午' : '下午', // 上午/下午
     A: date.getHours() < 12 ? 'AM' : 'PM' // AM/PM
-  }
+  } as any
   if (/(y+|Y+)/.test(format)) {
     format = format.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length))
   }

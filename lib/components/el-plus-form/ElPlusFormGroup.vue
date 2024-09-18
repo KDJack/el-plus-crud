@@ -1,6 +1,6 @@
 <template>
   <div class="el-plus-form-group">
-    <template v-for="(group, i) in getGroupFowmLayout" :key="i + group.formProps?.fid">
+    <template v-for="(group, i) in getGroupFowmLayout" :key="i + (group.formProps?.fid || '')">
       <template v-if="useSlots()['top' + indexList[i]]">
         <slot :name="'top' + indexList[i]"> </slot>
       </template>

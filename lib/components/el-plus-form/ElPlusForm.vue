@@ -828,7 +828,7 @@ function refresh() {
 // 监听Desc改变
 watch(
   () => props.formDesc,
-  (formDesc) => {
+  (formDesc: any) => {
     if (formDesc) {
       // 检查联动
       initFormAttrs()
@@ -839,7 +839,7 @@ watch(
 // 深度监听data改变
 watch(
   () => props.modelValue,
-  (data) => {
+  (data: any) => {
     // && JSON.stringify(data) !== JSON.stringify(oldFormData)
     if (!oldFormData || (isOpenListen.value && data)) {
       // 检查联动

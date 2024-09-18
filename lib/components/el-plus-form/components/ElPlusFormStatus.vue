@@ -49,7 +49,7 @@ const iconStyle = computed(() => {
 
 watch(
   () => props.desc.options,
-  async (data) => {
+  async (data: any) => {
     if (typeof data === 'string') {
       // 从全局数据中获取options
       options.splice(0, options.length, ...(globalData[data] || []))

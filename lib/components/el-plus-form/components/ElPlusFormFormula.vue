@@ -262,7 +262,7 @@ onBeforeMount(async () => {
 
 watch(
   () => props.desc.options,
-  async (data) => {
+  async (data: any) => {
     if (typeof data === 'string') {
       // 从全局数据中获取options
       options.splice(0, options.length, ...(globalData[data] || []))
@@ -286,7 +286,7 @@ watch(
 
 watch(
   () => props.modelValue,
-  (data) => {
+  (data: any) => {
     currentValue.value = data?.value || '='
     if (formulaRef.value) {
       formulaRef.value.innerHTML = data?.domStr || '='

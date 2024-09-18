@@ -116,7 +116,7 @@ function handelBeforeUpload(file: any) {
 
 watch(
   () => props.loading,
-  (data) => {
+  (data: any) => {
     isLoading.value = data
   },
   { immediate: true }

@@ -107,7 +107,7 @@ const btnShowText = computed(() => {
 
 watch(
   () => props.loading,
-  (val) => {
+  (val: any) => {
     localLoading.value = val
   }
 )

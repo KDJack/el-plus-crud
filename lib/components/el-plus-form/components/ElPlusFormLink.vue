@@ -188,7 +188,7 @@ function submit() {
 // 表格配置
 watch(
   () => props.desc.tableConfig,
-  (val) => {
+  (val: any) => {
     let tempConfig = {} as ITableConfig
     if (val) {
       tempConfig = lodash.cloneDeep(val)

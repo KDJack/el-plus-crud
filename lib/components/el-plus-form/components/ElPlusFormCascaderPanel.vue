@@ -48,7 +48,7 @@ onBeforeMount(async () => {
 //监听options数据
 watch(
   () => props.desc.options,
-  async (data) => {
+  async (data: any) => {
     if (typeof data === 'string') {
       options.splice(0, options.length, ...(globalData[data] || []))
     } else if (typeof data === 'function') {

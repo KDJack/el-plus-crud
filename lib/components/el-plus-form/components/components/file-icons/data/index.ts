@@ -24,4 +24,4 @@ export const iconMap = {
   '.pptx': ppt,
   '.xls': ppt,
   '.xlsx': xls
-}
+} as any

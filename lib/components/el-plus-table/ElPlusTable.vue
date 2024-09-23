@@ -16,7 +16,7 @@
     <!-- 中部的Tabs -->
     <div class="table-tabs-panel" v-if="tableConfig.tabConf">
       <el-radio-group v-model="tableTabVal" size="default" @change="handelTabChange">
-        <el-radio-button v-for="(item, i) in tableConfig.tabConf?.tabs" :key="i" :label="item.value" :loading="true">
+        <el-radio-button v-for="(item, i) in tableConfig.tabConf?.tabs" :key="i" :value="item.value" :loading="true">
           {{ item.label }}
           <template v-if="loadingTab">
             <el-icon class="is-loading"><Loading /></el-icon>
@@ -85,7 +85,7 @@
       </el-table>
     </div>
     <div class="bottom-page-static-info" v-if="isPager || tableConfig.statistic">
-      <el-pagination class="page-info" small @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="+pageInfo.current" :page-sizes="pageSizes || [5, 10, 20, 50, 100]" :page-size="pageInfo.size" layout="total, sizes, prev, pager, next, jumper" :total="pageInfo.total" />
+      <el-pagination class="page-info" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="+pageInfo.current" :page-sizes="pageSizes || [5, 10, 20, 50, 100]" :page-size="pageInfo.size" layout="total, sizes, prev, pager, next, jumper" :total="pageInfo.total" />
     </div>
     <slot name="bottom"></slot>
   </div>

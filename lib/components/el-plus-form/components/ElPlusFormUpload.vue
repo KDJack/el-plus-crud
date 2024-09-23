@@ -80,6 +80,7 @@ const onEvents = ref(getEvents(props))
 
 // 提交action
 const upAction = ref('')
+const isImageType = ref(true)
 
 const showPreview = ref(false)
 const previewIndex = ref(0)
@@ -97,14 +98,17 @@ onBeforeMount(async () => {
   if (!defaultConf.upload?.sign && !props.desc?.sign) {
     defaultConf.debug && console.warn('上传私有加密仓库必须在config或desc中配置sign方法进行图片/文件签名鉴权，否则图片将无法显示和预览！')
   }
+  // 是否是图片上传
+  isImageType.value = !props.desc.upType || props.desc.upType === 'image'
+
   attrs.value = await getAttrs(props, {
     drag: true,
-    listType: !!props.desc.upType ? 'text' : 'picture-card',
+    listType: isImageType.value ? 'picture-card' : 'text',
     multiple: !!props.desc.multiple,
     limit: props.desc.multiple ? props.desc.limit || 20 : 1,
     autoUpload: props.desc.autoUpload ?? true,
     accept: props.desc.accept || (fileTypes as any)[`${props.desc.upType || 'image'}Types`].join(','),
-    maxSize: props.desc.maxSize || (!!props.desc.upType ? defaultConf.upload?.maxFSize : defaultConf.upload?.maxISize),
+    maxSize: props.desc.maxSize || (isImageType.value ? defaultConf.upload?.maxISize : defaultConf.upload?.maxFSize),
     beforeUpload: handelUploadBefore,
     onRemove: handelUploadRemove,
     onSuccess: handelUploadSuccess,
@@ -233,7 +237,7 @@ async function handelUploadSuccess(response: any, file: any) {
     file.raw.previewUrl = file.raw.furl
     file.raw.shareUrl = file.raw.furl
   }
-  if (!props.desc.upType) {
+  if (isImageType.value) {
     file.url = getFileIcon(file.raw)
   } else {
     file.url = file.raw.furl
@@ -282,7 +286,7 @@ function handelListChange(item: any, type: 0 | 1) {
     currentValue.value.push({
       name: item.name,
       furl: item.raw.furl || item.furl || item.url,
-      url: !props.desc.upType ? getFileIcon(item.raw) : item?.raw?.shareUrl || item.url,
+      url: isImageType.value ? getFileIcon(item.raw) : item?.raw?.shareUrl || item.url,
       fsize: item.size,
       uid: item.uid,
       mimeType: item.raw?.type,
@@ -371,7 +375,7 @@ watch(
       } else {
         currentValue.value =
           data?.map((item: IOssInfo) => {
-            if (!props.desc.upType) {
+            if (isImageType.value) {
               item.url = getFileIcon(item)
               item.furl = getFileIcon(item)
             }

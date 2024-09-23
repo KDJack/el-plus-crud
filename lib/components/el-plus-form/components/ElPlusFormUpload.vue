@@ -71,7 +71,6 @@ const props = defineProps<{
 
 const emits = defineEmits(['update:modelValue', 'validateThis'])
 const currentValue = ref((typeof props.modelValue === 'string' ? [{ url: props.modelValue }] : props.modelValue) || [])
-
 emits('update:modelValue', currentValue)
 
 const attrs = ref({} as any)
@@ -80,7 +79,7 @@ const onEvents = ref(getEvents(props))
 
 // 提交action
 const upAction = ref('')
-const isImageType = ref(true)
+const isImageType = computed(() => !props.desc.upType || props.desc.upType === 'image')
 
 const showPreview = ref(false)
 const previewIndex = ref(0)
@@ -98,8 +97,6 @@ onBeforeMount(async () => {
   if (!defaultConf.upload?.sign && !props.desc?.sign) {
     defaultConf.debug && console.warn('上传私有加密仓库必须在config或desc中配置sign方法进行图片/文件签名鉴权，否则图片将无法显示和预览！')
   }
-  // 是否是图片上传
-  isImageType.value = !props.desc.upType || props.desc.upType === 'image'
 
   attrs.value = await getAttrs(props, {
     drag: true,

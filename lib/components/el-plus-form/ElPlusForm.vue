@@ -3,22 +3,24 @@
     <slot name="top" :formData="props.modelValue"></slot>
     <div :style="{ display: 'flex', justifyContent: isDialog ? 'center' : '' }">
       <el-form class="el-plus-form-panel" ref="refElPlusForm" :model="props.modelValue" @submit.prevent="handleSubmitForm" v-bind="computedFormAttrs">
-        <el-row :gutter="10" v-for="(formList, index) in attrMapToTableList" :key="index" :style="{ marginRight: isTable ? '20px' : 0 }">
-          <el-col v-for="(formItem, y) in formList" :key="index + '-' + y + '-' + formItem.field" :xs="24" :sm="24" :md="formItem.colspan && formItem.colspan >= column ? 24 : column >= 2 ? 12 : 24" :lg="formItem.colspan && formItem.colspan >= column ? 24 : Math.floor((24 / column) * (formItem.colspan || 1))" :xl="formItem.colspan && formItem.colspan >= column ? 24 : Math.floor((24 / column) * (formItem.colspan || 1))">
-            <div v-if="formItem._vif" class="el-plus-form-column-panel" :style="{ 'justify-content': isTable ? 'flex-end' : 'flex-start' }">
-              <el-form-item style="min-height: 40px; display: flex" :prop="formItem.field" :style="{ width: formItem._attrs?.width || formItem.width || (isTable ? '150px' : '100%'), marginBottom: itemMB }">
-                <template #label v-if="showLabel && formItem.showLabel !== false">
-                  <div class="crud-form-label" :style="{ width: formItem.labelWidth || computedFormAttrs._labelWidth || (isDialog ? '100px' : '120px'), justifyContent: computedFormAttrs.labelPosition === 'right' ? 'flex-end' : 'flex-start' }">
-                    <span class="required-dot">{{ formItem.required ? '*' : ' ' }}</span>
-                    <span>{{ formItem._label }}</span>
-                  </div>
-                </template>
-                <component style="min-width: 80px; width: 100%; flex: 1" :is="formItem._type" :formData="props.modelValue" :disabled="formItem._disabled ?? disabled ?? false" v-bind="formItem._attrs" :desc="formItem" :ref="setComponentRef" :field="formItem.field" v-model="props.modelValue[formItem.field || '']" :isTable="isTable" @validateThis="() => handelValidateThis(formItem.field || '')"></component>
-                <div class="el-plus-form-tip" v-if="formItem._tip" v-html="formItem._tip" />
-              </el-form-item>
-            </div>
-          </el-col>
-        </el-row>
+        <template v-if="attrMapToTableList?.length">
+          <el-row :gutter="10" v-for="(formList, index) in attrMapToTableList" :key="index" :style="{ marginRight: isTable ? '20px' : 0 }">
+            <el-col v-for="(formItem, y) in formList" :key="index + '-' + y + '-' + formItem.field" :xs="24" :sm="24" :md="formItem.colspan && formItem.colspan >= column ? 24 : column >= 2 ? 12 : 24" :lg="formItem.colspan && formItem.colspan >= column ? 24 : Math.floor((24 / column) * (formItem.colspan || 1))" :xl="formItem.colspan && formItem.colspan >= column ? 24 : Math.floor((24 / column) * (formItem.colspan || 1))">
+              <div v-if="formItem._vif" class="el-plus-form-column-panel" :style="{ 'justify-content': isTable ? 'flex-end' : 'flex-start' }">
+                <el-form-item style="min-height: 40px; display: flex" :prop="formItem.field" :style="{ width: formItem._attrs?.width || formItem.width || (isTable ? '150px' : '100%'), marginBottom: itemMB }">
+                  <template #label v-if="showLabel && formItem.showLabel !== false">
+                    <div class="crud-form-label" :style="{ width: formItem.labelWidth || computedFormAttrs._labelWidth || (isDialog ? '100px' : '120px'), justifyContent: computedFormAttrs.labelPosition === 'right' ? 'flex-end' : 'flex-start' }">
+                      <span class="required-dot">{{ formItem.required ? '*' : ' ' }}</span>
+                      <span>{{ formItem._label }}</span>
+                    </div>
+                  </template>
+                  <component :key="formItem.field + (formItem.upType || '')" style="min-width: 80px; width: 100%; flex: 1" :is="formItem._type" :formData="props.modelValue" :disabled="formItem._disabled ?? disabled ?? false" v-bind="formItem._attrs" :desc="formItem" :ref="setComponentRef" :field="formItem.field" v-model="props.modelValue[formItem.field || '']" :isTable="isTable" @validateThis="() => handelValidateThis(formItem.field || '')"></component>
+                  <div class="el-plus-form-tip" v-if="formItem._tip" v-html="formItem._tip" />
+                </el-form-item>
+              </div>
+            </el-col>
+          </el-row>
+        </template>
         <slot name="row"></slot>
       </el-form>
     </div>
@@ -349,6 +351,7 @@ const attrMapToTableList = computed(() => {
       }
     }
   }
+  console.log('formLayoutRows: ', formLayoutRows)
   return formLayoutRows
 })
 

@@ -16,7 +16,7 @@
     <!-- 中部的Tabs -->
     <div class="table-tabs-panel" v-if="tableConfig.tabConf">
       <el-radio-group v-model="tableTabVal" size="default" @change="handelTabChange">
-        <el-radio-button v-for="(item, i) in tableConfig.tabConf?.tabs" :key="i" :value="item.value" :loading="true">
+        <el-radio-button v-for="(item, i) in tableConfig.tabConf?.tabs" :key="i" :label="item.value" :loading="true">
           {{ item.label }}
           <template v-if="loadingTab">
             <el-icon class="is-loading"><Loading /></el-icon>

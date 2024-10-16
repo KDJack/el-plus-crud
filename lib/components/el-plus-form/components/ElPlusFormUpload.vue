@@ -261,7 +261,9 @@ function getFileIcon(file?: any): string {
       }
     }
   }
-  return iconMap.file
+  // 这里判断如果是图片，无论如何都返回本身
+  console.log(`!props.desc.upType || props.desc.upType === 'image' ? fileUrl : iconMap.file: `, !props.desc.upType || props.desc.upType === 'image' ? fileUrl : iconMap.file)
+  return !props.desc.upType || props.desc.upType === 'image' ? fileUrl : iconMap.file
 }
 
 /**

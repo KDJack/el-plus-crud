@@ -39,24 +39,7 @@
         <slot name="main" :tableData="tableData"></slot>
       </template>
       <!-- 这里开始是表格内容  -->
-      <el-table
-        ref="elPlusTableRef"
-        v-else
-        style="width: 100%"
-        :maxHeight="tableConfig.maxHeight || 'auto'"
-        v-bind="tableConfig.tableAttr"
-        :class="{ 'big-h-bar': tableConfig?.tableAttr?.bigHBar, 'big-v-bar': tableConfig.tableAttr?.bigVBar }"
-        :data="tableData"
-        :row-key="type !== 'expand' && isTempId ? 'tempId' : rowKey"
-        lazy
-        :load="loadExpandData"
-        :size="size"
-        @select="handelTableSelect"
-        @select-all="handelTableSelectAll"
-        @expand-change="handelTableExpandChange"
-        :treeProps="treeProps"
-        :span-method="handelSpanMethod"
-      >
+      <el-table ref="elPlusTableRef" v-else style="width: 100%" :maxHeight="tableConfig.maxHeight || 'auto'" v-bind="tableConfig.tableAttr" :class="{ 'big-h-bar': tableConfig?.tableAttr?.bigHBar, 'big-v-bar': tableConfig.tableAttr?.bigVBar }" :data="tableData" :row-key="localRowKey" lazy :load="loadExpandData" :size="size" @select="handelTableSelect" @select-all="handelTableSelectAll" @expand-change="handelTableExpandChange" :treeProps="treeProps" :span-method="handelSpanMethod">
         <!-- 复选框 -->
         <el-table-column v-if="type === 'selection'" type="selection" fixed="left" width="55px" :selectable="selectable" header-align="center" align="center" />
         <!-- 下标 -->
@@ -176,6 +159,7 @@ const props = withDefaults(
   }
 )
 
+const localRowKey = ref(props.rowKey)
 // 合并行算法
 const needSpanCellIndex = ref([] as any[])
 const handelSpanMethod = ref(null as unknown as Function)
@@ -680,9 +664,12 @@ async function loadData(isInit: Boolean) {
 
       if (props.type !== 'expand' && props.isTempId && Array.isArray(dataResult)) {
         const nowTime = new Date().getTime()
+        localRowKey.value = 'tempId'
         dataResult.map((item, i) => {
-          item.tempId = item[props.rowKey] || `${nowTime + i}`
+          item.tempId = `${nowTime + i}`
         })
+      } else {
+        localRowKey.value = props.rowKey
       }
 
       tableData.value = dataResult

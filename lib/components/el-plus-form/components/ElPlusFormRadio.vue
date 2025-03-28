@@ -1,6 +1,6 @@
 <template>
   <el-radio-group v-if="isInit" class="ElPlusFormRadio-panel" v-bind="attrs" :disabled="disabled" v-on="onEvents" v-model="currentValue">
-    <el-radio v-for="option of options" :key="option.value" :value="option.value">
+    <el-radio v-for="option of options" :key="option.value" :label="option.value">
       {{ option.l || option.label }}
     </el-radio>
   </el-radio-group>

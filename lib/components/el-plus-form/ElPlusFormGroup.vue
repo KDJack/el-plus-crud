@@ -7,7 +7,7 @@
       <slot :name="'title' + indexList[i]">
         <div class="title-line" v-if="group.title">{{ group.title }}</div>
       </slot>
-      <ElPlusForm v-model="currentValue" v-bind="group.formProps" isGroupForm :ref="setComponentRef" @reset="handleReset(group.formProps?.fid || '')">
+      <ElPlusForm v-model="currentValue" v-bind="group.formProps" isGroupForm :ref="setComponentRef" @reset="handleReset(group.formProps?.fid || '')" @cancel="handelCancel">
         <template v-if="useSlots()['default' + indexList[i]]">
           <slot :name="'default' + indexList[i]"> </slot>
         </template>
@@ -32,7 +32,7 @@ import { IFormDesc, IFormGroupConfig } from '../../../types'
 
 const lodash = inject('lodash') as any
 
-const emits = defineEmits(['update:show', 'update:modelValue', 'before-validate', 'before-request', 'request-success', 'request-error', 'request-end', 'request'])
+const emits = defineEmits(['update:show', 'update:modelValue', 'before-validate', 'before-request', 'request-success', 'request-error', 'request-end', 'request', 'cancel'])
 const props = defineProps<{
   modelValue: { [key: string]: any } | {}
   // 表单Group项
@@ -168,6 +168,17 @@ async function clear() {
 }
 
 /**
+ * 清空表单
+ */
+async function init() {
+  return await Promise.all(formRefs.value.map((tempRef) => tempRef.init()))
+}
+
+function handelCancel() {
+  emits('cancel')
+}
+
+/**
  * 获取数据
  */
 function getData() {
@@ -178,7 +189,7 @@ function getData() {
   return tempData
 }
 
-defineExpose({ validate, getData, clearValid, clear })
+defineExpose({ validate, getData, clearValid, clear, init })
 </script>
 <style lang="scss">
 .el-plus-form-group {
@@ -206,4 +217,3 @@ defineExpose({ validate, getData, clearValid, clear })
   }
 }
 </style>
-./util/aaaaa

@@ -291,7 +291,7 @@ export function handelVIf(item: IColumnItem, defaultConf: ICRUDConfig, tbName: s
       item._vif = defaultConf.auth(item.auth)
     }
   }
-  item.__vif = tbName ? item.scShow && item._vif : item._vif
+  item.__vif = tbName ? item.scShow !== false && item._vif : item._vif
   // 这里要判断下下级显示状态, 如果下级全部隐藏了，那么本级也应该隐藏
   if (item.children && item.children.every((info) => !info.__vif)) {
     item.__vif = false

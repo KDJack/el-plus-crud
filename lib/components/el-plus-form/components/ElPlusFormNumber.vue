@@ -1,5 +1,5 @@
 <template>
-  <el-input-number v-if="isInit" class="ElPlusFormNumber-panel" v-bind="attrs" :disabled="disabled" v-on="onEvents" v-model="currentValue" @focus="handelFocus" @blur="handelBlur" onkeypress="return( /[-\d\.]/.test(String.fromCharCode(event.keyCode)))" />
+  <el-input-number v-if="isInit" class="ElPlusFormNumber-panel" :class="{ 'show-error': showError }" v-bind="attrs" :disabled="disabled" v-on="onEvents" v-model="currentValue" @focus="handelFocus" @blur="handelBlur" onkeypress="return( /[-\d\.]/.test(String.fromCharCode(event.keyCode)))" />
 </template>
 <script lang="ts">
 export default {
@@ -10,7 +10,7 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { ref, computed, useAttrs, onBeforeMount, nextTick, inject } from 'vue'
+import { ref, computed, useAttrs, onBeforeMount, nextTick, inject, watch, onMounted } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
 import { ElMessage } from 'element-plus'
 import { ICRUDConfig } from '../../../../types'
@@ -36,6 +36,7 @@ const isInit = ref(false)
 const onEvents = ref(getEvents(props))
 
 const isDoChange = ref(false)
+const showError = ref(false)
 
 onBeforeMount(async () => {
   attrs.value = await getAttrs(props, { ...defaultConf.form?.leng?.nbinput, ...useAttrs() })
@@ -73,6 +74,7 @@ function handelBlur() {
       handelValChange(currentValue.value, 0)
     }
   }
+
   nextTick(() => {
     emits('validateThis')
   })
@@ -144,6 +146,20 @@ function handelValChange(val: any, oldVal: any) {
       change && change()
     }
   }
+  handelChangeError()
+}
+
+function handelChangeError() {
+  // 改变背景色
+  if (props.desc?.showError) {
+    if (typeof props.desc.showError === 'function') {
+      showError.value = props.desc.showError(currentValue.value, props.formData || {}, props.rowIndex)
+    } else {
+      showError.value = !!props.desc?.showError
+    }
+  } else {
+    showError.value = false
+  }
 }
 </script>
 <style lang="scss" scoped>
@@ -154,6 +170,14 @@ function handelValChange(val: any, oldVal: any) {
     // padding-left: 11px !important;
     input {
       text-align: left !important;
+    }
+  }
+}
+.show-error {
+  :deep(.el-input__wrapper) {
+    background-color: #f56c6c;
+    input {
+      color: #fff;
     }
   }
 }

@@ -34,15 +34,15 @@ const showPreview = ref(false)
 const previewIndex = ref(0)
 
 // 预览列表
-const previewList = computed(() =>
-  props.files
+const previewList = computed(() => {
+  return props.files
     .map((item: any) => {
       if (imgSuffix.indexOf(item.suffix || '') >= 0) {
-        return item.shareUrl || item.furl || item.url
+        return item.signUrl || item.shareUrl || item.furl || item.url
       }
     })
     .filter((url) => url)
-)
+})
 
 /**
  * 图片的样式
@@ -62,7 +62,7 @@ function getIcon(item: IOssInfo) {
   let icon = iconMap[item.suffix || ''] || fileIcon
   if (props.showImg) {
     if (imgSuffix.indexOf(item.suffix || '') >= 0) {
-      return item.shareUrl
+      return item.shareUrl || item.signUrl
     }
   }
   return icon
@@ -73,7 +73,7 @@ function handelPreview(file: IOssInfo) {
   if (props.preview) {
     // 如果是图片
     if (imgSuffix.indexOf(file.suffix || '') >= 0) {
-      previewIndex.value = previewList.value.indexOf(file.shareUrl || file.furl || file.url)
+      previewIndex.value = previewList.value.indexOf(file.shareUrl || file.signUrl || file.furl || file.url)
       showPreview.value = true
     } else {
       handelDownload(file)
@@ -89,7 +89,7 @@ function handelPreview(file: IOssInfo) {
 async function handelDownload(file: IOssInfo) {
   // 创建请求
   const xhr = new XMLHttpRequest()
-  let url = file.previewUrl || file.shareUrl || file.furl || ''
+  let url = file.previewUrl || file.signUrl || file.shareUrl || file.furl || ''
   xhr.open('get', url, true)
   // 转换流
   xhr.responseType = 'blob'
@@ -136,6 +136,7 @@ async function handelDownload(file: IOssInfo) {
     // 如果错误，则尝试直接打开链接
     const aLink = document.createElement('a')
     aLink.href = url
+    aLink.target = '_blank'
     aLink.download = fileName
     aLink.click()
   }

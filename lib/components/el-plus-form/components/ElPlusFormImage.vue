@@ -45,7 +45,7 @@ const imagList = computed(() => {
     if (typeof props.modelValue[0] === 'string') {
       return props.modelValue
     } else {
-      return props.modelValue.map((item) => item.shareUrl || item.furl)
+      return props.modelValue.map((item) => item.signUrl || item.shareUrl || item.furl)
     }
   } else if (typeof props.modelValue === 'string') {
     return props.modelValue.split(',')

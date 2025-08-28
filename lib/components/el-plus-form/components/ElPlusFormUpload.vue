@@ -79,6 +79,7 @@ const onEvents = ref(getEvents(props))
 
 // 提交action
 const upAction = ref('')
+const upActionInfo = ref({} as any)
 const isImageType = computed(() => !props.desc.upType || props.desc.upType === 'image')
 
 const showPreview = ref(false)
@@ -172,7 +173,7 @@ async function getActionInfo(action: string | Function | undefined, param?: any)
   const tempInfo = { action: '', uploadId: undefined, token: undefined, furl: '' }
   if (typeof action === 'function') {
     const result = action({ ...(param || {}), type: defaultConf.upload?.type })
-    const uploadInfo = isPromiseLike<any>(result) ? await result : result
+    const uploadInfo = (isPromiseLike<any>(result) ? await result : result) as any
     if (typeof uploadInfo === 'object') {
       tempInfo.action = getValue(props.desc?.actionMap?.actionKey || defaultConf.upload?.actionMap?.actionKey || [], uploadInfo)
       tempInfo.uploadId = getValue(props.desc?.actionMap?.uploadIdKey || defaultConf.upload?.actionMap?.uploadIdKey || [], uploadInfo)
@@ -181,6 +182,7 @@ async function getActionInfo(action: string | Function | undefined, param?: any)
     } else {
       tempInfo.action = uploadInfo as string
     }
+    upActionInfo.value = uploadInfo
   } else if (action !== undefined) {
     tempInfo.action = action
   }
@@ -221,7 +223,7 @@ async function handelUploadSuccess(response: any, file: any) {
   // 获取文件上传的token以及上传路径
   if (defaultConf.upload?.sign) {
     let signInfo = {} as any
-    const result = defaultConf.upload?.sign(file.raw.uploadId)
+    const result = defaultConf.upload?.sign(file.raw[defaultConf.upload?.type === 'aliyun' ? 'furl' : 'uploadId'])
     if (isPromiseLike<any>(result)) {
       signInfo = await result
     } else {
@@ -247,8 +249,8 @@ async function handelUploadSuccess(response: any, file: any) {
  * @param file
  */
 function getFileIcon(file?: any): string {
-  const fileUrl = file.shareUrl || file.furl || file.url
-  const suffix = (file?.suffix || fileUrl.substring(fileUrl.lastIndexOf('.')) || '').toLocaleLowerCase()
+  const fileUrl = file.shareUrl || file.signUrl || file.url || file.furl
+  const suffix = (file?.suffix || fileUrl.substring(fileUrl.split('?')[0].lastIndexOf('.')) || '').toLocaleLowerCase()
   if (suffix) {
     if (fileTypes.imageSuffixes.indexOf(suffix) >= 0) {
       return fileUrl
@@ -331,6 +333,7 @@ function handleOutOfLimit() {
  */
 function handelRequest(param: any) {
   param.action = upAction.value
+  param.actionInfo = upActionInfo.value
   const uploadFn = props.desc?.uploadFn || defaultConf.upload?.uploadFn
   return uploadFn(param)
 }
@@ -375,11 +378,11 @@ watch(
         currentValue.value =
           data?.map((item: IOssInfo) => {
             if (isImageType.value) {
-              item.url = getFileIcon(item)
-              item.furl = getFileIcon(item)
+              item.url = getFileIcon(item) || getValue(defaultConf.upload?.signMap?.previewUrlKey || [], item)
+              item.furl = item.furl || getFileIcon(item)
             }
             item.suffix = (item.suffix || item.url?.substring(item.url?.lastIndexOf('.') || 0) || '').toLocaleLowerCase()
-            item.previewUrl = item.furl || item.url
+            item.previewUrl = getValue(defaultConf.upload?.signMap?.previewUrlKey || [], item) || item.furl || item.url
             return item
           }) || []
       }

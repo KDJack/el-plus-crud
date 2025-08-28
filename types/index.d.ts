@@ -416,6 +416,7 @@ export interface IOssInfo {
   url?: string
   uid?: number
   previewUrl?: string
+  signUrl?: string
   shareUrl?: string
   uploadId?: string
 }
@@ -431,6 +432,8 @@ export interface IFormGroupItem {
   maxWidth?: string
   // 是否是表格
   isTable?: boolean
+  // 是否显示
+  vif?: boolean
   // labelWidth
   labelWidth?: string
 }

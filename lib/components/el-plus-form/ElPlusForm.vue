@@ -366,7 +366,7 @@ const initFormAttrs = lodash.debounce(
             // 设置 _type
             formItem._type = compTypeList.includes(formItem.type.toLowerCase()) ? 'el-plus-form-' + formItem.type : formItem.type
             // 触发 v-if 显示 / 隐藏 设置_vif
-            formItem._vif = handelKeyValue(formItem, 'vif', field, !formItem.isBlank ?? true)
+            formItem._vif = handelKeyValue(formItem, 'vif', field, !formItem.isBlank || true)
             // 触发 disabled 禁用 / 启用 设置_disabled
             formItem._disabled = handelKeyValue(formItem, 'disabled', field, props.disabled ?? false)
             // 动态属性 attrs

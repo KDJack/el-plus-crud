@@ -6,7 +6,23 @@
         {{ item[tableConfig.showSelectNameKey || 'name'] }}
       </el-tag>
     </div> -->
-    <EleTabletHeader ref="tableHeaderRef" v-if="Object.keys(tableConfig?.toolbar || {}).length || tableConfig.tbName" v-model="toolFormData" :tbName="tableConfig.tbName" :column="tableConfig?.column || []" :size="size" :isShowRefresh="isShowRefresh" :loading="compLoading" :toolbar="tableConfig.toolbar" :isDialog="isDialog" @query="handelTopQuery" :queryDataFn="getListQueryData" @reset="handelHeaderReset" />
+    <EleTabletHeader
+      ref="tableHeaderRef"
+      v-if="Object.keys(tableConfig?.toolbar || {}).length || tableConfig.tbName"
+      v-model="toolFormData"
+      :tbName="tableConfig.tbName"
+      :column="tableConfig?.column || []"
+      :size="size"
+      :isShowRefresh="isShowRefresh"
+      :loading="compLoading"
+      :toolbar="tableConfig.toolbar"
+      :isDialog="isDialog"
+      @query="handelTopQuery"
+      :queryDataFn="getListQueryData"
+      @reset="handelHeaderReset"
+      :layoutSelect="isDIYMain && !!tableConfig?.column?.length"
+      @layoutChange="handelLayoutChange"
+    />
 
     <!-- tabTop插槽 -->
     <template v-if="useSlots().tabTop">
@@ -14,17 +30,19 @@
     </template>
 
     <!-- 中部的Tabs -->
-    <div class="table-tabs-panel" v-if="tableConfig.tabConf">
+    <div class="table-tabs-panel" v-if="tableConfig?.tabConf?.tabs?.length">
       <el-radio-group v-model="tableTabVal" size="default" @change="handelTabChange">
-        <el-radio-button v-for="(item, i) in tableConfig.tabConf?.tabs" :key="i" :label="item.value" :loading="true">
-          {{ item.label }}
-          <template v-if="loadingTab">
-            <el-icon class="is-loading"><Loading /></el-icon>
-          </template>
-          <template v-else>
-            {{ getTabLabel(item) }}
-          </template>
-        </el-radio-button>
+        <template v-for="(item, i) in tableConfig.tabConf?.tabs" :key="i">
+          <el-radio-button :value="item.value" :loading="true">
+            {{ item.label }}
+            <template v-if="loadingTab">
+              <el-icon class="is-loading"><Loading /></el-icon>
+            </template>
+            <template v-else>
+              {{ getTabLabel(item) }}
+            </template>
+          </el-radio-button>
+        </template>
       </el-radio-group>
     </div>
 
@@ -35,7 +53,7 @@
 
     <!-- 中间列表 -->
     <div class="el-plus-table-main" v-loading="compLoading">
-      <template v-if="isDIYMain">
+      <template v-if="isShowDIYMain">
         <slot name="main" :tableData="tableData"></slot>
       </template>
       <!-- 这里开始是表格内容  -->
@@ -43,7 +61,7 @@
         <!-- 复选框 -->
         <el-table-column v-if="type === 'selection'" type="selection" fixed="left" width="55px" :selectable="selectable" header-align="center" align="center" />
         <!-- 下标 -->
-        <el-table-column v-if="isIndex" type="index" width="60" fixed="left" label="序号" :headerAlign="headerAlign" />
+        <el-table-column v-if="isIndex" type="index" width="60" fixed="left" :label="indexLabel || '序号'" :headerAlign="headerAlign" />
         <!-- 首列 -->
         <template v-if="useSlots().firstColumn">
           <slot name="firstColumn" />
@@ -70,7 +88,7 @@
     <div class="bottom-page-static-info" v-if="isPager || tableConfig.statistic">
       <el-pagination class="page-info" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="+pageInfo.current" :page-sizes="pageSizes || [5, 10, 20, 50, 100]" :page-size="pageInfo.size" layout="total, sizes, prev, pager, next, jumper" :total="pageInfo.total" />
     </div>
-    <slot name="bottom"></slot>
+    <slot name="bottom" :tableData="tableData"></slot>
   </div>
 </template>
 <script lang="ts">
@@ -100,7 +118,7 @@ const lodash = inject('lodash') as any
 const defaultConf = inject('defaultConf') as ICRUDConfig
 const format = inject('format') as any
 
-const emits = defineEmits(['getUrlConsumerIds', 'selection', 'select', 'selectAll', 'update:modelValue', 'tabChange', 'queryChange', 'expandChange', 'inited', 'headerReset'])
+const emits = defineEmits(['getUrlConsumerIds', 'selection', 'select', 'selectAll', 'update:modelValue', 'tabChange', 'queryChange', 'expandChange', 'inited', 'headerReset', 'layoutChange'])
 const props = withDefaults(
   defineProps<{
     tableConfig: ITableConfig
@@ -110,6 +128,8 @@ const props = withDefaults(
     type?: string
     // 是否显示第一列的Index下标
     isIndex?: boolean
+    // 首列标题
+    indexLabel?: string
     // 是否分页
     isPager?: boolean
     // 每页显示条数
@@ -158,6 +178,8 @@ const props = withDefaults(
     loading: false
   }
 )
+
+const isShowDIYMain = ref(props.isDIYMain || false)
 
 const localRowKey = ref(props.rowKey)
 // 合并行算法
@@ -230,7 +252,7 @@ const treeProps = (props.tableConfig?.explan?.treeProps || { children: 'children
 
 // 处理后的列显示
 const headerColumns = computed(() => {
-  const tempList = handelListColumn(lodash.cloneDeep(props.tableConfig?.column), defaultConf, props.tableConfig?.tbName || '', props.headerAlign, props.isDialog ? 'auto' : props.colMinWidth)
+  const tempList = handelListColumn(lodash.cloneDeep(props.tableConfig?.column), defaultConf, props.tableConfig?.tbName || '', props.headerAlign, props.colMinWidth || 'auto')
   // 这里重构一下合并行算法
   // 获取所有列
   const allColumn = getColumList(tempList)
@@ -401,6 +423,17 @@ async function handelTabChange(val: string | number | boolean) {
   // 这里触发下initCol
   setTimeout(() => {
     initCol()
+  }, 100)
+}
+
+function handelLayoutChange(type: 'card' | 'list') {
+  emits('layoutChange', type)
+  localLoading.value = true
+  setTimeout(() => {
+    isShowDIYMain.value = type === 'card'
+    setTimeout(() => {
+      localLoading.value = false
+    }, 500)
   }, 100)
 }
 

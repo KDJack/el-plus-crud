@@ -2,7 +2,7 @@
   <div class="ele-form-image">
     <template v-if="imagList && imagList.length > 0">
       <template v-for="(image, i) in imagList" :key="image + i">
-        <el-image :class="desc.class" :src="image" :preview-src-list="attrs.isShowPreview === false ? null : imagList" :initial-index="i" v-bind="attrs" :style="styles" v-on="onEvents" :fit="attrs.fit || 'cover'" />
+        <el-image v-if="!attrs.showOne || (attrs.showOne && i === 0)" :class="desc.class" :src="image" :preview-src-list="attrs.isShowPreview === false ? null : imagList" :initial-index="i" v-bind="attrs" :style="styles" v-on="onEvents" :fit="attrs.fit || 'cover'" />
       </template>
     </template>
     <div v-else>
@@ -34,7 +34,7 @@ const attrs = ref({} as any)
 const onEvents = ref(getEvents(props))
 
 onBeforeMount(async () => {
-  attrs.value = await getAttrs(props, { isShowPreview: true, previewTeleported: true, ...useAttrs() })
+  attrs.value = await getAttrs(props, { isShowPreview: true, previewTeleported: true, showOne: false, ...useAttrs() })
 })
 
 const imagList = computed(() => {

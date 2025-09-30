@@ -10,6 +10,16 @@
                 <ElPlusFormBtn v-if="Object.keys(formConfig?.formDesc || {}).length" :desc="{ label: '重置', on: { click: handelReset }, size }" />
                 <ElPlusTableSettingColumn ref="settingColumnRef" v-if="tbName" :tbName="tbName" :column="column || []" :size="size" />
 
+                <!-- 布局 -->
+                <el-radio-group v-if="layoutSelect" v-model="layoutType" style="margin-left: 12px; margin-right: 12px" @change="handelLayoutChange">
+                  <el-radio-button label="card">
+                    <el-icon><Menu /></el-icon>
+                  </el-radio-button>
+                  <el-radio-button label="list">
+                    <el-icon><Expand /></el-icon>
+                  </el-radio-button>
+                </el-radio-group>
+
                 <template v-for="(item, i) in headerBtns" :key="i">
                   <template v-if="getVIf(item)">
                     <template v-if="item.customize">
@@ -63,10 +73,11 @@ import ElPlusFormBtn from '../../el-plus-form/components/ElPlusFormBtn.vue'
 import ElPlusFormUpbtn from '../../el-plus-form/components/ElPlusFormUpbtn.vue'
 import { isMobile, handelBtnType, mapToUrlStr } from '../../../util'
 import { IBtnBack, ICRUDConfig, IColumnItem, ITableToolbar } from '../../../../types'
+import { Expand, Menu } from '@element-plus/icons-vue'
 
 const defaultConf = inject('defaultConf') as ICRUDConfig
 
-const emits = defineEmits(['query', 'reset'])
+const emits = defineEmits(['query', 'reset', 'layoutChange'])
 const props = withDefaults(
   defineProps<{
     modelValue?: { [key: string]: any } | {}
@@ -78,12 +89,14 @@ const props = withDefaults(
     isShowRefresh: boolean
     size: string
     queryDataFn?: Function
+    layoutSelect?: boolean
   }>(),
   { tbName: '', isDialog: false, loading: false, isShowRefresh: true, size: 'default' }
 )
 
 const elPlusFormRef = ref()
 const settingColumnRef = ref()
+const layoutType = ref('card')
 
 const headerBtns = computed(() => {
   const btns = [] as any[]
@@ -137,6 +150,10 @@ const exportConf = computed(() => {
 function handelQueryData() {
   // 通知父类执行查询
   emits('query')
+}
+
+function handelLayoutChange(data: any) {
+  emits('layoutChange', data)
 }
 
 /**

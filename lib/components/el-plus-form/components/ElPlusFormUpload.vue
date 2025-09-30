@@ -88,7 +88,7 @@ const previewList = computed(() => {
   const tempList = [] as string[]
   currentValue.value.map((item: any) => {
     if (fileTypes.imageSuffixes.indexOf(item.raw?.suffix || item.suffix) >= 0) {
-      tempList.push(item.url)
+      tempList.push(item.signUrl || item.url)
     }
   })
   return tempList
@@ -131,7 +131,7 @@ onBeforeMount(async () => {
  * @param file
  */
 async function handelUploadBefore(file: any) {
-  file.suffix = (file.name as string).substring(file.name.lastIndexOf('.'))
+  file.suffix = `${(file.name as string).substring(file.name.lastIndexOf('.'))}`.split('?')[0]
   const message = validateFile(file, (fileTypes as any)[`${props.desc.upType || 'image'}Suffixes`], attrs.value.maxSize)
   if (message !== true) {
     ElMessage.warning(message)
@@ -250,7 +250,7 @@ async function handelUploadSuccess(response: any, file: any) {
  */
 function getFileIcon(file?: any): string {
   const fileUrl = file.shareUrl || file.signUrl || file.url || file.furl
-  const suffix = (file?.suffix || fileUrl.substring(fileUrl.split('?')[0].lastIndexOf('.')) || '').toLocaleLowerCase()
+  const suffix = `${(file?.suffix || fileUrl.substring(fileUrl.split('?')[0].lastIndexOf('.')) || '').toLocaleLowerCase()}`.split('?')[0]
   if (suffix) {
     if (fileTypes.imageSuffixes.indexOf(suffix) >= 0) {
       return fileUrl
@@ -310,7 +310,7 @@ function handelListChange(item: any, type: 0 | 1) {
  */
 function handelPreview(file: any) {
   if (fileTypes.imageSuffixes.indexOf((file.raw?.suffix || file.suffix || '').toLocaleLowerCase()) >= 0) {
-    previewIndex.value = previewList.value.findIndex((item) => item === (file.raw?.shareUrl || file.furl))
+    previewIndex.value = previewList.value.findIndex((item) => item === (file.signUrl || file.raw?.shareUrl || file.raw?.signUrl || file.furl))
     if (previewIndex.value < 0) {
       previewIndex.value = 0
     }
@@ -370,7 +370,7 @@ watch(
       // 这里初始化一下
       if (typeof data === 'string') {
         if (data !== '') {
-          currentValue.value = [{ url: data, furl: data, suffix: data.substring(data.lastIndexOf('.')).toLocaleLowerCase() }]
+          currentValue.value = [{ url: data, furl: data, suffix: `${data.substring(data.lastIndexOf('.')).toLocaleLowerCase()}`.split('?')[0] }]
         } else {
           currentValue.value = []
         }
@@ -381,7 +381,7 @@ watch(
               item.url = getFileIcon(item) || getValue(defaultConf.upload?.signMap?.previewUrlKey || [], item)
               item.furl = item.furl || getFileIcon(item)
             }
-            item.suffix = (item.suffix || item.url?.substring(item.url?.lastIndexOf('.') || 0) || '').toLocaleLowerCase()
+            item.suffix = `${(item.suffix || item.url?.substring(item.url?.lastIndexOf('.') || 0) || '').toLocaleLowerCase()}`.split('?')[0]
             item.previewUrl = getValue(defaultConf.upload?.signMap?.previewUrlKey || [], item) || item.furl || item.url
             return item
           }) || []

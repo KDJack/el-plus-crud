@@ -386,7 +386,8 @@ const initFormAttrs = lodash.debounce(
             formItem._tip = handelKeyValue(formItem, 'tip', field)
             // 单独处理下上传
             if (!formItem._tip && !formItem.noTip && formItem.type === 'upload') {
-              formItem._tip = `最多上传${formItem.multiple ? formItem.limit || 20 : 1}${formItem.upType === 'file' ? '个文件' : '张图片'}`
+              const maxSize = formItem.maxSize || (!formItem.upType || formItem.upType === 'image' ? defaultConf.upload?.maxISize : defaultConf.upload?.maxFSize) || 1024 * 1024
+              formItem._tip = `最多上传${formItem.multiple ? formItem.limit || 20 : 1}${formItem.upType === 'file' ? '个文件' : '张图片'}，且单个文件大小不能超过  ${(maxSize / 1024 / 1024).toFixed(2)} M`
             }
             // 这里初始化一下默认值
             if (formItem.default !== undefined && formItem.default !== null && props.modelValue[field] === undefined) {

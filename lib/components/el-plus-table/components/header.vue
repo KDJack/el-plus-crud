@@ -71,7 +71,7 @@ import { ref, computed, onMounted, nextTick, inject } from 'vue'
 import ElPlusTableSettingColumn from './settingColumn.vue'
 import ElPlusFormBtn from '../../el-plus-form/components/ElPlusFormBtn.vue'
 import ElPlusFormUpbtn from '../../el-plus-form/components/ElPlusFormUpbtn.vue'
-import { isMobile, handelBtnType, mapToUrlStr } from '../../../util'
+import { isMobile, handelBtnType, mapToUrlStr, isPromiseLike } from '../../../util'
 import { IBtnBack, ICRUDConfig, IColumnItem, ITableToolbar } from '../../../../types'
 import { Expand, Menu } from '@element-plus/icons-vue'
 
@@ -90,6 +90,8 @@ const props = withDefaults(
     size: string
     queryDataFn?: Function
     layoutSelect?: boolean
+    initLoad?: boolean
+    isInitLoad?: boolean
   }>(),
   { tbName: '', isDialog: false, loading: false, isShowRefresh: true, size: 'default' }
 )
@@ -168,7 +170,16 @@ async function handelDownload({ callBack }: IBtnBack, index: number) {
     let url = tempConf.url || ''
     const method = tempConf.method || 'get'
 
-    let postData = Object.assign({}, props.queryDataFn ? await props.queryDataFn() : {}, tempConf?.data || { size: 1000 })
+    let postData = Object.assign({}, props.queryDataFn ? await props.queryDataFn() : {})
+
+    if (typeof tempConf?.data === 'function') {
+      // 如果有方法类型的判断，则需要启用动态监测
+      const result = tempConf.data(postData)
+      Object.assign(postData, isPromiseLike<any>(result) ? await result : result)
+    } else {
+      Object.assign(postData, tempConf?.data || { size: 1000 })
+    }
+
     // 提交数据前的处理
     if (props.toolbar?.formConfig?.beforeRequest) {
       postData = await (props.toolbar.formConfig.beforeRequest as Function)(postData)
@@ -346,6 +357,7 @@ function initCol() {
 }
 
 onMounted(() => {
+  if (!props.initLoad && !props.isInitLoad) return false
   nextTick(() => {
     setTimeout(() => {
       handelSearch()

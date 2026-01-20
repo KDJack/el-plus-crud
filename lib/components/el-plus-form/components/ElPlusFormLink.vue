@@ -73,6 +73,7 @@ const topAttrs = reactive({
   size: props.desc.size,
   collapseTags: true,
   collapseTagsTooltip: true,
+  maxCollapseTags: props.desc.maxCollapseTags || 3,
   clearable: false,
   placeholder: props.desc.placeholder || '请选择' + props.desc.label
 })
@@ -293,7 +294,7 @@ onMounted(async () => {})
       overflow: hidden;
       .tag-item {
         .el-tag__content {
-          max-width: 100px;
+          // max-width: 100px;
           text-overflow: ellipsis;
           overflow: hidden;
           white-space: nowrap;

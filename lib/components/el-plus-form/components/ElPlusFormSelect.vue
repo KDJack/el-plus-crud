@@ -167,6 +167,7 @@ onBeforeMount(async () => {
   attrs.value = await getAttrs(props, tempAttr)
   attrs.value.remote = !!props.desc.remote
   delete attrs.value.disabled
+  delete attrs.value.options
   isInit.value = true
 })
 

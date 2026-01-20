@@ -22,6 +22,8 @@
       @reset="handelHeaderReset"
       :layoutSelect="isDIYMain && !!tableConfig?.column?.length"
       @layoutChange="handelLayoutChange"
+      :initLoad="initLoad"
+      :isInitLoad="isInitLoad"
     />
 
     <!-- tabTop插槽 -->
@@ -102,7 +104,7 @@ export default {
 import { ref, reactive, onMounted, computed, watch, nextTick, useSlots, inject, provide } from 'vue'
 import EleTabletHeader from './components/header.vue'
 import ElPlusTableColumn from './ElPlusTableColumn.vue'
-import { handelListColumn, isEqual } from '../../util'
+import { handelListColumn, is, isEqual } from '../../util'
 import { Loading } from '@element-plus/icons-vue'
 import type { TableColumnCtx } from 'element-plus'
 import { ICRUDConfig, ITableConfig, ITableTabItem, ITreeProps } from '../../../types'
@@ -158,6 +160,8 @@ const props = withDefaults(
     isTempId?: boolean
     // 加载状态
     loading?: boolean
+    // 是否初始化就查询
+    initLoad?: boolean
   }>(),
   {
     modelValue: null,
@@ -175,9 +179,12 @@ const props = withDefaults(
     colMinWidth: 'auto',
     headerAlign: 'left',
     isTempId: true,
-    loading: false
+    loading: false,
+    initLoad: true
   }
 )
+
+const isInitLoad = ref(false)
 
 const isShowDIYMain = ref(props.isDIYMain || false)
 
@@ -415,7 +422,8 @@ function getColumList(list: Array<any>): Array<any> {
  */
 async function handelTabChange(val: string | number | boolean) {
   // 这里直接重新查询
-  reload(true)
+  if (!props.initLoad && !isInitLoad.value) return false
+  handelTopQuery(true)
 
   // 通知父类 第二个参数是回调
   await emits('tabChange', val, initCol)
@@ -763,20 +771,23 @@ async function reload(isTab: boolean = false) {
     tabStatic.value = await props.tableConfig?.tabConf.fetch(Object.assign({}, await getListQueryData(), props.tableConfig?.tabConf.queryMap))
     loadingTab.value = false
   }
+  isInitLoad.value = true
   return tableData.value
 }
 
 /**
  * 处理顶部条件表单筛选
  */
-async function handelTopQuery() {
+async function handelTopQuery(isTab: boolean = false) {
+  // 判断是否直接查询
+  if (!props.initLoad && !isInitLoad.value) return false
   // topQueryData.value = cloneDeep(tableHeaderRef.value.getData())
   let tempQueryData = await getListQueryData()
   if (props.tableConfig?.toolbar?.formConfig?.beforeRequest) {
     tempQueryData = props.tableConfig?.toolbar?.formConfig?.beforeRequest(lodash.cloneDeep(tempQueryData)) || tempQueryData
   }
   if (tempQueryData) emits('queryChange', tempQueryData)
-  reload()
+  reload(isTab)
 }
 
 /**
@@ -846,7 +857,9 @@ if (props.isDIYMain) {
 onMounted(() => {
   // toolbar.formConfig
   if (!(Object.keys(props.tableConfig?.toolbar?.formConfig || {}).length || props.tableConfig?.tbName)) {
-    reload()
+    if (props.initLoad) {
+      reload()
+    }
   }
 })
 

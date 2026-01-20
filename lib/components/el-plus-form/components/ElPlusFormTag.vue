@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-tag v-bind="attrs" :disabled="disabled" :size="attrs.size || 'default'" :type="tagType !== '--' ? tagType : ''" v-on="onEvents">
+    <el-tag v-bind="attrs" :disabled="disabled" :size="attrs.size || 'default'" :type="tagType && tagType !== '--' ? tagType : 'primary'" v-on="onEvents">
       {{ formatValue || modelValue }}
     </el-tag>
   </div>
@@ -16,6 +16,7 @@ export default {
 <script lang="ts" setup>
 import { ref, watch, useAttrs, onBeforeMount, inject } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
+import { isPromiseLike } from '../../../util'
 
 const format = inject('format') as any
 
@@ -47,7 +48,8 @@ watch(
     } else {
       if (typeof props.desc.tagType === 'function') {
         // 如果有方法类型的判断，则需要启用动态监测
-        tagType.value = await props.desc.tagType(props.modelValue, props.formData || {}, props.field)
+        const result = props.desc.tagType(props.modelValue, props.formData || {}, props.field)
+        tagType.value = isPromiseLike<any>(result) ? await result : result
       } else if (typeof props.desc.tagType === 'string') {
         tagType.value = (await format)[props.desc.tagType](props.modelValue, props.formData || {}, props.field)
       } else {
@@ -66,7 +68,8 @@ watch(
     } else {
       if (typeof props.desc.format === 'function') {
         // 如果有方法类型的判断，则需要启用动态监测
-        formatValue.value = await props.desc.format(props.modelValue, props.formData || {}, props.field)
+        const result = props.desc.format(props.modelValue, props.formData || {}, props.field)
+        formatValue.value = isPromiseLike<any>(result) ? await result : result
       } else if (typeof props.desc.format === 'string') {
         formatValue.value = (await format)[props.desc.format](props.modelValue, props.formData || {}, props.field)
       } else {

@@ -253,7 +253,7 @@ export interface IExportConfig {
   // 如何去解析数据结果获取url
   urlKey?: string | Array<string>
   // 请求夹带的数据
-  data?: Object
+  data?: Object | ((data?: any) => Object)
   // 文件名
   name?: string
   // 是否增加token权限

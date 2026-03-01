@@ -15,9 +15,10 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { ref, useAttrs, useSlots, onBeforeMount, nextTick, computed, watch } from 'vue'
+import { ref, useAttrs, useSlots, onBeforeMount, nextTick, computed, watch, onMounted } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
 import { ElMessage } from 'element-plus'
+import { useVModel } from '@vueuse/core'
 
 const props = defineProps<{
   modelValue?: string | number | null
@@ -27,6 +28,7 @@ const props = defineProps<{
   formData: { [key: string]: any }
 }>()
 const emits = defineEmits(['update:modelValue', 'change', 'input', 'validateThis'])
+
 const slots = ref(Object.assign({}, useSlots(), props.desc.slots))
 const attrs = ref({} as any)
 const onEvents = ref(getEvents(props))
@@ -34,8 +36,7 @@ const onEvents = ref(getEvents(props))
 const isDoChange = ref(false)
 
 const currentText = ref()
-const currentValue = ref()
-emits('update:modelValue', currentValue)
+const currentValue = useVModel(props, 'modelValue', emits)
 
 onBeforeMount(async () => {
   attrs.value = await getAttrs(props, { autocomplete: 'new-password', maxlength: 10, clearable: true, ...useAttrs() })
@@ -103,25 +104,6 @@ const numBindAttr = computed(() => {
   return { min, max, precision }
 })
 
-// 判断一下初始值
-if (currentText.value !== undefined && currentText.value !== null) {
-  if (currentText.value < numBindAttr.value.min) {
-    currentText.value = numBindAttr.value.min
-  } else if (currentText.value > numBindAttr.value.max) {
-    currentText.value = numBindAttr.value.max
-  }
-}
-
-if (onEvents.value.change) {
-  const tempChange = onEvents.value.change
-  onEvents.value.change = (val: any, oldVal: any) => {
-    handelValChange(val, oldVal)
-    tempChange(val)
-  }
-} else {
-  onEvents.value.change = handelValChange
-}
-
 /**
  * 监听值改变
  * @param val
@@ -170,8 +152,30 @@ watch(
     if (val !== undefined && val !== null && val !== '') {
       handelValChange((val * 100).toFixed(numBindAttr.value.precision - 2), null)
     }
-  }
+  },
+  { immediate: true }
 )
+
+onMounted(() => {
+  // 判断一下初始值
+  if (currentText.value !== undefined && currentText.value !== null) {
+    if (currentText.value < numBindAttr.value.min) {
+      currentText.value = numBindAttr.value.min
+    } else if (currentText.value > numBindAttr.value.max) {
+      currentText.value = numBindAttr.value.max
+    }
+  }
+
+  if (onEvents.value.change) {
+    const tempChange = onEvents.value.change
+    onEvents.value.change = (val: any, oldVal: any) => {
+      handelValChange(val, oldVal)
+      tempChange(val)
+    }
+  } else {
+    onEvents.value.change = handelValChange
+  }
+})
 
 defineExpose({ clear, field: props.field })
 </script>

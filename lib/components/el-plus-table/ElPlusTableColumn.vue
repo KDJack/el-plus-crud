@@ -1,5 +1,5 @@
 <template>
-  <el-table-column v-if="props.item.__vif" v-bind="columnAttr">
+  <el-table-column v-if="props.item.__vif" v-bind="columnAttr" :key="'col_' + item.__id + '-' + item.label + '-' + index">
     <template #header="{ column }: any">
       <div :class="{ 'th-required': item.required }" :style="item.hstyle">
         {{ column.label }}
@@ -8,7 +8,7 @@
     <template #default="scope: any">
       <!-- 递归 -->
       <template v-if="item.children?.length">
-        <ElPlusTableColumn v-for="(child, i) in item.children" :item="child" :size="size" :key="i"></ElPlusTableColumn>
+        <ElPlusTableColumn v-for="(child, i) in item.children" :item="child" :size="size" :key="index + '-' + i" :index="i"></ElPlusTableColumn>
       </template>
       <template v-else>
         <ColumnItem v-if="scope['$index'] >= 0" :field="item.prop" :desc="item" :scope="scope" :size="size" v-model="scope.row[item.prop as any]" />
@@ -35,6 +35,7 @@ const lodash = inject('lodash') as any
 const props = defineProps<{
   item: IColumnItem
   size: string
+  index: number
 }>()
 
 /**

@@ -45,6 +45,7 @@ const onEvents = ref(getEvents(props))
 const treeRef = ref()
 const selectAll = ref(false)
 const allIds = ref([] as any[])
+let isPromise = false
 
 onBeforeMount(async () => {
   attrs.value = await getAttrs(props, { checkStrictly: true, showCheckbox: true, accordion: true, noSelectAll: false, props: { label: 'label', children: 'children' }, ...useAttrs() })
@@ -57,7 +58,22 @@ onBeforeMount(async () => {
 /**
  * 处理单个checkbox改变
  */
-function handelCheckChange(item: any, isSelect: boolean) {
+async function handelCheckChange(item: any, isSelect: boolean) {
+  if (isSelect && attrs.value?.checkStrictly) {
+    if (isPromise) return
+    isPromise = true
+    console.log('item: ', item)
+    await new Promise((resolve) => {
+      // 遍历该节点的所有下级节点id,然后选中
+      const tempList = getLoopIds([item])
+      tempList.push(...treeRef.value!.getCheckedKeys(!(props.desc.isPId ?? true)))
+      treeRef.value!.setCheckedKeys(tempList)
+      setTimeout(() => {
+        isPromise = false
+        resolve(true)
+      }, 50)
+    })
+  }
   currentValue.value = treeRef.value!.getCheckedKeys(!(props.desc.isPId ?? true))
   nextTick(() => {
     // 这里判断一下全选状态
@@ -71,7 +87,9 @@ function handelCheckChange(item: any, isSelect: boolean) {
  */
 function handelSelectAll() {
   let selectIds = [] as any[]
-  if (selectAll.value) selectIds = lodash.cloneDeep(allIds.value)
+  if (selectAll.value) {
+    selectIds = lodash.cloneDeep(allIds.value)
+  }
   currentValue.value = selectIds
   treeRef.value!.setCheckedKeys(currentValue.value)
 }
@@ -83,8 +101,8 @@ function getLoopIds(list: Array<any>) {
   const tempIds = [] as any[]
   if (list?.length) {
     list.map((item) => {
-      if (item[attrs.value.props.children]?.length) {
-        tempIds.push(...getLoopIds(item[attrs.value.props.children]))
+      if (item[attrs.value.props.children || 'children']?.length) {
+        tempIds.push(...getLoopIds(item[attrs.value.props.children || 'children']))
       }
       tempIds.push(item.id)
     })
@@ -107,10 +125,13 @@ watch(
     } else {
       options.splice(0, options.length)
     }
-    // 如果是复选,这里重新获取下所有IDs
-    if (attrs.value.showCheckbox && !attrs.value.noSelectAll) {
-      allIds.value = getLoopIds(options)
-    }
+    setTimeout(() => {
+      // 如果是复选,这里重新获取下所有IDs
+      if (attrs.value.showCheckbox && !attrs.value.noSelectAll) {
+        allIds.value = getLoopIds(options)
+        selectAll.value = allIds.value.length === currentValue.value?.length
+      }
+    }, 20)
   },
   { immediate: true }
 )

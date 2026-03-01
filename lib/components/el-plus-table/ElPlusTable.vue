@@ -59,7 +59,25 @@
         <slot name="main" :tableData="tableData"></slot>
       </template>
       <!-- 这里开始是表格内容  -->
-      <el-table ref="elPlusTableRef" v-else style="width: 100%" :maxHeight="tableConfig.maxHeight || 'auto'" v-bind="tableConfig.tableAttr" :class="{ 'big-h-bar': tableConfig?.tableAttr?.bigHBar, 'big-v-bar': tableConfig.tableAttr?.bigVBar }" :data="tableData" :row-key="localRowKey" lazy :load="loadExpandData" :size="size" @select="handelTableSelect" @select-all="handelTableSelectAll" @expand-change="handelTableExpandChange" :treeProps="treeProps" :span-method="handelSpanMethod">
+      <el-table
+        ref="elPlusTableRef"
+        v-else
+        style="width: 100%"
+        :maxHeight="tableConfig.maxHeight || 'auto'"
+        v-bind="tableAttributes"
+        :class="{ 'big-h-bar': tableAttributes?.bigHBar, 'big-v-bar': tableAttributes?.bigVBar }"
+        :data="tableData"
+        :row-key="localRowKey"
+        lazy
+        :load="loadExpandData"
+        :size="size"
+        @select="handelTableSelect"
+        @select-all="handelTableSelectAll"
+        @expand-change="handelTableExpandChange"
+        :treeProps="treeProps"
+        :span-method="handelSpanMethod"
+        @header-dragend="handelHeaderDragend"
+      >
         <!-- 复选框 -->
         <el-table-column v-if="type === 'selection'" type="selection" fixed="left" width="55px" :selectable="selectable" header-align="center" align="center" />
         <!-- 下标 -->
@@ -69,7 +87,7 @@
           <slot name="firstColumn" />
         </template>
         <!-- 一级或多级列 -->
-        <ElPlusTableColumn v-for="(item, i) in headerColumns" :key="item.__id + '-' + item.label + '-' + i" :item="item" :size="size"></ElPlusTableColumn>
+        <ElPlusTableColumn v-for="(item, i) in headerColumns" :key="item.__id + '-' + item.label + '-' + i" :item="item" :size="size" :index="i"></ElPlusTableColumn>
 
         <!-- 空 -->
         <template v-if="!compLoading && loadingStatus === 2" #empty>
@@ -120,7 +138,7 @@ const lodash = inject('lodash') as any
 const defaultConf = inject('defaultConf') as ICRUDConfig
 const format = inject('format') as any
 
-const emits = defineEmits(['getUrlConsumerIds', 'selection', 'select', 'selectAll', 'update:modelValue', 'tabChange', 'queryChange', 'expandChange', 'inited', 'headerReset', 'layoutChange'])
+const emits = defineEmits(['getUrlConsumerIds', 'selection', 'select', 'selectAll', 'update:modelValue', 'tabChange', 'queryChange', 'expandChange', 'inited', 'headerReset', 'layoutChange', 'loadDataEnd'])
 const props = withDefaults(
   defineProps<{
     tableConfig: ITableConfig
@@ -207,6 +225,11 @@ const tableTabVal = ref(props.tableConfig?.tabConf?.tabs[props.tableConfig?.tabC
 //   }
 //   return ''
 // })
+const tableAttributes = computed(() => {
+  // 限时边框-方便调整列宽 横向滚动条宽度翻倍 & 一直显示
+  return Object.assign({ border: true, bigHBar: true, scrollbarAlwaysOn: true }, props.tableConfig?.tableAttr || {})
+})
+
 const getTabLabel = computed(() => (item: ITableTabItem) => {
   if (item.key) {
     return tabStatic.value[item.key] || 0
@@ -215,8 +238,8 @@ const getTabLabel = computed(() => (item: ITableTabItem) => {
 })
 
 const selectable = computed(() => (row: any, index: number) => {
-  if (typeof props.tableConfig?.tableAttr?.selectable === 'function') {
-    return props.tableConfig?.tableAttr?.selectable(row, index)
+  if (typeof tableAttributes.value?.selectable === 'function') {
+    return tableAttributes.value?.selectable(row, index)
   }
   return true
 })
@@ -690,6 +713,7 @@ async function loadData(isInit: Boolean) {
   try {
     let dataPage = ((await props.tableConfig.fetch(postData)) || {}) as any
     // 这里要进行赋值操作-同时要转换相关key
+    emits('loadDataEnd', dataPage)
     if (Array.isArray(dataPage)) {
       dataPage = { [defaultConf.table?.list || props.tableConfig?.fetchMap?.list || 'records']: dataPage }
     }
@@ -810,6 +834,17 @@ function initCol() {
  */
 function resetQuery() {
   tableHeaderRef.value?.resetQuery()
+}
+
+/**
+ * 列宽改变事件
+ * @param newWidth
+ * @param oldWidth
+ * @param column
+ * @param event
+ */
+function handelHeaderDragend(newWidth: number, oldWidth: number, column: TableColumnCtx<any>, event: MouseEvent) {
+  console.log('newWidth: ', newWidth, oldWidth, column, event)
 }
 
 // 监听父类数据变更

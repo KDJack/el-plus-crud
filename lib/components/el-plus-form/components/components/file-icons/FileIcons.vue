@@ -173,7 +173,13 @@ async function handelDownload(file: IOssInfo) {
       }
 
       .file-name {
-        margin-left: 10px;
+        max-width: 100%;
+        margin: 0 10px;
+        word-break: keep-all;
+        display: block !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
       }
     }
   }

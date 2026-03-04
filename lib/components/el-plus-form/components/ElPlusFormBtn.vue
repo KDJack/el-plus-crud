@@ -58,7 +58,14 @@ const vif = computed(() => {
 const attrs = computed(() => {
   const attrs = Object.assign({}, useAttrs(), props.desc, props.desc?._attrs)
   if (attrs.btnType) {
-    attrs.type = attrs.btnType
+    if (typeof attrs.btnType == 'function') {
+      attrs.type = attrs.btnType(props.formData || {})
+    } else {
+      attrs.type = attrs.btnType
+    }
+    if (!attrs.type) {
+      attrs.type = 'primary'
+    }
   }
   return attrs
 })

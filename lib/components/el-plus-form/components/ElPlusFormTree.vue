@@ -46,6 +46,7 @@ const treeRef = ref()
 const selectAll = ref(false)
 const allIds = ref([] as any[])
 let isPromise = false
+let isSelectAllAction = false
 
 onBeforeMount(async () => {
   attrs.value = await getAttrs(props, { checkStrictly: true, showCheckbox: true, accordion: true, noSelectAll: false, props: { label: 'label', children: 'children' }, ...useAttrs() })
@@ -62,7 +63,6 @@ async function handelCheckChange(item: any, isSelect: boolean) {
   if (isSelect && attrs.value?.checkStrictly) {
     if (isPromise) return
     isPromise = true
-    console.log('item: ', item)
     await new Promise((resolve) => {
       // 遍历该节点的所有下级节点id,然后选中
       const tempList = getLoopIds([item])
@@ -77,7 +77,9 @@ async function handelCheckChange(item: any, isSelect: boolean) {
   currentValue.value = treeRef.value!.getCheckedKeys(!(props.desc.isPId ?? true))
   nextTick(() => {
     // 这里判断一下全选状态
-    selectAll.value = isSelect && allIds.value.length === currentValue.value?.length
+    if (!isSelectAllAction) {
+      selectAll.value = isSelect && allIds.value.length === currentValue.value?.length
+    }
     emits('validateThis')
   })
 }
@@ -86,12 +88,18 @@ async function handelCheckChange(item: any, isSelect: boolean) {
  * 处理权限
  */
 function handelSelectAll() {
+  const isChecked = selectAll.value
   let selectIds = [] as any[]
-  if (selectAll.value) {
+  if (isChecked) {
     selectIds = lodash.cloneDeep(allIds.value)
   }
+  isSelectAllAction = true
   currentValue.value = selectIds
   treeRef.value!.setCheckedKeys(currentValue.value)
+  setTimeout(() => {
+    isSelectAllAction = false
+    selectAll.value = isChecked
+  }, 150)
 }
 
 /**
@@ -129,7 +137,9 @@ watch(
       // 如果是复选,这里重新获取下所有IDs
       if (attrs.value.showCheckbox && !attrs.value.noSelectAll) {
         allIds.value = getLoopIds(options)
-        selectAll.value = allIds.value.length === currentValue.value?.length
+        if (!isSelectAllAction) {
+          selectAll.value = allIds.value.length === currentValue.value?.length
+        }
       }
     }, 20)
   },

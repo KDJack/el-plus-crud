@@ -180,6 +180,8 @@ const props = withDefaults(
     loading?: boolean
     // 是否初始化就查询
     initLoad?: boolean
+    // 是否存储分页数据-主要是给DIYMain用的
+    isStorePageData?: boolean
   }>(),
   {
     modelValue: null,
@@ -198,7 +200,8 @@ const props = withDefaults(
     headerAlign: 'left',
     isTempId: true,
     loading: false,
-    initLoad: true
+    initLoad: true,
+    isStorePageData: false
   }
 )
 
@@ -459,12 +462,14 @@ async function handelTabChange(val: string | number | boolean) {
 
 function handelLayoutChange(type: 'card' | 'list') {
   emits('layoutChange', type)
-  localLoading.value = true
+  // localLoading.value = true
   setTimeout(() => {
     isShowDIYMain.value = type === 'card'
-    setTimeout(() => {
-      localLoading.value = false
-    }, 500)
+    tableData.value = []
+    reload()
+    // setTimeout(() => {
+    //   localLoading.value = false
+    // }, 500)
   }, 100)
 }
 
@@ -704,6 +709,9 @@ async function loadData(isInit: Boolean) {
   localLoading.value = true
   if (isInit) {
     pageInfo.current = 1
+    if (props.isStorePageData) {
+      tableData.value = []
+    }
   }
   let postData = await getListQueryData()
   // 这里处理一下外部数据格式化
@@ -737,7 +745,11 @@ async function loadData(isInit: Boolean) {
         localRowKey.value = props.rowKey
       }
 
-      tableData.value = dataResult
+      if (props.isStorePageData) {
+        tableData.value.push(...dataResult)
+      } else {
+        tableData.value = dataResult
+      }
       // 如果是树形结构
       if (props.type === 'expand') {
         treeIndexList.splice(0, treeIndexList.length)
@@ -847,6 +859,14 @@ function handelHeaderDragend(newWidth: number, oldWidth: number, column: TableCo
   console.log('newWidth: ', newWidth, oldWidth, column, event)
 }
 
+function nextPage() {
+  handleCurrentChange(pageInfo.current + 1)
+}
+
+function hasNextPage() {
+  return pageInfo.total >= pageInfo.current * pageInfo.size
+}
+
 // 监听父类数据变更
 // watch(
 //   () => props.modelValue,
@@ -898,7 +918,7 @@ onMounted(() => {
   }
 })
 
-defineExpose({ tableRef: elPlusTableRef, reload, tableData, changeSelect, resetSelect, initCol, resetQuery })
+defineExpose({ tableRef: elPlusTableRef, reload, tableData, changeSelect, resetSelect, initCol, resetQuery, nextPage, hasNextPage })
 </script>
 <style lang="scss">
 .dark .el-plus-table-content {

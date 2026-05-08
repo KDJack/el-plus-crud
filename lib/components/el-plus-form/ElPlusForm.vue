@@ -4,7 +4,7 @@
     <div :style="{ display: 'flex', justifyContent: isDialog ? 'center' : '' }">
       <el-form class="el-plus-form-panel" ref="refElPlusForm" :model="props.modelValue" @submit.prevent="handleSubmitForm" v-bind="computedFormAttrs">
         <template v-if="attrMapToTableList?.length">
-          <el-row :gutter="10" v-for="(formList, index) in attrMapToTableList" :key="index" :style="{ marginRight: isTable ? '20px' : 0 }">
+          <el-row :gutter="10" v-for="(formList, index) in attrMapToTableList" :key="index" v-show="maxShowRowIndex < 0 || index < maxShowRowIndex" :style="{ marginRight: isTable ? '20px' : 0 }">
             <el-col v-for="(formItem, y) in formList" :key="index + '-' + y + '-' + formItem.field" :xs="24" :sm="24" :md="formItem.colspan && formItem.colspan >= column ? 24 : column >= 2 ? 12 : 24" :lg="formItem.colspan && formItem.colspan >= column ? 24 : Math.floor((24 / column) * (formItem.colspan || 1))" :xl="formItem.colspan && formItem.colspan >= column ? 24 : Math.floor((24 / column) * (formItem.colspan || 1))">
               <div v-if="formItem._vif" class="el-plus-form-column-panel" :style="{ 'justify-content': isTable ? 'flex-end' : 'flex-start' }">
                 <el-form-item style="min-height: 40px; display: flex" :prop="formItem.field" :style="{ width: formItem._attrs?.width || formItem.width || (isTable ? '150px' : '100%'), marginBottom: itemMB }">
@@ -114,6 +114,8 @@ export interface IFormProps {
   disabledTab?: boolean
   // item的底部边距
   itemMB?: string
+  // 收起状态下最多显示的行数索引，-1 表示不限制
+  maxShowRowIndex?: number
   // 比如 beforeValidate, beforeRequest, success, requestError, requestEnd
   // 其他钩子 直接放到attrs里面去了
 }
@@ -175,7 +177,9 @@ const props = withDefaults(defineProps<IFormProps>(), {
   // 是否禁用最后一个元素的tab
   disabledTab: false,
   // item的底部边距
-  itemMB: '18px'
+  itemMB: '18px',
+  // 收起状态下最多显示的行数索引
+  maxShowRowIndex: -1
   // 其他钩子 直接放到attrs里面去了
   // 比如 beforeValidate, beforeRequest, success, requestError, requestEnd
 })
@@ -869,7 +873,7 @@ onMounted(async () => {
 })
 
 // 暴露对外方法
-defineExpose({ fid: props.fid, formRef: refElPlusForm, submit: handleSubmitForm, getData: getFormData, validate: validateForm, reset, clearValid, clear, changeValidImg, refresh, init })
+defineExpose({ fid: props.fid, formRef: refElPlusForm, submit: handleSubmitForm, getData: getFormData, validate: validateForm, reset, clearValid, clear, changeValidImg, refresh, init, totalRows: computed(() => attrMapToTableList.value?.length || 0) })
 </script>
 <style lang="scss">
 .crud-form-panel {

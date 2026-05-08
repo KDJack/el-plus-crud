@@ -163,6 +163,8 @@ export interface IFormConfig {
   successTip?: string | ((data?: any) => string)
   // 列表的ref
   tableRef?: any
+  // 收起时显示的行数，默认 1
+  collapsedRows?: number
 }
 
 /**
@@ -286,6 +288,8 @@ export interface ITableToolbar {
   formConfig?: IFormConfig
   // 顶部导出excel配置
   export?: IExportConfig | Array<IExportConfig>
+  // 是否启用表单折叠
+  collapsible?: boolean
 }
 
 /**

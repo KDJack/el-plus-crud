@@ -3,9 +3,12 @@
     <template v-if="props.toolbar && Object.keys(props.toolbar || {}).length">
       <el-form :inline="true" class="el-plus-table-header-form" :style="{ justifyContent: !props.toolbar.formConfig && props.toolbar.btnRight ? 'flex-end' : 'space-between' }">
         <div v-if="props.toolbar.formConfig" class="el-plus-table-form-items">
-          <ElPlusForm ref="elPlusFormRef" v-bind="formConfig" v-model="props.modelValue" :requestFn="handelQueryData" :showBtns="false" :isTable="true">
+          <ElPlusForm ref="elPlusFormRef" v-bind="formConfig" v-model="props.modelValue" :requestFn="handelQueryData" :showBtns="false" :isTable="true" :maxShowRowIndex="maxShowRowIndex">
             <template #row>
               <div class="table-header-form-btns">
+                <el-button v-if="showCollapseBtn" :size="size" type="primary" link @click="toggleCollapse"
+                  >{{ isCollapsed ? '展开' : '收起' }}筛选条件<el-icon class="el-icon--right"><ArrowDown v-if="isCollapsed" /><ArrowUp v-else /></el-icon
+                ></el-button>
                 <ElPlusFormBtn v-if="Object.keys(formConfig?.formDesc || {}).length" type="primary" icon="ele-Search" :loading="loading" :desc="{ label: '查询', on: { click: handelSearch }, size }" />
                 <ElPlusFormBtn v-if="Object.keys(formConfig?.formDesc || {}).length" :desc="{ label: '重置', on: { click: handelReset }, size }" />
                 <ElPlusTableSettingColumn ref="settingColumnRef" v-if="tbName" :tbName="tbName" :column="column || []" :size="size" />
@@ -67,13 +70,14 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ref, computed, onMounted, nextTick, inject } from 'vue'
+import { ref, computed, onMounted, nextTick, inject, watch } from 'vue'
 import ElPlusTableSettingColumn from './settingColumn.vue'
 import ElPlusFormBtn from '../../el-plus-form/components/ElPlusFormBtn.vue'
 import ElPlusFormUpbtn from '../../el-plus-form/components/ElPlusFormUpbtn.vue'
 import { isMobile, handelBtnType, mapToUrlStr, isPromiseLike } from '../../../util'
 import { IBtnBack, ICRUDConfig, IColumnItem, ITableToolbar } from '../../../../types'
 import { Expand, Menu } from '@element-plus/icons-vue'
+import { ArrowDown, ArrowUp } from '@element-plus/icons-vue'
 
 const defaultConf = inject('defaultConf') as ICRUDConfig
 
@@ -99,6 +103,8 @@ const props = withDefaults(
 const elPlusFormRef = ref()
 const settingColumnRef = ref()
 const layoutType = ref('card')
+const isCollapsed = ref(true)
+const totalFormRows = ref(0)
 
 const headerBtns = computed(() => {
   const btns = [] as any[]
@@ -127,6 +133,21 @@ const formConfig = computed(() => {
     })
   }
   return tempConf
+})
+
+const collapsedRowCount = computed(() => {
+  return props.toolbar?.formConfig?.collapsedRows ?? 1
+})
+
+const showCollapseBtn = computed(() => {
+  if (!props.toolbar?.collapsible && !props.toolbar?.formConfig?.collapsedRows) return false
+  return totalFormRows.value > collapsedRowCount.value
+})
+
+const maxShowRowIndex = computed(() => {
+  if (!props.toolbar?.collapsible && !props.toolbar?.formConfig?.collapsedRows) return -1
+  if (!isCollapsed.value) return -1
+  return collapsedRowCount.value
 })
 
 /**
@@ -286,6 +307,13 @@ async function handelDownload({ callBack }: IBtnBack, index: number) {
 }
 
 /**
+ * 切换折叠状态
+ */
+function toggleCollapse() {
+  isCollapsed.value = !isCollapsed.value
+}
+
+/**
  * 处理搜索
  */
 function handelSearch() {
@@ -357,6 +385,9 @@ function initCol() {
 }
 
 onMounted(() => {
+  nextTick(() => {
+    totalFormRows.value = elPlusFormRef.value?.totalRows || 0
+  })
   if (!props.initLoad && !props.isInitLoad) return false
   nextTick(() => {
     setTimeout(() => {
@@ -364,6 +395,16 @@ onMounted(() => {
     }, 200)
   })
 })
+
+watch(
+  () => props.toolbar?.formConfig,
+  () => {
+    nextTick(() => {
+      totalFormRows.value = elPlusFormRef.value?.totalRows || 0
+    })
+  },
+  { deep: true }
+)
 
 defineExpose({ getData: () => elPlusFormRef.value?.getData(), initCol, resetQuery: handelReset })
 </script>
@@ -380,7 +421,7 @@ defineExpose({ getData: () => elPlusFormRef.value?.getData(), initCol, resetQuer
       flex-wrap: wrap;
 
       .el-form-item {
-        margin-bottom: 16px !important;
+        margin-bottom: 5px !important;
         .el-form-item__label {
           width: auto !important;
         }
@@ -395,7 +436,7 @@ defineExpose({ getData: () => elPlusFormRef.value?.getData(), initCol, resetQuer
         flex-wrap: wrap;
         align-items: center;
         & > * {
-          margin-bottom: 16px;
+          margin-bottom: 5px;
         }
       }
     }

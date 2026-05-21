@@ -109,4 +109,10 @@ function handelClosed() {
 function handelOpen() {
   refElPlusDialogForm.value?.init()
 }
+
+function handelSubmit() {
+  refElPlusDialogForm.value?.submit()
+}
+
+defineExpose({ submit: handelSubmit })
 </script>

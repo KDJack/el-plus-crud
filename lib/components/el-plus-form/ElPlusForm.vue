@@ -255,7 +255,8 @@ const computedRules = computed(() => {
             // 设置必填
             props.formDesc[field].required = true
           }
-        } else if (required) {
+        }
+        if (required && !tempRules[field].find((item: any) => item.required)) {
           let rules = 'notAllBlank'
           switch (props.formDesc[field].type) {
             case 'upload':

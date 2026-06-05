@@ -10,7 +10,7 @@
     </template>
     <template v-if="limitList && limitList.length > 0">
       <el-dropdown class="group-menu-btn" :size="desc.size || 'default'" :disabled="disabled || desc.disabled">
-        <el-button type="primary" :size="desc.size || 'default'" :plain="desc.plain ?? true"> 更多<i class="ele-ArrowDown el-icon--right" /> </el-button>
+        <el-button type="primary" :size="desc.size || 'default'" :plain="desc.plain ?? true"> 更多<el-icon class="el-icon--right"><ArrowDown /></el-icon> </el-button>
         <template #dropdown>
           <el-dropdown-menu>
             <el-dropdown-item v-for="(item, i) in limitList" :key="i + (item.label || item.title)" v-on="handelEvelt(item)">
@@ -35,6 +35,7 @@ import { ref, computed, watch, onMounted, inject } from 'vue'
 import ElPlusFormBtn from './ElPlusFormBtn.vue'
 import ElPlusFormUpbtn from './ElPlusFormUpbtn.vue'
 import { ElMessageBox } from 'element-plus'
+import { ArrowDown } from '@element-plus/icons-vue'
 import { IBtnBack, ICRUDConfig } from '../../../../types'
 
 const defaultConf = inject('defaultConf') as ICRUDConfig

@@ -9,7 +9,7 @@
                 <el-button v-if="showCollapseBtn" :size="size" type="primary" link @click="toggleCollapse"
                   >{{ isCollapsed ? '展开' : '收起' }}筛选条件<el-icon class="el-icon--right"><ArrowDown v-if="isCollapsed" /><ArrowUp v-else /></el-icon
                 ></el-button>
-                <ElPlusFormBtn v-if="Object.keys(formConfig?.formDesc || {}).length" type="primary" icon="ele-Search" :loading="loading" :desc="{ label: '查询', on: { click: handelSearch }, size }" />
+                <ElPlusFormBtn v-if="Object.keys(formConfig?.formDesc || {}).length" type="primary" :icon="Search" :loading="loading" :desc="{ label: '查询', on: { click: handelSearch }, size }" />
                 <ElPlusFormBtn v-if="Object.keys(formConfig?.formDesc || {}).length" :desc="{ label: '重置', on: { click: handelReset }, size }" />
                 <ElPlusTableSettingColumn ref="settingColumnRef" v-if="tbName" :tbName="tbName" :column="column || []" :size="size" />
 
@@ -76,7 +76,7 @@ import ElPlusFormBtn from '../../el-plus-form/components/ElPlusFormBtn.vue'
 import ElPlusFormUpbtn from '../../el-plus-form/components/ElPlusFormUpbtn.vue'
 import { isMobile, handelBtnType, mapToUrlStr, isPromiseLike } from '../../../util'
 import { IBtnBack, ICRUDConfig, IColumnItem, ITableToolbar } from '../../../../types'
-import { Expand, Menu } from '@element-plus/icons-vue'
+import { Expand, Menu, Search } from '@element-plus/icons-vue'
 import { ArrowDown, ArrowUp } from '@element-plus/icons-vue'
 
 const defaultConf = inject('defaultConf') as ICRUDConfig

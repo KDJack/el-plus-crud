@@ -1,7 +1,7 @@
 <template>
   <div class="el-plus-table-edit-column">
     <el-button v-if="showText" type="primary" @click="showSettingDialog" :size="size" plain>编辑显示列</el-button>
-    <el-button v-else type="primary" icon="ele-Setting" @click="showSettingDialog" :size="size" title="编辑显示列" plain circle />
+    <el-button v-else type="primary" :icon="Setting" @click="showSettingDialog" :size="size" title="编辑显示列" plain circle />
 
     <!-- 编辑列 -->
     <el-dialog title="编辑显示列" v-model="showSettingColumn" draggable width="40%">
@@ -20,6 +20,7 @@
 <script lang="ts" setup>
 import { ref, onMounted, inject, reactive } from 'vue'
 import { ElMessage } from 'element-plus'
+import { Setting } from '@element-plus/icons-vue'
 import { ICRUDConfig, IColumnItem } from '../../../../types'
 
 const defaultConf = inject('defaultConf') as ICRUDConfig

@@ -2,16 +2,16 @@
   <div class="custom-tree-node-list">
     <div v-for="(node, idx) in nodes" :key="`${treeState.getNodeIdStr(node)}-${depth}-${idx}`" v-show="treeState.isNodeVisible(node)" class="custom-tree-node">
       <!-- 节点行：展开图标 + 复选框 + 标签 -->
-      <div class="node-row" :style="{ paddingLeft: depth * 20 + 'px' }">
+      <div class="node-row" :style="{ paddingLeft: depth * 20 + 'px' }" @click="handleRowClick(node)">
         <!-- 展开图标 -->
-        <span v-if="treeState.nodeHasChildren(node)" class="expand-icon" :class="{ 'is-expanded': treeState.isNodeExpanded(node) }" @click.stop="handleExpand(node)">
+        <span v-if="treeState.nodeHasChildren(node)" class="expand-icon" :class="{ 'is-expanded': treeState.isNodeExpanded(node) }">
           <el-icon><ArrowRight /></el-icon>
         </span>
         <!-- 无子节点时占位 -->
         <span v-else class="expand-placeholder" />
 
-        <!-- 复选框 -->
-        <el-checkbox v-if="treeState.config.showCheckbox" :model-value="treeState.isNodeChecked(node)" :indeterminate="treeState.isNodeIndeterminate(node)" :disabled="treeState.isNodeDisabled(node)" @change="(val: any) => handleCheck(node, !!val)" />
+        <!-- 复选框（阻止冒泡，避免触发展开/收起） -->
+        <el-checkbox v-if="treeState.config.showCheckbox" :model-value="treeState.isNodeChecked(node)" :indeterminate="treeState.isNodeIndeterminate(node)" :disabled="treeState.isNodeDisabled(node)" @click.stop @change="(val: any) => handleCheck(node, !!val)" />
 
         <!-- 节点标签 -->
         <span class="node-label" :title="node[treeState.config.labelKey]">
@@ -54,10 +54,12 @@ function handleCheck(node: any, checked: boolean) {
   props.onNodeCheck(node, checked)
 }
 
-/** 处理展开/收起 */
-function handleExpand(node: any) {
-  props.treeState.toggleExpand(node)
-  props.onNodeExpand(node)
+/** 点击节点行：展开/收起 */
+function handleRowClick(node: any) {
+  if (props.treeState.nodeHasChildren(node)) {
+    props.treeState.toggleExpand(node)
+    props.onNodeExpand(node)
+  }
 }
 </script>
 

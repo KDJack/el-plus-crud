@@ -301,6 +301,7 @@ const onEvents = ref(getEvents(props))
 // ========== 树状态 ==========
 
 const treeConfig = ref(null as TreeConfig | null)
+const lastRawOptions = ref<any>(null) // 记录上次原始数据，用于精确比较避免误重置展开状态
 
 // 响应式状态
 const searchText = ref('')
@@ -494,7 +495,7 @@ onBeforeMount(async () => {
   attrs.value = await getAttrs(props, {
     checkStrictly: false,
     showCheckbox: true,
-    accordion: true,
+    accordion: false,
     noSelectAll: false,
     enableSearch: false,
     showCascadeSwitch: false,
@@ -578,7 +579,9 @@ watch(
     } else if (typeof data === 'function') {
       options.value = await data(props.formData || {})
     } else if (Array.isArray(data)) {
-      if (data && !isEqual(data, options.value)) options.value = [...data]
+      if (isEqual(data, lastRawOptions.value)) return
+      lastRawOptions.value = lodash.cloneDeep(data)
+      options.value = [...data]
     } else {
       options.value = []
     }

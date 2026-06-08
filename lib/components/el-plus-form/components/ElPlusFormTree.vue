@@ -4,7 +4,7 @@
     <div class="btns" v-if="(attrs.showCheckbox && !attrs.noSelectAll) || attrs.showCascadeSwitch || attrs.enableSearch">
       <el-checkbox v-if="attrs.showCheckbox && !attrs.noSelectAll" :model-value="treeState.selectAll" :indeterminate="treeState.selectAllIndeterminate" @change="(val: any) => (treeState.selectAll = !!val)" label="全部勾选" border />
       <el-switch v-if="attrs.showCascadeSwitch" :model-value="treeState.cascadeMode" @change="(val: boolean) => (treeState.cascadeMode = val)" active-text="级联" inactive-text="独立" inline-prompt />
-      <el-input v-if="attrs.enableSearch" :model-value="treeState.searchText" @update:model-value="handleSearchInput" placeholder="输入关键字筛选" :validate-event="false" clearable class="tree-search-input" />
+      <el-input v-if="attrs.enableSearch" :model-value="treeState.searchText" @update:model-value="handleSearchInput" @keydown.enter.prevent placeholder="输入关键字筛选" :validate-event="false" clearable class="tree-search-input" />
     </div>
 
     <!-- 自定义递归树（isInit 确保配置加载完成后再渲染） -->

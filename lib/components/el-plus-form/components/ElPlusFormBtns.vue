@@ -151,6 +151,10 @@ onMounted(() => {
 .el-plus-form-btn-group {
   display: flex;
 
+  .el-link + .el-link {
+    margin-left: 12px;
+  }
+
   .group-menu-btn {
     margin-left: 10px;
   }

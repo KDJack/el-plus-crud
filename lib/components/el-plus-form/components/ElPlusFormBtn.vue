@@ -1,21 +1,45 @@
 <template>
   <template v-if="vif">
-    <template v-if="props.desc?.confirm">
-      <el-popconfirm @confirm="onEvents.click" :title="props.desc?.confirm">
-        <template #reference>
-          <el-button :loading="localLoading" :size="props.desc?.size || 'default'" v-bind="attrs">
-            <slot name="default">
-              <template v-if="!!props.desc?.label">{{ btnShowText }}</template>
-            </slot>
-          </el-button>
-        </template>
-      </el-popconfirm>
+    <!-- text 模式使用 el-link -->
+    <template v-if="isTextBtn">
+      <template v-if="props.desc?.confirm">
+        <el-popconfirm @confirm="onEvents.click" :title="props.desc?.confirm">
+          <template #reference>
+            <el-link :underline="false" :type="linkType" v-bind="linkAttrs" :disabled="localLoading || linkAttrs.disabled" :style="{ pointerEvents: desc?.isTag ? 'none' : 'all' }" :class="{ 'no-label': !props.desc?.label }">
+              <el-icon v-if="localLoading" class="is-loading"><Loading /></el-icon>
+              <slot name="default">
+                <template v-if="!!props.desc?.label">{{ btnShowText }}</template>
+              </slot>
+            </el-link>
+          </template>
+        </el-popconfirm>
+      </template>
+      <el-link v-else :underline="false" :type="linkType" v-bind="linkAttrs" v-on="onEvents" :disabled="localLoading || linkAttrs.disabled" :style="{ pointerEvents: desc?.isTag ? 'none' : 'all' }" :class="{ 'no-label': !props.desc?.label }">
+        <el-icon v-if="localLoading" class="is-loading"><Loading /></el-icon>
+        <slot name="default">
+          <template v-if="!!props.desc?.label">{{ btnShowText }}</template>
+        </slot>
+      </el-link>
     </template>
-    <el-button v-else :loading="localLoading" :size="props.desc?.size || 'default'" v-bind="attrs" v-on="onEvents" :style="{ pointerEvents: desc?.isTag ? 'none' : 'all' }" :class="{ 'no-label': !props.desc?.label }">
-      <slot name="default">
-        <template v-if="!!props.desc?.label">{{ btnShowText }}</template>
-      </slot>
-    </el-button>
+    <!-- 非 text 模式保持原有 el-button -->
+    <template v-else>
+      <template v-if="props.desc?.confirm">
+        <el-popconfirm @confirm="onEvents.click" :title="props.desc?.confirm">
+          <template #reference>
+            <el-button :loading="localLoading" :size="props.desc?.size || 'default'" v-bind="attrs">
+              <slot name="default">
+                <template v-if="!!props.desc?.label">{{ btnShowText }}</template>
+              </slot>
+            </el-button>
+          </template>
+        </el-popconfirm>
+      </template>
+      <el-button v-else :loading="localLoading" :size="props.desc?.size || 'default'" v-bind="attrs" v-on="onEvents" :style="{ pointerEvents: desc?.isTag ? 'none' : 'all' }" :class="{ 'no-label': !props.desc?.label }">
+        <slot name="default">
+          <template v-if="!!props.desc?.label">{{ btnShowText }}</template>
+        </slot>
+      </el-button>
+    </template>
   </template>
 </template>
 <script lang="ts">
@@ -28,6 +52,7 @@ export default {
 </script>
 <script lang="ts" setup>
 import { ref, computed, useAttrs, watch, inject } from 'vue'
+import { Loading } from '@element-plus/icons-vue'
 import { IBtnBack, ICRUDConfig } from '../../../../types'
 
 const lodash = inject('lodash') as any
@@ -53,6 +78,40 @@ const vif = computed(() => {
     }
   }
   return true
+})
+
+/** 是否为文字按钮模式 */
+const isTextBtn = computed(() => !!props.desc?.text)
+
+/** el-link 不支持的属性列表 */
+const LINK_UNSUPPORTED_KEYS = new Set([
+  'text', 'plain', 'bg', 'loading', 'round', 'circle', 'dashed',
+  'native-type', 'autofocus', 'auto-insert-space', 'tag', 'size',
+  'btnType', 'btnLabel', 'mask', 'confirm', 'auth', 'isTag',
+  'label', 'on', '_attrs', 'type'
+])
+
+/** 为 el-link 准备的属性，过滤掉不支持的属性 */
+const linkAttrs = computed(() => {
+  const result: Record<string, any> = {}
+  for (const key in attrs.value) {
+    if (!LINK_UNSUPPORTED_KEYS.has(key)) {
+      result[key] = (attrs.value as any)[key]
+    }
+  }
+  return result
+})
+
+/** el-link 的 type 属性，从 btnType 逻辑中获取 */
+const linkType = computed(() => {
+  const a = attrs.value as any
+  if (a.btnType) {
+    if (typeof a.btnType === 'function') {
+      return a.btnType(props.formData || {}) || 'primary'
+    }
+    return a.btnType || 'primary'
+  }
+  return a.type || 'primary'
 })
 
 const attrs = computed(() => {
@@ -122,5 +181,8 @@ watch(
 <style lang="scss">
 .el-button.no-label > span {
   margin-left: 0 !important;
+}
+.el-link.no-label {
+  font-size: var(--el-font-size-base);
 }
 </style>

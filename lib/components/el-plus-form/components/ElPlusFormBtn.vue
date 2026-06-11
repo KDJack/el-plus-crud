@@ -5,7 +5,7 @@
       <template v-if="props.desc?.confirm">
         <el-popconfirm @confirm="onEvents.click" :title="props.desc?.confirm">
           <template #reference>
-            <el-link :underline="false" :type="linkType" v-bind="linkAttrs" :disabled="localLoading || linkAttrs.disabled" :style="{ pointerEvents: desc?.isTag ? 'none' : 'all' }" :class="{ 'no-label': !props.desc?.label }">
+            <el-link :underline="'never'" :type="linkType" v-bind="linkAttrs" :disabled="localLoading || linkAttrs.disabled" :style="{ pointerEvents: desc?.isTag ? 'none' : 'all' }" :class="{ 'no-label': !props.desc?.label }">
               <el-icon v-if="localLoading" class="is-loading"><Loading /></el-icon>
               <slot name="default">
                 <template v-if="!!props.desc?.label">{{ btnShowText }}</template>
@@ -14,7 +14,7 @@
           </template>
         </el-popconfirm>
       </template>
-      <el-link v-else :underline="false" :type="linkType" v-bind="linkAttrs" v-on="onEvents" :disabled="localLoading || linkAttrs.disabled" :style="{ pointerEvents: desc?.isTag ? 'none' : 'all' }" :class="{ 'no-label': !props.desc?.label }">
+      <el-link v-else :underline="'never'" :type="linkType" v-bind="linkAttrs" v-on="onEvents" :disabled="localLoading || linkAttrs.disabled" :style="{ pointerEvents: desc?.isTag ? 'none' : 'all' }" :class="{ 'no-label': !props.desc?.label }">
         <el-icon v-if="localLoading" class="is-loading"><Loading /></el-icon>
         <slot name="default">
           <template v-if="!!props.desc?.label">{{ btnShowText }}</template>

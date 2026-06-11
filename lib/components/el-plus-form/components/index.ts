@@ -1,7 +1,7 @@
 /**
  * 这里加载当前文件夹下的所有Vue组件
  */
-const modulesFiles = import.meta.globEager('./*.vue')
+const modulesFiles = import.meta.glob('./*.vue', { eager: true })
 
 const components: any[] = []
 const typeList: String[] = []

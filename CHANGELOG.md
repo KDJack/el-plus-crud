@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 0.1.67 (2026-06-11)
+
+
+### Features
+
+* ElPlusFormTree 组件增加搜索过滤功能 ([34fceba](https://github.com/KDJack/el-plus-crud/commit/34fceba836d54c41320a47e25a6a1331f26624fa))
+* 使用 el-link 替代已废弃的 el-button type='text' ([1fdea8d](https://github.com/KDJack/el-plus-crud/commit/1fdea8d9e6dfcd8dcc52a6949c29f398f9ce8b05))
+* 表单筛选区增加收起/展开功能 ([1293887](https://github.com/KDJack/el-plus-crud/commit/1293887ecf995e2bd96ef0feaa0466c601eecc5e))
+
+
+### Bug Fixes
+
+* 阻止 Tree 搜索框回车键触发表单提交 ([7b16d45](https://github.com/KDJack/el-plus-crud/commit/7b16d4589b6ab1a111652d7428474c56c86b4692))
+
 ### [0.1.66](https://github.com/KDJack/el-plus-crud/compare/v0.1.65...v0.1.66) (2026-01-20)
 
 ### [0.1.65](https://github.com/KDJack/el-plus-crud/compare/v0.1.64...v0.1.65) (2026-01-20)

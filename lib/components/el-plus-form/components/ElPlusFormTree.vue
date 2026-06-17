@@ -8,7 +8,7 @@
     </div>
 
     <!-- 自定义递归树（isInit 确保配置加载完成后再渲染） -->
-    <div class="custom-tree" v-if="isInit && options.length">
+    <div class="custom-tree" v-if="isInit && options.length" :style="{ maxHeight: getHeight || '400px' }">
       <CustomTreeNode :nodes="options" :depth="0" :tree-state="treeState" :on-node-check="handleNodeCheck" :on-node-expand="handleNodeExpand" />
     </div>
     <div v-else-if="isInit" class="null-tip">暂无选项</div>
@@ -298,6 +298,17 @@ const isInit = ref(false)
 const attrs = ref({} as any)
 const onEvents = ref(getEvents(props))
 
+const getHeight = computed(() => {
+  if (props.desc?.height) {
+    if (typeof props.desc.height == 'function') {
+      return props.desc.height()
+    } else {
+      return props.desc?.height
+    }
+  }
+  return '400px'
+})
+
 // ========== 树状态 ==========
 
 const treeConfig = ref(null as TreeConfig | null)
@@ -311,7 +322,9 @@ const checkedLeafIdSet = ref(new Set<string>())
 const actionableLeafIds = ref<string[]>([])
 
 /** 获取当前配置（确保已初始化） */
-function cfg(): TreeConfig { return treeConfig.value! }
+function cfg(): TreeConfig {
+  return treeConfig.value!
+}
 
 /** 刷新缓存并触发 UI 更新 */
 function refreshCache(): void {
@@ -319,18 +332,18 @@ function refreshCache(): void {
   const checked = collectCheckedLeafIds(options.value, c)
   checkedLeafCount.value = checked.length
   checkedLeafIdSet.value = new Set(checked)
-  const leafIds = searchText.value
-    ? collectVisibleLeafIds(options.value, c)
-    : collectAllLeafIds(options.value, c)
-  actionableLeafIds.value = leafIds.filter(
-    (id) => !c.fsIds.includes(id) && !c.nsIds.includes(id)
-  )
+  const leafIds = searchText.value ? collectVisibleLeafIds(options.value, c) : collectAllLeafIds(options.value, c)
+  actionableLeafIds.value = leafIds.filter((id) => !c.fsIds.includes(id) && !c.nsIds.includes(id))
   triggerRef(options)
 }
 
 // 节点状态查询
-function isNodeChecked(node: any): boolean { return !!node._checked }
-function isNodeIndeterminate(node: any): boolean { return !!node._indeterminate }
+function isNodeChecked(node: any): boolean {
+  return !!node._checked
+}
+function isNodeIndeterminate(node: any): boolean {
+  return !!node._indeterminate
+}
 function isNodeDisabled(node: any): boolean {
   const c = cfg()
   if (c.disabled) return true
@@ -340,10 +353,18 @@ function isNodeDisabled(node: any): boolean {
   }
   return false
 }
-function isNodeVisible(node: any): boolean { return node._visible !== false }
-function isNodeExpanded(node: any): boolean { return !!node._expanded }
-function nodeHasChildren(node: any): boolean { return hasChildren(node, cfg()) }
-function getNodeIdStr(node: any): string { return getNodeId(node, cfg()) }
+function isNodeVisible(node: any): boolean {
+  return node._visible !== false
+}
+function isNodeExpanded(node: any): boolean {
+  return !!node._expanded
+}
+function nodeHasChildren(node: any): boolean {
+  return hasChildren(node, cfg())
+}
+function getNodeIdStr(node: any): string {
+  return getNodeId(node, cfg())
+}
 
 // 操作方法
 function toggleCheck(node: any, checked: boolean): boolean {
@@ -378,12 +399,8 @@ function toggleExpand(node: any): void {
 
 function toggleSelectAll(checked: boolean): void {
   const c = cfg()
-  const targetIds = searchText.value
-    ? collectVisibleLeafIds(options.value, c)
-    : collectAllLeafIds(options.value, c)
-  const actionableIds = targetIds.filter(
-    (id) => !c.fsIds.includes(id) && !c.nsIds.includes(id)
-  )
+  const targetIds = searchText.value ? collectVisibleLeafIds(options.value, c) : collectAllLeafIds(options.value, c)
+  const actionableIds = targetIds.filter((id) => !c.fsIds.includes(id) && !c.nsIds.includes(id))
   if (checked) {
     const currentChecked = new Set(collectCheckedLeafIds(options.value, c))
     for (const id of actionableIds) {
@@ -460,7 +477,9 @@ const selectAll = computed({
     toggleSelectAll(val)
     // 同步 v-model 值并触发表单校验
     currentValue.value = getCheckedIds()
-    nextTick(() => { emits('validateThis') })
+    nextTick(() => {
+      emits('validateThis')
+    })
   }
 })
 
@@ -486,7 +505,7 @@ const treeState = reactive({
   nodeHasChildren,
   getNodeIdStr,
   toggleCheck,
-  toggleExpand,
+  toggleExpand
 })
 
 // ========== 生命周期 ==========
@@ -547,7 +566,9 @@ function handleSearchInput(val: string) {
   debouncedSearch(val)
 }
 
-onUnmounted(() => { debouncedSearch.cancel() })
+onUnmounted(() => {
+  debouncedSearch.cancel()
+})
 
 /** 节点选中回调 */
 function handleNodeCheck(node: any, checked: boolean) {
@@ -647,7 +668,7 @@ watch(
   .custom-tree {
     flex: 1;
     overflow: auto;
-    max-height: 400px;
+    // max-height: 400px;
     border: 1px solid var(--el-border-color-lighter, #ebeef5);
     border-radius: 4px;
     padding: 4px 0;

@@ -80,11 +80,8 @@ const onEvents = computed(() => {
     Object.keys(props.desc.on).map((key: string) => {
       tempOn[key] = () => {
         nextTick(() => {
-          props.desc.on[key](
-            props.formData || {},
-            options.find((item) => item.value === currentValue.value),
-            props.rowIndex
-          )
+          const values = props.desc?.multiple ? options.filter((item) => currentValue.value.find((id: any) => item.value === id)) : options.find((item) => item.value === currentValue.value)
+          props.desc.on[key](props.formData || {}, values, props.rowIndex)
         })
       }
     })

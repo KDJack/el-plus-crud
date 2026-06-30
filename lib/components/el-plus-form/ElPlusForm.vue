@@ -10,7 +10,7 @@
                 <el-form-item style="min-height: 40px; display: flex" :prop="formItem.field" :style="{ width: formItem._attrs?.width || formItem.width || (isTable ? '150px' : '100%'), marginBottom: itemMB }">
                   <template #label v-if="showLabel && formItem.showLabel !== false">
                     <div class="crud-form-label" :style="{ width: formItem.labelWidth || computedFormAttrs._labelWidth || (isDialog ? '100px' : '120px'), justifyContent: computedFormAttrs.labelPosition === 'right' ? 'flex-end' : 'flex-start' }">
-                      <span class="required-dot">{{ formItem.required ? '*' : ' ' }}</span>
+                      <span class="required-dot">{{ formItem._required ? '*' : ' ' }}</span>
                       <span>{{ formItem._label }}</span>
                     </div>
                   </template>
@@ -227,7 +227,8 @@ const computedFormAttrs = computed(() => {
 // 合并校验规则
 const computedRules = computed(() => {
   // 首先拿到表单总体传入的rules
-  const tempRules = props.rules || {}
+  // 深拷贝：避免复用同一引用，否则每次重算时规则会在原对象上累积残留（动态 required 一旦为 true 就永远清不掉，校验恒必填）
+  const tempRules = props.rules ? lodash.cloneDeep(props.rules) : {}
   // 遍历属性描述对象，看看里面有没有校验规则
   if (props.formDesc) {
     Object.keys(props.formDesc).map((field: any) => {
@@ -252,8 +253,10 @@ const computedRules = computed(() => {
           }
           // 这里判断一下rules中是否有required
           if (tempRules[field].find((item: any) => item.required)) {
-            // 设置必填
-            props.formDesc[field].required = true
+            // 设置必填（保留动态 required 函数，避免被覆盖导致动态必填失效）
+            if (typeof props.formDesc[field].required !== 'function') {
+              props.formDesc[field].required = true
+            }
           }
         }
         if (required && !tempRules[field].find((item: any) => item.required)) {
@@ -382,13 +385,14 @@ const initFormAttrs = lodash.debounce(
             formItem._attrs = Object.assign({}, handelKeyValue(formItem, 'attrs', field), tempAttr)
             // 动态options
             // formItem._options = handelKeyValue(formItem, 'options', field)
-            // 动态 _label
+            // 动态 _label（保留原 label 函数/字符串，每次重算 _label，避免就地改写导致动态失效）
             formItem._label = handelKeyValue(formItem, 'label', field)
-            if (typeof formItem.label !== 'string') formItem.label = formItem._label
             // 动态 prop
             // formItem._prop = handelKeyValue(formItem, 'prop', field);
             // 动态 _tip
             formItem._tip = handelKeyValue(formItem, 'tip', field)
+            // 动态 _required（支持函数 / 布尔形式）
+            formItem._required = handelKeyValue(formItem, 'required', field, false)
             // 单独处理下上传
             if (!formItem._tip && !formItem.noTip && formItem.type === 'upload') {
               const maxSize = formItem.maxSize || (!formItem.upType || formItem.upType === 'image' ? defaultConf.upload?.maxISize : defaultConf.upload?.maxFSize) || 1024 * 1024

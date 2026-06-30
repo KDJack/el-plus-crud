@@ -5,7 +5,7 @@
     </div>
 
     <!-- 弹框 -->
-    <el-dialog class="el-plus-form-formula-dialog" :width="desc.dialogWidth || '800px'" :title="desc.title || desc.placeholder || '请编辑' + desc.label" draggable :closeOnClickModal="false" showCancel v-model="isShowDialog" append-to-body destroy-on-close>
+    <el-dialog class="el-plus-form-formula-dialog" :width="desc.dialogWidth || '800px'" :title="desc.title || desc.placeholder || '请编辑' + desc._label" draggable :closeOnClickModal="false" showCancel v-model="isShowDialog" append-to-body destroy-on-close>
       <div class="show-panel">
         <h2>{{ currentValue }}</h2>
       </div>

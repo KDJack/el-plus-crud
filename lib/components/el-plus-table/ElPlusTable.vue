@@ -33,7 +33,7 @@
 
     <!-- 中部的Tabs -->
     <div class="table-tabs-panel" v-if="tableConfig?.tabConf?.tabs?.length">
-      <el-radio-group v-model="tableTabVal" size="default" @change="handelTabChange">
+      <el-radio-group v-model="tableTabVal" :size="size" @change="handelTabChange">
         <template v-for="(item, i) in tableConfig.tabConf?.tabs" :key="i">
           <el-radio-button :value="item.value" :label="item.value" :loading="true">
             {{ item.label }}

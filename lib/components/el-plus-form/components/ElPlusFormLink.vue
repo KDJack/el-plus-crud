@@ -4,7 +4,7 @@
       <el-option v-for="option in options" :key="option.value" v-bind="option" />
     </el-select>
     <!-- 弹框 -->
-    <el-dialog :width="desc.dialogWidth || '1000px'" :title="desc.title || desc.placeholder || '请选择' + desc.label" draggable :closeOnClickModal="false" showCancel v-model="isShowDialog" append-to-body destroy-on-close>
+    <el-dialog :width="desc.dialogWidth || '1000px'" :title="desc.title || desc.placeholder || '请选择' + desc._label" draggable :closeOnClickModal="false" showCancel v-model="isShowDialog" append-to-body destroy-on-close>
       <div style="width: 100%" class="form-link-dialog">
         <div class="panel-left">
           <!-- 左侧列表 -->
@@ -75,7 +75,7 @@ const topAttrs = reactive({
   collapseTagsTooltip: true,
   maxCollapseTags: props.desc.maxCollapseTags || 3,
   clearable: false,
-  placeholder: props.desc.placeholder || '请选择' + props.desc.label
+  placeholder: props.desc.placeholder || '请选择' + props.desc._label
 })
 
 // 显示弹框

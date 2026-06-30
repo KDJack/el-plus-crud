@@ -117,6 +117,7 @@ export interface IFormDescItem extends IDescItem {
   _disabled?: boolean
   _attrs?: IBaseObj
   _label?: string
+  _required?: boolean
   _prop?: IBaseObj
   _options?: Array<IFormDescItemOptionItem>
   // 其他属性

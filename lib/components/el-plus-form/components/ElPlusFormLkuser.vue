@@ -4,7 +4,7 @@
       <el-option v-for="option in options" :key="option.value" v-bind="option" />
     </el-select>
     <!-- 弹框 -->
-    <el-dialog :width="desc.dialogWidth || '900px'" :title="desc.placeholder || '选择' + desc.label" draggable :closeOnClickModal="false" showCancel v-model="isShowDialog" append-to-body destroy-on-close @close="close">
+    <el-dialog :width="desc.dialogWidth || '900px'" :title="desc.placeholder || '选择' + desc._label" draggable :closeOnClickModal="false" showCancel v-model="isShowDialog" append-to-body destroy-on-close @close="close">
       <div style="width: 100%" class="form-link-user-dialog">
         <div class="panel-left">
           <!-- 搜索 -->

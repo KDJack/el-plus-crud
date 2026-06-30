@@ -112,14 +112,14 @@ function handelValChange(val: any, oldVal: any) {
   isDoChange.value = true
   if (val !== oldVal) {
     if (val < numBindAttr.value.min) {
-      ElMessage.warning(`${props.desc?.label || ''}最少不能低于${numBindAttr.value.min}`)
+      ElMessage.warning(`${props.desc?._label || ''}最少不能低于${numBindAttr.value.min}`)
       nextTick(() => {
         currentText.value = numBindAttr.value.min
         currentValue.value = +(currentText.value / 100).toFixed(numBindAttr.value.precision)
         emits('change', currentValue.value)
       })
     } else if (val > numBindAttr.value.max) {
-      ElMessage.warning(`${props.desc?.label || ''}最多不能大于${numBindAttr.value.max}`)
+      ElMessage.warning(`${props.desc?._label || ''}最多不能大于${numBindAttr.value.max}`)
       nextTick(() => {
         currentText.value = numBindAttr.value.max
         currentValue.value = +(currentText.value / 100).toFixed(numBindAttr.value.precision)

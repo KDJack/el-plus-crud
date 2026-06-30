@@ -2,7 +2,7 @@
   "name": "el-plus-crud",
   "description": "采用Vue3 + TS，封装的element-plus数据驱动表单、列表组件",
   "author": "K.D.Jack",
-  "version": "0.1.71",
+  "version": "0.1.72",
   "license": "MIT",
   "private": false,
   "main": "dist/el-plus-crud.mjs",
@@ -16,7 +16,7 @@
     "lint-fix": "eslint --fix --ext .js --ext .jsx --ext .vue lib/",
     "preview": "vite preview",
     "release": "standard-version",
-    "pub": "pnpm build && pnpm release && pnpm publish"
+    "pub": "pnpm build && pnpm release && npm publish"
   },
   "keywords": [
     "element+",

@@ -14,8 +14,8 @@
                       <span>{{ formItem._label }}</span>
                     </div>
                   </template>
-                  <component :key="formItem.field + (formItem.upType || '')" style="min-width: 80px; width: 100%; flex: 1" :is="formItem._type" :formData="props.modelValue" :disabled="formItem._disabled ?? disabled ?? false" v-bind="formItem._attrs" :desc="formItem" :ref="setComponentRef" :field="formItem.field" v-model="props.modelValue[formItem.field || '']" :isTable="isTable" @validateThis="() => handelValidateThis(formItem.field || '')"></component>
-                  <div class="el-plus-form-tip" v-if="formItem._tip" v-html="formItem._tip" />
+                  <component :key="formItem.field + (formItem.upType || '')" :style="{ minWidth: '80px', width: formItem.tipInline && formItem._tip ? 'auto' : '100%', flex: '1' }" :is="formItem._type" :formData="props.modelValue" :disabled="formItem._disabled ?? disabled ?? false" v-bind="formItem._attrs" :desc="formItem" :ref="setComponentRef" :field="formItem.field" v-model="props.modelValue[formItem.field || '']" :isTable="isTable" @validateThis="() => handelValidateThis(formItem.field || '')"></component>
+                  <div class="el-plus-form-tip" :class="{ 'is-inline': formItem.tipInline }" :style="formItem.tipStyle" v-if="formItem._tip" v-html="formItem._tip" />
                 </el-form-item>
               </div>
             </el-col>
@@ -900,6 +900,11 @@ defineExpose({ fid: props.fid, formRef: refElPlusForm, submit: handleSubmitForm,
       line-height: 1.5em;
       margin-top: 3px;
       margin-left: 12px;
+
+      &.is-inline {
+        margin-top: 0;
+        flex-shrink: 0;
+      }
     }
 
     .el-plus-form-tip code {

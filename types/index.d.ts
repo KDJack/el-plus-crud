@@ -91,6 +91,10 @@ export interface IFormDescItem extends IDescItem {
   showLabel?: boolean
   labelWidth?: string | number
   tip?: string | ((data?: any) => string)
+  // tip 是否行内显示(紧跟控件右侧同一行)，默认 false 换行显示在控件下方
+  tipInline?: boolean
+  // tip 自定义样式(颜色/字号等)，支持 CSS 字符串或样式对象
+  tipStyle?: string | IBaseObj
   size?: string
   placeholder?: string
   attrs?: IBaseObj | ((data?: any) => IBaseObj)

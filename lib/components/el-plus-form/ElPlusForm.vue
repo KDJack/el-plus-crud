@@ -9,7 +9,7 @@
               <div v-if="formItem._vif" class="el-plus-form-column-panel" :style="{ 'justify-content': isTable ? 'flex-end' : 'flex-start' }">
                 <el-form-item style="min-height: 40px; display: flex" :prop="formItem.field" :style="{ width: formItem._attrs?.width || formItem.width || (isTable ? '150px' : '100%'), marginBottom: itemMB }">
                   <template #label v-if="showLabel && formItem.showLabel !== false">
-                    <div class="crud-form-label" :style="{ width: formItem.labelWidth || computedFormAttrs._labelWidth || (isDialog ? '100px' : '120px'), justifyContent: computedFormAttrs.labelPosition === 'right' ? 'flex-end' : 'flex-start' }">
+                    <div class="crud-form-label" :style="{ width: formItem.labelWidth || computedFormAttrs._labelWidth || (isDialog ? '100px' : 'auto'), justifyContent: computedFormAttrs.labelPosition === 'right' ? 'flex-end' : 'flex-start' }">
                       <span class="required-dot">{{ formItem._required ? '*' : ' ' }}</span>
                       <span>{{ formItem._label }}</span>
                     </div>
@@ -942,6 +942,9 @@ defineExpose({ fid: props.fid, formRef: refElPlusForm, submit: handleSubmitForm,
             // text-align: left;
             display: flex;
             box-sizing: border-box;
+            span {
+              line-height: 18px;
+            }
             .required-dot {
               display: inline-block;
               width: 10px;

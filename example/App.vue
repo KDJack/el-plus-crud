@@ -36,9 +36,9 @@ const formGroupConfig = ref({
     {
       title: '基本信息',
       formDesc: {
-        name: { type: 'input', label: '名称', require: true, attrs: { maxlength: 30 } },
-        contactsName: { type: 'input', label: '联系人', require: true, attrs: { maxlength: 20 } },
-        contactsPhone: { type: 'select', label: '项目劳资负责人', required: true, options: [], tip: '带企业劳资负责人信息可修改' }
+        name: { type: 'input', label: '名项目劳资负责资负责资负责人称', require: true, attrs: { maxlength: 30 } },
+        contactsName: { type: 'input', label: '联系项目劳资负责资负责资负责人人', require: true, attrs: { maxlength: 20 } },
+        contactsPhone: { type: 'select', label: '项目劳资负责资负责资负责人', required: true, options: [], tip: '带企业劳资负责人信息可修改' }
       } as IFormDesc
     },
     {

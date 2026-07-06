@@ -7,7 +7,7 @@
           <el-row :gutter="10" v-for="(formList, index) in attrMapToTableList" :key="index" v-show="maxShowRowIndex < 0 || index < maxShowRowIndex" :style="{ marginRight: isTable ? '20px' : 0 }">
             <el-col v-for="(formItem, y) in formList" :key="index + '-' + y + '-' + formItem.field" :xs="24" :sm="24" :md="formItem.colspan && formItem.colspan >= column ? 24 : column >= 2 ? 12 : 24" :lg="formItem.colspan && formItem.colspan >= column ? 24 : Math.floor((24 / column) * (formItem.colspan || 1))" :xl="formItem.colspan && formItem.colspan >= column ? 24 : Math.floor((24 / column) * (formItem.colspan || 1))">
               <div v-if="formItem._vif" class="el-plus-form-column-panel" :style="{ 'justify-content': isTable ? 'flex-end' : 'flex-start' }">
-                <el-form-item style="min-height: 40px; display: flex" :prop="formItem.field" :style="{ width: formItem._attrs?.width || formItem.width || (isTable ? '150px' : '100%'), marginBottom: itemMB }">
+                <el-form-item style="min-height: 40px; display: flex" :prop="formItem.field" :style="{ width: formItem._attrs?.width || formItem.width || (isTable ? '150px' : '100%'), marginBottom: itemMB, alignItems: formItem.labelAlign || 'center' }">
                   <template #label v-if="showLabel && formItem.showLabel !== false">
                     <div class="crud-form-label" :style="{ width: formItem.labelWidth || computedFormAttrs._labelWidth || (isDialog ? '100px' : 'auto'), justifyContent: computedFormAttrs.labelPosition === 'right' ? 'flex-end' : 'flex-start' }">
                       <span class="required-dot">{{ formItem._required ? '*' : ' ' }}</span>
@@ -935,6 +935,7 @@ defineExpose({ fid: props.fid, formRef: refElPlusForm, submit: handleSubmitForm,
           width: auto !important;
           position: relative;
           display: flex;
+          align-items: center;
           &::before {
             content: '' !important;
           }

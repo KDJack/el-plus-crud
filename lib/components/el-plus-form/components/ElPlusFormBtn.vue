@@ -26,7 +26,7 @@
       <template v-if="props.desc?.confirm">
         <el-popconfirm @confirm="onEvents.click" :title="props.desc?.confirm">
           <template #reference>
-            <el-button :loading="localLoading" :size="props.desc?.size || 'default'" v-bind="attrs">
+            <el-button :loading="localLoading" :size="props.desc?.size || 'default'" v-bind="attrs" :class="{ btnHideLabel: !props.desc?.label }">
               <slot name="default">
                 <template v-if="!!props.desc?.label">{{ btnShowText }}</template>
               </slot>
@@ -34,7 +34,7 @@
           </template>
         </el-popconfirm>
       </template>
-      <el-button v-else :loading="localLoading" :size="props.desc?.size || 'default'" v-bind="attrs" v-on="onEvents" :style="{ pointerEvents: desc?.isTag ? 'none' : 'all' }" :class="{ 'no-label': !props.desc?.label }">
+      <el-button v-else :loading="localLoading" :size="props.desc?.size || 'default'" v-bind="attrs" v-on="onEvents" :style="{ pointerEvents: desc?.isTag ? 'none' : 'all' }" :class="{ 'no-label': !props.desc?.label, btnHideLabel: !props.desc?.label }">
         <slot name="default">
           <template v-if="!!props.desc?.label">{{ btnShowText }}</template>
         </slot>
@@ -84,12 +84,7 @@ const vif = computed(() => {
 const isTextBtn = computed(() => !!props.desc?.text)
 
 /** el-link 不支持的属性列表 */
-const LINK_UNSUPPORTED_KEYS = new Set([
-  'text', 'plain', 'bg', 'loading', 'round', 'circle', 'dashed',
-  'native-type', 'autofocus', 'auto-insert-space', 'tag', 'size',
-  'btnType', 'btnLabel', 'mask', 'confirm', 'auth', 'isTag',
-  'label', 'on', '_attrs', 'type'
-])
+const LINK_UNSUPPORTED_KEYS = new Set(['text', 'plain', 'bg', 'loading', 'round', 'circle', 'dashed', 'native-type', 'autofocus', 'auto-insert-space', 'tag', 'size', 'btnType', 'btnLabel', 'mask', 'confirm', 'auth', 'isTag', 'label', 'on', '_attrs', 'type'])
 
 /** 为 el-link 准备的属性，过滤掉不支持的属性 */
 const linkAttrs = computed(() => {
@@ -184,5 +179,10 @@ watch(
 }
 .el-link.no-label {
   font-size: var(--el-font-size-base);
+}
+.el-button.btnHideLabel {
+  & > span {
+    display: none !important;
+  }
 }
 </style>

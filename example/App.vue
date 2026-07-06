@@ -1,7 +1,7 @@
 <template>
   <el-config-provider :locale="zhCn">
     <div class="layout-padding">
-      <ElPlusTable ref="listTableRef" :tableConfig="tableConfig" colMinWidth="100px" :isIndex="false" headerAlign="center"></ElPlusTable>
+      <!-- <ElPlusTable ref="listTableRef" :tableConfig="tableConfig" colMinWidth="100px" :isIndex="false" headerAlign="center"></ElPlusTable> -->
 
       <ElPlusFormGroup v-model="formData" :formGroup="formGroupConfig">
         <template #default0>default0插槽</template>
@@ -38,7 +38,7 @@ const formGroupConfig = ref({
       formDesc: {
         name: { type: 'input', label: '名称', require: true, attrs: { maxlength: 30 } },
         contactsName: { type: 'input', label: '联系人', require: true, attrs: { maxlength: 20 } },
-        contactsPhone: { type: 'input', label: '联系电话', rules: 'phone', require: true }
+        contactsPhone: { type: 'select', label: '项目劳资负责人', required: true, options: [], tip: '带企业劳资负责人信息可修改' }
       } as IFormDesc
     },
     {

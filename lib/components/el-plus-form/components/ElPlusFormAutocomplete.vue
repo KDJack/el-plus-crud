@@ -22,6 +22,7 @@ export default {
 <script lang="ts" setup>
 import { ref, useAttrs, useSlots, onBeforeMount } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
+import { useVModel } from '@vueuse/core'
 
 const props = defineProps<{
   modelValue?: string | number | '' | null
@@ -31,8 +32,7 @@ const props = defineProps<{
 }>()
 
 const emits = defineEmits(['update:modelValue'])
-const currentValue = ref(props.modelValue)
-emits('update:modelValue', currentValue)
+const currentValue = useVModel(props, 'modelValue', emits)
 
 const slots = ref(Object.assign({}, useSlots(), props.desc.slots))
 const attrs = ref({} as any)

@@ -1,5 +1,5 @@
 <template>
-  <el-input-number v-if="isInit" class="ElPlusFormNumber-panel" :class="{ 'show-error': showError }" v-bind="attrs" :disabled="disabled" v-on="onEvents" v-model="currentValue" @focus="handelFocus" @blur="handelBlur" onkeypress="return( /[-\d\.]/.test(String.fromCharCode(event.keyCode)))" />
+  <el-input-number v-if="isInit" class="ElPlusFormNumber-panel" :class="{ 'show-error': showError }" v-bind="attrs" :disabled="disabled" v-on="onEvents" v-model="currentValue" @focus="handelFocus" @blur="handelBlur" onkeypress="return /[-\d\.]/.test(String.fromCharCode(event.keyCode))" />
 </template>
 <script lang="ts">
 export default {
@@ -14,6 +14,7 @@ import { ref, computed, useAttrs, onBeforeMount, nextTick, inject, watch, onMoun
 import { getAttrs, getEvents } from '../mixins'
 import { ElMessage } from 'element-plus'
 import { ICRUDConfig } from '../../../../types'
+import { useVModel } from '@vueuse/core'
 
 const defaultConf = inject('defaultConf') as ICRUDConfig
 
@@ -28,9 +29,21 @@ const props = defineProps<{
 }>()
 
 const emits = defineEmits(['update:modelValue', 'validateThis'])
-const currentValue = ref(typeof props.modelValue === 'string' ? +props.modelValue : props.modelValue)
+const currentValue = useVModel(props, 'modelValue', emits)
 
-emits('update:modelValue', currentValue)
+// ponytail: 兼容外部传入字符串，转为数字；非数字脏数据（如 'abc'）转成 NaN 会污染父 modelValue，归一为 null
+watch(
+  () => props.modelValue,
+  (data) => {
+    if (typeof data === 'string') {
+      const num = +data
+      currentValue.value = Number.isNaN(num) ? null : num
+    } else {
+      currentValue.value = data
+    }
+  },
+  { immediate: true }
+)
 const attrs = ref({} as any)
 const isInit = ref(false)
 const onEvents = ref(getEvents(props))
@@ -60,15 +73,12 @@ function handelBlur() {
   if (!isDoChange.value) {
     if (currentValue.value !== 0 && !currentValue.value) {
       nextTick(() => {
-        // currentValue.value = props.desc?.required ? numBindAttr.value.min : 0
+        // ponytail: useVModel 下 currentValue.value=0 后无法立即回读（getter 返回 props 旧值），去掉 ===0 判断，直接两步赋值触发 el-input-number 重新渲染
         currentValue.value = 0
-        if (currentValue.value === 0) {
-          // 查看了源码，这里需要二次赋不一样的值，这里才会真正重新渲染
-          nextTick(() => {
-            currentValue.value = null
-            change && change()
-          })
-        }
+        nextTick(() => {
+          currentValue.value = null
+          change && change()
+        })
       })
     } else {
       handelValChange(currentValue.value, 0)
@@ -107,9 +117,9 @@ const numBindAttr = computed(() => {
 
 // 判断一下初始值
 if (currentValue.value !== undefined && currentValue.value !== null) {
-  if (currentValue.value < numBindAttr.value.min) {
+  if (+currentValue.value < numBindAttr.value.min) {
     currentValue.value = numBindAttr.value.min
-  } else if (currentValue.value > numBindAttr.value.max) {
+  } else if (+currentValue.value > numBindAttr.value.max) {
     currentValue.value = numBindAttr.value.max
   }
 }

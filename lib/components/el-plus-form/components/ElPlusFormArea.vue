@@ -10,8 +10,9 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { onMounted, ref, useAttrs, onBeforeMount, inject } from 'vue'
+import { onMounted, ref, watch, useAttrs, onBeforeMount, inject } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
+import { useVModel } from '@vueuse/core'
 
 const globalData = inject('globalData') as any
 
@@ -27,9 +28,15 @@ const areaList = ref([] as any)
 const attrs = ref({} as any)
 const isInit = ref(false)
 const onEvents = ref(getEvents(props))
-const currentValue = ref(props.modelValue)
+const currentValue = useVModel(props, 'modelValue', emits)
 
-emits('update:modelValue', currentValue)
+watch(
+  () => props.modelValue,
+  (data) => {
+    currentValue.value = Array.isArray(data) ? data : data == null ? [] : [data]
+  },
+  { immediate: true }
+)
 
 /**
  * 远程加载数据

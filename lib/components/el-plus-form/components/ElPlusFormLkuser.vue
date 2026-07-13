@@ -74,6 +74,7 @@ import { ref, reactive, nextTick, watch, onMounted, computed, inject, onBeforeMo
 import { Share, UserFilled } from '@element-plus/icons-vue'
 import { getAttrs } from '../mixins'
 import { ICRUDConfig } from '../../../../types'
+import { useVModel } from '@vueuse/core'
 
 const lodash = inject('lodash') as any
 const globalData = inject('globalData') as any
@@ -87,7 +88,7 @@ interface ILinkItem {
 }
 
 const props = defineProps<{
-  modelValue?: []
+  modelValue?: Array<any>
   field?: string
   loading?: boolean
   desc: { [key: string]: any }
@@ -99,8 +100,7 @@ const onEvents = ref(getEvents(props))
 
 const emits = defineEmits(['update:modelValue', 'change', 'input', 'validateThis', 'close'])
 
-const currentValue = ref((props.modelValue || []) as any[])
-emits('update:modelValue', currentValue)
+const currentValue = useVModel(props, 'modelValue', emits)
 
 // 顶部的select
 const selectRef = ref()

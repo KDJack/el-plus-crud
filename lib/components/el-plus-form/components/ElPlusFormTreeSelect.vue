@@ -13,6 +13,7 @@ export default {
 import { isEqual } from '../../../util'
 import { ref, useAttrs, reactive, watch, onBeforeMount, inject } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
+import { useVModel } from '@vueuse/core'
 
 const globalData = inject('globalData') as any
 
@@ -27,8 +28,8 @@ const props = defineProps<{
 
 const emits = defineEmits(['update:modelValue'])
 
-const currentValue = ref(props.modelValue)
-emits('update:modelValue', currentValue)
+// ponytail: 对齐 ElPlusFormCheckbox，修复用户选择无法回写父表单（tree-select 值可能为标量或数组，不强制归一化）
+const currentValue = useVModel(props, 'modelValue', emits)
 
 const options = reactive([] as any[])
 const isInit = ref(false)

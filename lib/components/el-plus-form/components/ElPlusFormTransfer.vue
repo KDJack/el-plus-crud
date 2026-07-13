@@ -15,11 +15,12 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { ref, useAttrs, useSlots, onBeforeMount } from 'vue'
+import { ref, watch, useAttrs, useSlots, onBeforeMount } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
+import { useVModel } from '@vueuse/core'
 
 const props = defineProps<{
-  modelValue?: string | number | '' | null
+  modelValue?: Array<string | number> | string | number | null
   field?: string
   loading?: boolean
   desc: { [key: string]: any }
@@ -28,8 +29,16 @@ const props = defineProps<{
 }>()
 
 const emits = defineEmits(['update:modelValue'])
-const currentValue = ref(props.modelValue)
-emits('update:modelValue', currentValue)
+// ponytail: 对齐 ElPlusFormCheckbox，修复用户选择无法回写父表单
+const currentValue = useVModel(props, 'modelValue', emits)
+
+watch(
+  () => props.modelValue,
+  (data: Array<string | number> | string | number | null | undefined) => {
+    currentValue.value = data ? (Array.isArray(data) ? data : [data]) : []
+  },
+  { immediate: true }
+)
 
 const slots = ref(Object.assign({}, useSlots(), props.desc.slots))
 const attrs = ref({} as any)

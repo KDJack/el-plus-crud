@@ -17,6 +17,7 @@ export default {
 <script lang="ts" setup>
 import { ref, useAttrs, useSlots, onBeforeMount } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
+import { useVModel } from '@vueuse/core'
 
 const props = defineProps<{
   modelValue?: Array<string> | Date
@@ -27,13 +28,11 @@ const props = defineProps<{
 }>()
 
 const emits = defineEmits(['update:modelValue'])
-const currentValue = ref(props.modelValue)
+const currentValue = useVModel(props, 'modelValue', emits)
 const slots = ref(Object.assign({}, useSlots(), props.desc.slots))
 const isInit = ref(false)
 const attrs = ref({} as any)
 const onEvents = ref(getEvents(props))
-
-emits('update:modelValue', currentValue)
 
 onBeforeMount(async () => {
   attrs.value = await getAttrs(props, { type: 'daterange', format: 'YYYY-MM-DD', valueFormat: 'x', editable: false, ...useAttrs() })

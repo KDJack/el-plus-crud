@@ -17,6 +17,7 @@ export default {
 import { ref, watch, useAttrs, useSlots, onBeforeMount, inject } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
 import { ICRUDConfig } from '../../../../types'
+import { useVModel } from '@vueuse/core'
 
 const defaultConf = inject('defaultConf') as ICRUDConfig
 
@@ -34,8 +35,7 @@ const attrs = ref({} as any)
 const isInit = ref(false)
 const onEvents = ref(getEvents(props))
 
-const currentValue = ref()
-emits('update:modelValue', currentValue)
+const currentValue = useVModel(props, 'modelValue', emits)
 
 onBeforeMount(async () => {
   attrs.value = await getAttrs(props, { autocomplete: 'new-password', maxlength: defaultConf.form?.leng?.input || 0, clearable: true, ...useAttrs() })

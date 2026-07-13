@@ -30,7 +30,7 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { ref, computed, useAttrs, onBeforeMount, watch, inject } from 'vue'
+import { ref, computed, useAttrs, onBeforeMount, watch, inject, type Ref } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
 import { ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
@@ -47,6 +47,7 @@ import zip from '../images/icon/zip.png'
 import ppt from '../images/icon/ppt.png'
 import { ICRUDConfig, IOssInfo } from '../../../../types'
 import { isPromiseLike, getValue } from '../../../util'
+import { useVModel } from '@vueuse/core'
 
 interface IUpAction {
   action: string
@@ -70,8 +71,8 @@ const props = defineProps<{
 }>()
 
 const emits = defineEmits(['update:modelValue', 'validateThis'])
-const currentValue = ref((typeof props.modelValue === 'string' ? [{ url: props.modelValue }] : props.modelValue) || [])
-emits('update:modelValue', currentValue)
+// ponytail: 内部 currentValue 恒为文件数组（modelValue 多态，由下方 watch 归一化），用 Ref<Array> 断言保留 .push/.map 用法
+const currentValue = useVModel(props, 'modelValue', emits) as Ref<Array<any>>
 
 const attrs = ref({} as any)
 const isInit = ref(false)

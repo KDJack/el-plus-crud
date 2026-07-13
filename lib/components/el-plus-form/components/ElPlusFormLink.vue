@@ -37,6 +37,7 @@ export default {
 <script lang="ts" setup>
 import { ref, reactive, watch, onMounted, computed, inject } from 'vue'
 import { IBtnBack, ITableConfig } from '../../../../types'
+import { useVModel } from '@vueuse/core'
 
 const lodash = inject('lodash') as any
 
@@ -59,8 +60,7 @@ const onEvents = ref(props.desc?.on || {})
 
 const emits = defineEmits(['update:modelValue', 'change', 'input', 'validateThis'])
 
-const currentValue = ref(props.modelValue as any[])
-emits('update:modelValue', currentValue)
+const currentValue = useVModel(props, 'modelValue', emits)
 
 // 顶部的select
 const selectRef = ref()

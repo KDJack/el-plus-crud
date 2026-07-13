@@ -17,6 +17,7 @@ import { ref, useAttrs, watch, onBeforeMount, inject, reactive } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
 import { isEqual } from '../../../util'
 import { ICRUDConfig } from '../../../../types'
+import { useVModel } from '@vueuse/core'
 
 const globalData = inject('globalData') as any
 const defaultConf = inject('defaultConf') as ICRUDConfig
@@ -35,8 +36,7 @@ const attrs = ref({} as any)
 const isInit = ref(false)
 const onEvents = ref(getEvents(props))
 const options = reactive([] as any[])
-const currentValue = ref(props.modelValue)
-emits('update:modelValue', currentValue)
+const currentValue = useVModel(props, 'modelValue', emits)
 
 onBeforeMount(async () => {
   attrs.value = await getAttrs(props, { maxlength: defaultConf.form?.leng?.textare, showWordLimit: true, rows: 3, ...useAttrs() })

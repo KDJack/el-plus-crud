@@ -14,11 +14,12 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { ref, useAttrs, onBeforeMount } from 'vue'
+import { ref, watch, useAttrs, onBeforeMount } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
+import { useVModel } from '@vueuse/core'
 
 const props = defineProps<{
-  modelValue?: string | number | '' | null
+  modelValue?: Array<string | number> | string | number | null
   field?: string
   desc: { [key: string]: any }
   formData?: { [key: string]: any }
@@ -26,8 +27,15 @@ const props = defineProps<{
 }>()
 
 const emits = defineEmits(['update:modelValue'])
-const currentValue = ref(props.modelValue)
-emits('update:modelValue', currentValue)
+const currentValue = useVModel(props, 'modelValue', emits)
+
+watch(
+  () => props.modelValue,
+  (data) => {
+    currentValue.value = data ? (Array.isArray(data) ? data : [data]) : []
+  },
+  { immediate: true }
+)
 
 const attrs = ref({} as any)
 const isInit = ref(false)

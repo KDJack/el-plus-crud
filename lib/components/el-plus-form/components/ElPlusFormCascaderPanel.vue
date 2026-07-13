@@ -13,6 +13,7 @@ export default {
 import { ref, reactive, useAttrs, watch, onBeforeMount, inject } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
 import { isEqual } from '../../../util'
+import { useVModel } from '@vueuse/core'
 
 const globalData = inject('globalData') as any
 
@@ -25,8 +26,16 @@ const props = defineProps<{
 }>()
 
 const emits = defineEmits(['update:modelValue'])
-const currentValue = ref(Array.isArray(props.modelValue) ? props.modelValue : [props.modelValue])
-emits('update:modelValue', currentValue)
+// ponytail: 对齐 ElPlusFormCheckbox，修复用户选择无法回写父表单
+const currentValue = useVModel(props, 'modelValue', emits)
+
+watch(
+  () => props.modelValue,
+  (data: any) => {
+    currentValue.value = data ? (Array.isArray(data) ? data : [data]) : []
+  },
+  { immediate: true }
+)
 
 const attrs = ref({} as any)
 const isInit = ref(false)

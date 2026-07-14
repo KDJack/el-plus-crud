@@ -10,7 +10,9 @@
     </template>
     <template v-if="limitList && limitList.length > 0">
       <el-dropdown class="group-menu-btn" :size="desc.size || 'default'" :disabled="disabled || desc.disabled">
-        <el-button type="primary" :size="desc.size || 'default'" :plain="desc.plain ?? true"> 更多<el-icon class="el-icon--right"><ArrowDown /></el-icon> </el-button>
+        <el-button type="primary" :size="desc.size || 'default'" :plain="desc.plain ?? true">
+          更多<el-icon class="el-icon--right"><ArrowDown /></el-icon>
+        </el-button>
         <template #dropdown>
           <el-dropdown-menu>
             <el-dropdown-item v-for="(item, i) in limitList" :key="i + (item.label || item.title)" v-on="handelEvelt(item)">
@@ -157,6 +159,7 @@ onMounted(() => {
 
   .group-menu-btn {
     margin-left: 10px;
+    align-items: center;
   }
 }
 </style>

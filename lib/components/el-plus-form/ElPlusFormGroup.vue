@@ -1,5 +1,5 @@
 <template>
-  <div class="el-plus-form-group">
+  <div class="el-plus-form-group" ref="groupRoot">
     <template v-for="(group, i) in getGroupFowmLayout" :key="i + (group.formProps?.fid || '')">
       <template v-if="useSlots()['top' + indexList[i]]">
         <slot :name="'top' + indexList[i]"> </slot>
@@ -26,7 +26,7 @@ export default {
 </script>
 <script lang="ts" setup>
 import { isPromiseLike } from '../../util'
-import { computed, inject, ref, useSlots } from 'vue'
+import { computed, inject, nextTick, ref, useSlots } from 'vue'
 import ElPlusForm, { IFormProps } from './ElPlusForm.vue'
 import { IFormDesc, IFormGroupConfig } from '../../../types'
 
@@ -44,6 +44,17 @@ const props = defineProps<{
 }>()
 
 const formRefs = ref([] as any[])
+
+// 分组根元素，用于滚动定位到首个错误项
+const groupRoot = ref<HTMLElement>()
+
+// ponytail: 滚动到全局第一个错误表单项；allSettled 后 DOM 已标记 is-error，nextTick 确保查询到
+function scrollToFirstError() {
+  nextTick(() => {
+    const errorItem = groupRoot.value?.querySelector('.el-form-item.is-error')
+    errorItem?.scrollIntoView({ block: 'center' })
+  })
+}
 
 // 主要记录原来groupFowmLayout下标和group下标的对应
 const indexList = ref([] as number[])
@@ -96,7 +107,13 @@ const getGroupFowmLayout = computed(() => {
       const result = (props.formGroup.beforeValidate as Function)(postData)
       if (!(isPromiseLike<any>(result) ? await result : result)) return false
     }
-    return await Promise.all(formRefs.value.map((tempRef) => tempRef.validate()))
+    // 用 allSettled 等所有分组校验完，再统一滚动到全局首个错误项；Promise.all 一遇失败即 reject，此时其他分组 DOM 可能尚未标记 is-error
+    const results = await Promise.allSettled(formRefs.value.map((tempRef) => tempRef.validate()))
+    if (results.some((r) => r.status === 'rejected')) {
+      scrollToFirstError()
+      return false
+    }
+    return true
   }
 
   tempFormConfig.groupFormDesc = {} as IFormDesc
@@ -150,7 +167,13 @@ function handleReset(fid: string) {
  * 校验
  */
 async function validate() {
-  return await Promise.all(formRefs.value.map((tempRef) => tempRef.validate()))
+  const results = await Promise.allSettled(formRefs.value.map((tempRef) => tempRef.validate()))
+  const failed = results.find((r) => r.status === 'rejected') as PromiseRejectedResult | undefined
+  if (failed) {
+    scrollToFirstError()
+    throw failed.reason
+  }
+  return results
 }
 
 /**

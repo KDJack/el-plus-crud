@@ -225,6 +225,8 @@ const formLayout = computed(() => ({ display: 'flex', flexDirection: props.isTab
 const computedFormAttrs = computed(() => {
   return {
     ...props.formAttrs,
+    // 校验失败时滚动到首个错误项；分组表单(isGroupForm)交由 ElPlusFormGroup 统一滚动，此处默认关闭
+    scrollToError: props.formAttrs?.scrollToError ?? !props.isGroupForm,
     _labelWidth: props.isTable ? 'auto' : props.labelWidth === 'auto' ? (props.isDialog ? '100px' : '120px') : parseInt(props.labelWidth + '') + 'px',
     // validateOnRuleChange: false,
     disabled: props.disabled || innerIsLoading.value,

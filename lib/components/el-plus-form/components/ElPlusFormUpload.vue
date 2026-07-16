@@ -120,7 +120,7 @@ onBeforeMount(async () => {
     attrs.value.httpRequest = handelRequest
   } else {
     if (defaultConf.upload?.type === 'minio') {
-      attrs.value.method = 'PUT'
+      attrs.value.method = defaultConf.upload.actionType || 'PUT'
     }
     attrs.value.action = upAction
   }

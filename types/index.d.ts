@@ -542,6 +542,8 @@ export interface ICRUDConfig {
     type?: 'minio' | 'quniu' | 'aliyun'
     // 上传路径，也可以单独配置到子组件desc中
     action?: string | ((data?: any) => string | Promise<any>)
+    // action的类型
+    actionType?: 'PUT' | 'POST'
     // 如果action返回的值是对象的话，则按照以下map进行解析
     actionMap?: {
       // 获取文件上传地址的对象key，如果不在根级，则需使用数组的形式。如：data.xxx.action 就需要写为 ['data', 'xxx', 'action']

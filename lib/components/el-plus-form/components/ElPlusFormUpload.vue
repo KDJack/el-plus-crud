@@ -96,6 +96,11 @@ const previewList = computed(() => {
 })
 
 onBeforeMount(async () => {
+  // 兜底：modelValue 未初始化（undefined）时补 []。否则 :fileList="currentValue || []" 每次 render 产生新 [] 引用，
+  // ElUpload 内部 uploadFiles 被动 watch 不断重置 → handleSuccess 的 getFile 找不到文件 → onSuccess 不触发 / handelListChange 报错
+  if (!currentValue.value) {
+    currentValue.value = []
+  }
   if (!defaultConf.upload?.sign && !props.desc?.sign) {
     defaultConf.debug && console.warn('上传私有加密仓库必须在config或desc中配置sign方法进行图片/文件签名鉴权，否则图片将无法显示和预览！')
   }

@@ -396,6 +396,28 @@ watch(
   },
   { immediate: true }
 )
+
+/**
+ * 回显补全（v0.1.97+）：父组件 push 进来的附件对象（如详情接口返回的 FileAnnexVO）
+ * 可能只有 signUrl/previewUrl/furl 而缺 url，但 el-upload 的 picture-card 缩略图只读
+ * file.url，缺失则破图。主 watch 无 deep、对数组 push 不触发，故此处 deep 监听原地补全
+ * url（不换数组引用，避免触发 el-upload uploadFiles 重置而破坏上传成功回调）。
+ * 已有 url 的对象一律不覆盖 —— 100% 兼容既有数据、新增上传与提交流程。
+ */
+watch(
+  () => props.modelValue,
+  (data) => {
+    if (Array.isArray(data)) {
+      data.forEach((item: any) => {
+        if (item && !item.url) {
+          const fallback = item.signUrl || item.shareUrl || item.previewUrl || item.furl
+          if (fallback) item.url = fallback
+        }
+      })
+    }
+  },
+  { deep: true, immediate: true }
+)
 </script>
 <style lang="scss">
 .ele-form-upload-image {

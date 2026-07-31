@@ -1,3 +1,4 @@
+import { ref } from 'vue'
 import { ICRUDConfig, IColumnItem } from '../../types'
 
 /**
@@ -320,15 +321,27 @@ export function isUnDef(val: any) {
   return val === null || val === undefined
 }
 
+// 窄屏断点：与 Element Plus 的 xs 断点一致；若想让标签在「单列平板范围( <992 )」也上移，可调大此处
+const MOBILE_BREAKPOINT = 768
+
 /**
- * 判断是否是移动端
+ * 判断是否为窄屏（移动端布局）
+ * 基于视口宽度响应式判断（而非 UA 嗅探）：桌面浏览器拉窄窗口也能实时切换。
+ * 内部维护模块级 ref + matchMedia 监听；在 computed / 模板中调用会自动建立响应式依赖，
+ * 视口变化时调用方自动重算 / 重渲染。
  */
+const _isMobile = ref(false)
+const _mobileMQ =
+  typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+    ? window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`)
+    : null
+if (_mobileMQ) {
+  _isMobile.value = _mobileMQ.matches
+  _mobileMQ.addEventListener('change', (e: MediaQueryListEvent) => (_isMobile.value = e.matches))
+}
+
 export function isMobile() {
-  if (navigator.userAgent.match(/('phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone')/i)) {
-    return true
-  } else {
-    return false
-  }
+  return _isMobile.value
 }
 
 /**

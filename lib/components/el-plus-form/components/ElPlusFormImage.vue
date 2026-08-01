@@ -1,8 +1,8 @@
 <template>
   <div class="ele-form-image">
-    <template v-if="imagList && imagList.length > 0">
-      <template v-for="(image, i) in imagList" :key="image + i">
-        <el-image v-if="!attrs.showOne || (attrs.showOne && i === 0)" :class="desc.class" :src="image" :preview-src-list="attrs.isShowPreview === false ? null : imagList" :initial-index="i" v-bind="attrs" :style="styles" v-on="onEvents" :fit="attrs.fit || 'cover'" />
+    <template v-if="imageItems && imageItems.length > 0">
+      <template v-for="(img, i) in imageItems" :key="i">
+        <el-image v-if="!attrs.showOne || (attrs.showOne && i === 0)" :class="desc.class" :src="img.list[img.idx]" :preview-src-list="attrs.isShowPreview === false ? null : imageItems.map((im) => im.list[im.idx])" :initial-index="i" v-bind="attrs" :style="styles" v-on="onEvents" :fit="attrs.fit || 'cover'" referrerpolicy="no-referrer" @error="onErrImg(img)" />
       </template>
     </template>
     <div v-else>
@@ -19,7 +19,7 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { ref, computed, useAttrs, onBeforeMount } from 'vue'
+import { ref, computed, reactive, watch, useAttrs, onBeforeMount } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
 
 const props = defineProps<{
@@ -37,23 +37,35 @@ onBeforeMount(async () => {
   attrs.value = await getAttrs(props, { isShowPreview: true, previewTeleported: true, showOne: false, ...useAttrs() })
 })
 
-const imagList = computed(() => {
-  if (!props.modelValue) {
-    return []
-  }
-  if (Array.isArray(props.modelValue)) {
-    if (typeof props.modelValue[0] === 'string') {
-      return props.modelValue
-    } else {
-      return props.modelValue.map((item) => item.signUrl || item.shareUrl || item.furl)
+// ponytail: 候选 URL 逐个回退。附件 signUrl 可能 404/过期/被删，
+// 按 signUrl→shareUrl→previewUrl→furl 逐个尝试（与 ElPlusFormUpload 回显补全同序），
+// @error 时 idx 自增触发 :src 切换，避免展示组件直接"加载失败"。
+const imageItems = ref<Array<{ list: string[]; idx: number }>>([])
+watch(
+  () => props.modelValue,
+  (val) => {
+    let groups: string[][] = []
+    if (Array.isArray(val)) {
+      if (val.length > 0) {
+        if (typeof val[0] === 'string') {
+          groups = (val as unknown as string[]).map((s) => [s])
+        } else {
+          groups = val.map((item: any) => [item.signUrl, item.shareUrl, item.previewUrl, item.furl].filter((u: any) => !!u))
+        }
+      }
+    } else if (typeof val === 'string') {
+      groups = val.split(',').map((s) => [s])
     }
-  } else if (typeof props.modelValue === 'string') {
-    return props.modelValue.split(',')
-  } else {
-    // console.log('unknown image Type.....')
+    imageItems.value = groups.map((list) => reactive({ list, idx: 0 }))
+  },
+  { immediate: true, deep: true }
+)
+
+const onErrImg = (img: { list: string[]; idx: number }) => {
+  if (img.idx < img.list.length - 1) {
+    img.idx++
   }
-  return []
-})
+}
 
 /**
  * 格式化样式

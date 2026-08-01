@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.99](https://github.com/KDJack/el-plus-crud/compare/v0.1.98...v0.1.99) (2026-08-01)
+
+
+### Features
+
+* **textarea:** 新增可选快捷填充 quickFill 配置 ([efe63eb](https://github.com/KDJack/el-plus-crud/commit/efe63eb0f5dcb98b9d774d44ab7d8ad445b8254f))
+
 ### [0.1.98](https://github.com/KDJack/el-plus-crud/compare/v0.1.97...v0.1.98) (2026-07-23)
 
 ### [0.1.97](https://github.com/KDJack/el-plus-crud/compare/v0.1.96...v0.1.97) (2026-07-17)

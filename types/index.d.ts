@@ -105,6 +105,7 @@ export interface IFormDescItem extends IDescItem {
   valueFormat?: Function | string
   isBlank?: boolean
   colspan?: number
+  rowspan?: number
   upType?: string
   multiple?: boolean
   noTip?: boolean

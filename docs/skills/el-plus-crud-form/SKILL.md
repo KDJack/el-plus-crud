@@ -234,6 +234,40 @@ const formDesc: IFormDesc = {
 }
 ```
 
+### Vertical Spanning with Rowspan
+
+When any visible field sets `rowspan`, that group switches to a CSS Grid layout so an item can span multiple rows. Other fields keep flowing around it.
+
+```html
+<ElPlusForm :column="3" v-model="formData" :formDesc="formDesc" />
+```
+
+```typescript
+const formDesc: IFormDesc = {
+  avatar:  { type: 'image', label: '头像', rowspan: 2 },   // spans 2 rows
+  name:    { type: 'input', label: '姓名' },
+  phone:   { type: 'input', label: '手机号' },
+  email:   { type: 'input', label: '邮箱' },
+  address: { type: 'input', label: '地址' }
+}
+```
+
+Layout — `avatar` occupies the left column across 2 rows, the rest flow around it:
+
+```
+┌──────┬──────┬──────┐
+│      │ 姓名 │ 手机 │
+│ 头像 ├──────┼──────┤
+│      │ 邮箱 │ 地址 │
+└──────┴──────┴──────┘
+```
+
+**Limitations**
+- Only effective with `column >= 2`; on a single-column form and on mobile/narrow screens it degrades to normal stacking.
+- Ignored in `isTable` mode (inline search bar).
+- `maxShowRowIndex` (collapse first N rows) is not supported in Grid mode — all rows are shown.
+- `colspan` and `rowspan` can be combined on the same field.
+
 ### Dynamic Visibility and Linking
 
 ```typescript

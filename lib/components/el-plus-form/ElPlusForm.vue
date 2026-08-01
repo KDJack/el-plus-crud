@@ -4,35 +4,71 @@
     <div :style="{ display: 'flex', justifyContent: isDialog ? 'center' : '' }">
       <el-form class="el-plus-form-panel" ref="refElPlusForm" :model="props.modelValue" @submit.prevent="handleSubmitForm" v-bind="computedFormAttrs">
         <template v-if="attrMapToTableList?.length">
-          <el-row :gutter="10" v-for="(formList, index) in attrMapToTableList" :key="index" v-show="maxShowRowIndex < 0 || index < maxShowRowIndex" :style="{ marginRight: isTable ? '20px' : 0 }">
-            <el-col v-for="(formItem, y) in formList" :key="index + '-' + y + '-' + formItem.field" :xs="24" :sm="24" :md="formItem.colspan && formItem.colspan >= column ? 24 : column >= 2 ? 12 : 24" :lg="formItem.colspan && formItem.colspan >= column ? 24 : Math.floor((24 / column) * (formItem.colspan || 1))" :xl="formItem.colspan && formItem.colspan >= column ? 24 : Math.floor((24 / column) * (formItem.colspan || 1))">
-              <div v-if="formItem._vif" class="el-plus-form-column-panel" :style="{ 'justify-content': isTable ? 'flex-end' : 'flex-start' }">
-                <el-form-item style="min-height: 40px; display: flex" :prop="formItem.field" :style="{ width: formItem._attrs?.width || formItem.width || (isTable ? '150px' : '100%'), marginBottom: itemMB, alignItems: formItem.labelAlign || 'center' }">
-                  <template #label v-if="showLabel && formItem.showLabel !== false">
-                    <div class="crud-form-label" :style="{ width: formItem.labelWidth || computedFormAttrs._labelWidth || (isDialog ? '100px' : 'auto'), justifyContent: computedFormAttrs.labelPosition === 'right' ? 'flex-end' : 'flex-start' }">
-                      <span class="required-dot">{{ formItem._required ? '*' : ' ' }}</span>
-                      <span>{{ formItem._label }}</span>
-                    </div>
-                  </template>
-                  <component
-                    :key="formItem.field + (formItem.upType || '')"
-                    :style="{ minWidth: '80px', width: formItem.tipInline && formItem._tip ? 'auto' : '100%', flex: '1' }"
-                    :is="formItem._type"
-                    :formData="props.modelValue"
-                    :disabled="formItem._disabled ?? disabled ?? false"
-                    v-bind="formItem._attrs"
-                    :desc="formItem"
-                    :ref="setComponentRef"
-                    :field="formItem.field"
-                    v-model="props.modelValue[formItem.field || '']"
-                    :isTable="isTable"
-                    @validateThis="() => handelValidateThis(formItem.field || '')"
-                  ></component>
-                  <div class="el-plus-form-tip" :class="{ 'is-inline': formItem.tipInline }" :style="{ ...formItem.tipStyle, width: !!formItem.tipInline ? '' : '100%' }" v-if="formItem._tip" v-html="formItem._tip" />
-                </el-form-item>
-              </div>
-            </el-col>
-          </el-row>
+          <!-- rowspan 跨行布局：CSS Grid（含 rowspan>=2 且非 isTable 时启用） -->
+          <div v-if="hasRowspan" class="crud-form-grid" :style="gridContainerStyle">
+            <div
+              v-for="(formItem, idx) in flatFormItems"
+              :key="'grid-' + idx + '-' + (formItem.field || '')"
+              class="el-plus-form-column-panel"
+              :style="[gridItemStyle(formItem), { 'justify-content': 'flex-start' }]"
+            >
+              <el-form-item style="min-height: 40px; display: flex" :prop="formItem.field" :style="{ width: formItem._attrs?.width || formItem.width || '100%', marginBottom: itemMB, alignItems: formItem.labelAlign || 'center' }">
+                <template #label v-if="showLabel && formItem.showLabel !== false">
+                  <div class="crud-form-label" :style="{ width: formItem.labelWidth || computedFormAttrs._labelWidth || (isDialog ? '100px' : 'auto'), justifyContent: computedFormAttrs.labelPosition === 'right' ? 'flex-end' : 'flex-start' }">
+                    <span class="required-dot">{{ formItem._required ? '*' : ' ' }}</span>
+                    <span>{{ formItem._label }}</span>
+                  </div>
+                </template>
+                <component
+                  :key="formItem.field + (formItem.upType || '')"
+                  :style="{ minWidth: '80px', width: formItem.tipInline && formItem._tip ? 'auto' : '100%', flex: '1' }"
+                  :is="formItem._type"
+                  :formData="props.modelValue"
+                  :disabled="formItem._disabled ?? disabled ?? false"
+                  v-bind="formItem._attrs"
+                  :desc="formItem"
+                  :ref="setComponentRef"
+                  :field="formItem.field"
+                  v-model="props.modelValue[formItem.field || '']"
+                  :isTable="isTable"
+                  @validateThis="() => handelValidateThis(formItem.field || '')"
+                ></component>
+                <div class="el-plus-form-tip" :class="{ 'is-inline': formItem.tipInline }" :style="{ ...formItem.tipStyle, width: !!formItem.tipInline ? '' : '100%' }" v-if="formItem._tip" v-html="formItem._tip" />
+              </el-form-item>
+            </div>
+          </div>
+          <!-- 默认栅格布局：el-row / el-col（无 rowspan 时走原路径，零回归） -->
+          <template v-else>
+            <el-row :gutter="10" v-for="(formList, index) in attrMapToTableList" :key="index" v-show="maxShowRowIndex < 0 || index < maxShowRowIndex" :style="{ marginRight: isTable ? '20px' : 0 }">
+              <el-col v-for="(formItem, y) in formList" :key="index + '-' + y + '-' + formItem.field" :xs="24" :sm="24" :md="formItem.colspan && formItem.colspan >= column ? 24 : column >= 2 ? 12 : 24" :lg="formItem.colspan && formItem.colspan >= column ? 24 : Math.floor((24 / column) * (formItem.colspan || 1))" :xl="formItem.colspan && formItem.colspan >= column ? 24 : Math.floor((24 / column) * (formItem.colspan || 1))">
+                <div v-if="formItem._vif" class="el-plus-form-column-panel" :style="{ 'justify-content': isTable ? 'flex-end' : 'flex-start' }">
+                  <el-form-item style="min-height: 40px; display: flex" :prop="formItem.field" :style="{ width: formItem._attrs?.width || formItem.width || (isTable ? '150px' : '100%'), marginBottom: itemMB, alignItems: formItem.labelAlign || 'center' }">
+                    <template #label v-if="showLabel && formItem.showLabel !== false">
+                      <div class="crud-form-label" :style="{ width: formItem.labelWidth || computedFormAttrs._labelWidth || (isDialog ? '100px' : 'auto'), justifyContent: computedFormAttrs.labelPosition === 'right' ? 'flex-end' : 'flex-start' }">
+                        <span class="required-dot">{{ formItem._required ? '*' : ' ' }}</span>
+                        <span>{{ formItem._label }}</span>
+                      </div>
+                    </template>
+                    <component
+                      :key="formItem.field + (formItem.upType || '')"
+                      :style="{ minWidth: '80px', width: formItem.tipInline && formItem._tip ? 'auto' : '100%', flex: '1' }"
+                      :is="formItem._type"
+                      :formData="props.modelValue"
+                      :disabled="formItem._disabled ?? disabled ?? false"
+                      v-bind="formItem._attrs"
+                      :desc="formItem"
+                      :ref="setComponentRef"
+                      :field="formItem.field"
+                      v-model="props.modelValue[formItem.field || '']"
+                      :isTable="isTable"
+                      @validateThis="() => handelValidateThis(formItem.field || '')"
+                    ></component>
+                    <div class="el-plus-form-tip" :class="{ 'is-inline': formItem.tipInline }" :style="{ ...formItem.tipStyle, width: !!formItem.tipInline ? '' : '100%' }" v-if="formItem._tip" v-html="formItem._tip" />
+                  </el-form-item>
+                </div>
+              </el-col>
+            </el-row>
+          </template>
         </template>
         <slot name="row"></slot>
       </el-form>
@@ -376,6 +412,27 @@ const attrMapToTableList = computed(() => {
   }
   // console.log('formLayoutRows: ', formLayoutRows)
   return formLayoutRows
+})
+
+// ===== rowspan 跨行布局：按需启用 CSS Grid =====
+// 扁平化的可见表单项列表（Grid 模式使用，复用 attrMapToTableList 的处理结果）
+const flatFormItems = computed(() => (attrMapToTableList.value || []).flat())
+// 是否启用 Grid：存在 rowspan>=2 的可见项，且非 isTable 表内表单模式
+const hasRowspan = computed(() => !props.isTable && flatFormItems.value.some((i) => Number(i.rowspan) >= 2))
+// Grid 当前列数（窄屏单列退化）
+const gridColumnCount = computed(() => (isMobile() ? 1 : props.column))
+// Grid 容器样式（行间距沿用各 el-form-item 的 marginBottom，列间距对齐 el-row gutter:10）
+const gridContainerStyle = computed(() => ({
+  display: 'grid',
+  gridTemplateColumns: `repeat(${gridColumnCount.value}, minmax(0, 1fr))`,
+  gridAutoRows: 'minmax(40px, auto)',
+  columnGap: '10px',
+  rowGap: '0px'
+}))
+// 单个表单项的跨格样式
+const gridItemStyle = (item: IFormDescItem) => ({
+  gridColumn: `span ${Math.max(1, Number(item.colspan) || 1)}`,
+  gridRow: `span ${Math.max(1, Number(item.rowspan) || 1)}`
 })
 
 // 整体初始化属性

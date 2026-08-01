@@ -79,6 +79,14 @@ const formGroupConfig = ref({
       formDesc: {
         remark: { type: 'textarea', label: '备注', colspan: 2, require: true }
       } as IFormDesc
+    },
+    {
+      title: '跨行布局(rowspan)',
+      formDesc: {
+        intro: { type: 'textarea', label: '简介', rowspan: 2, require: true },
+        nick: { type: 'input', label: '昵称', require: true },
+        mobile: { type: 'input', label: '手机', require: true }
+      } as IFormDesc
     }
   ]
 } as IFormGroupConfig)

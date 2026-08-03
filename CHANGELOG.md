@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.103](https://github.com/KDJack/el-plus-crud/compare/v0.1.102...v0.1.103) (2026-08-03)
+
+
+### Features
+
+* **form:** 新增表单项 rowspan 纵向跨行支持 ([a2ac9d2](https://github.com/KDJack/el-plus-crud/commit/a2ac9d2212d8ed8942cf357c1c3ee7543a4a6596))
+
 ### [0.1.102](https://github.com/KDJack/el-plus-crud/compare/v0.1.101...v0.1.102) (2026-08-01)
 
 ### [0.1.101](https://github.com/KDJack/el-plus-crud/compare/v0.1.100...v0.1.101) (2026-08-01)

@@ -42,6 +42,7 @@ const transferData = computed(() => {
   const raw = props.desc.options
   if (!Array.isArray(raw)) return []
   return raw.map((item: any) => ({
+    ...item, // 保留原字段，el-transfer 按 desc.props.key/label 读自定义字段名（如 employeeId/employeeName）
     key: item.key ?? item.value ?? item.v,
     label: item.label ?? item.l ?? item.text ?? item.value ?? item.key,
     disabled: !!item.disabled

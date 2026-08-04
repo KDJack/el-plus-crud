@@ -1,6 +1,6 @@
 <template>
   <el-checkbox-group v-if="isInit" class="ElPlusFormCheckboxButton-panel" v-bind="attrs" :disabled="disabled" v-on="onEvents" v-model="currentValue">
-    <el-checkbox-button v-for="option of desc.options" :key="option.value" :label="option.value" v-bind="option.attrs">
+    <el-checkbox-button v-for="option of desc.options" :key="option.value" :value="option.value" v-bind="option.attrs">
       {{ option.text }}
     </el-checkbox-button>
   </el-checkbox-group>

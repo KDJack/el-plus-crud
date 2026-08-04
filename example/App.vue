@@ -19,7 +19,8 @@ import { ElMessage } from 'element-plus'
 import { IFormBack, IFormDesc, IFormGroupConfig, ITableConfig } from 'types'
 
 let formData = reactive({
-  name: ''
+  name: '',
+  transferField: [] as Array<string | number>
 } as any)
 const formGroupConfig = ref({
   column: 2,
@@ -78,6 +79,26 @@ const formGroupConfig = ref({
       title: '备注信息',
       formDesc: {
         remark: { type: 'textarea', label: '备注', colspan: 2, require: true }
+      } as IFormDesc
+    },
+    {
+      title: '穿梭框测试',
+      formDesc: {
+        // 用 {value, label} 数据结构：原本 el-transfer 读 item.key 会 undefined → 触发 label-as-value 告警
+        // 验证 transferData 的 key 兜底（key: item.value）是否消除告警
+        transferField: {
+          type: 'transfer',
+          label: '数据权限',
+          colspan: 2,
+          options: [
+            { value: '1', label: '选项一' },
+            { value: '2', label: '选项二' },
+            { value: '3', label: '选项三' },
+            { value: '4', label: '选项四' },
+            { value: '5', label: '选项五' }
+          ],
+          attrs: { titles: ['全部', '已选'] }
+        }
       } as IFormDesc
     },
     {

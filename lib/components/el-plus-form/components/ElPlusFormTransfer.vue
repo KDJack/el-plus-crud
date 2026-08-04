@@ -43,7 +43,7 @@ const transferData = computed(() => {
   if (!Array.isArray(raw)) return []
   return raw.map((item: any) => ({
     ...item, // 保留原字段，el-transfer 按 desc.props.key/label 读自定义字段名（如 employeeId/employeeName）
-    key: item.key ?? item.value ?? item.v,
+    key: item.key ?? item.value ?? item.v ?? item.label ?? item.l ?? item.text, // ponytail: 兜底到 label 类字段，确保 el-transfer 内部 checkbox 的 value 永不缺失，避免 label-as-value 弃用告警
     label: item.label ?? item.l ?? item.text ?? item.value ?? item.key,
     disabled: !!item.disabled
   }))

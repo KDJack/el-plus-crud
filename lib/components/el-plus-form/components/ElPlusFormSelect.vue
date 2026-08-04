@@ -49,6 +49,9 @@ const currentValue = useVModel(props, 'modelValue', emits)
 
 const attrs = ref({} as any)
 const options = reactive([] as any[])
+// remote 场景 options 易变（focus 重查/clear 整体替换），选中瞬间 options.find(item.value===currentValue)
+// 可能落空，致 on.change 第二参 undefined。维护历史 option 累计映射，find 失败时回退，保证第二参稳定。
+const optionMap = new Map<any, any>()
 const oldQuery = ref(null) as any
 const tempAttr = { clearable: true, ...useAttrs() } as any
 const isInit = ref(false)
@@ -80,7 +83,7 @@ const onEvents = computed(() => {
     Object.keys(props.desc.on).map((key: string) => {
       tempOn[key] = () => {
         nextTick(() => {
-          const values = props.desc?.multiple ? options.filter((item) => Array.isArray(currentValue.value) && currentValue.value.find((id: any) => item.value === id)) : options.find((item) => item.value === currentValue.value)
+          const values = props.desc?.multiple ? options.filter((item) => Array.isArray(currentValue.value) && currentValue.value.find((id: any) => item.value === id)) : (options.find((item) => item.value === currentValue.value) || optionMap.get(currentValue.value))
           props.desc.on[key](props.formData || {}, values, props.rowIndex)
         })
       }
@@ -205,6 +208,17 @@ watch(
     initDefault()
   },
   { immediate: true }
+)
+
+// 维护历史 option 累计映射（remote 每次返回都累加），find 落空时供 on.change 第二参回退
+watch(
+  options,
+  (arr: any[]) => {
+    arr.forEach((item: any) => {
+      if (item && item.value !== undefined && item.value !== null) optionMap.set(item.value, item)
+    })
+  },
+  { flush: 'sync' } // splice 后同步更新，确保先于 change 的 nextTick 回调
 )
 
 defineExpose({ field: props.field, clear })

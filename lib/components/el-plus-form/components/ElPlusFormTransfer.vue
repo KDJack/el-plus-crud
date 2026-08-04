@@ -1,5 +1,5 @@
 <template>
-  <el-transfer :class="desc.class" :data="desc.options" :style="desc.style" class="ele-form-transfer" v-bind="attrs" :disabled="disabled" v-model="currentValue" v-on="onEvents">
+  <el-transfer :class="desc.class" :data="transferData" :style="desc.style" class="ele-form-transfer" v-bind="attrs" :disabled="disabled" v-model="currentValue" v-on="onEvents">
     <!-- 非作用域插槽 -->
     <template v-for="(item, key, index) in slots" #[key]="data" :key="index">
       <slot :name="key" :data="data" />
@@ -15,9 +15,8 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { ref, watch, useAttrs, useSlots, onBeforeMount } from 'vue'
+import { ref, computed, useAttrs, useSlots, onBeforeMount } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
-import { useVModel } from '@vueuse/core'
 
 const props = defineProps<{
   modelValue?: Array<string | number> | string | number | null
@@ -29,16 +28,25 @@ const props = defineProps<{
 }>()
 
 const emits = defineEmits(['update:modelValue'])
-// ponytail: 对齐 ElPlusFormCheckbox，修复用户选择无法回写父表单
-const currentValue = useVModel(props, 'modelValue', emits)
-
-watch(
-  () => props.modelValue,
-  (data: Array<string | number> | string | number | null | undefined) => {
-    currentValue.value = data ? (Array.isArray(data) ? data : [data]) : []
+// ponytail: el-transfer 内部对 modelValue 调用 .includes，null 会崩；归一化为数组，替代 useVModel 透传
+const currentValue = computed({
+  get: () => {
+    const v = props.modelValue
+    return v == null ? [] : Array.isArray(v) ? v : [v]
   },
-  { immediate: true }
-)
+  set: (val: Array<string | number>) => emits('update:modelValue', val)
+})
+
+// ponytail: 兼容 {key,label}/{value,label}/{l,v}/{value,text}，并防御 options 被清空为 null（el-transfer 内部 props.data.reduce 会崩）
+const transferData = computed(() => {
+  const raw = props.desc.options
+  if (!Array.isArray(raw)) return []
+  return raw.map((item: any) => ({
+    key: item.key ?? item.value ?? item.v,
+    label: item.label ?? item.l ?? item.text ?? item.value ?? item.key,
+    disabled: !!item.disabled
+  }))
+})
 
 const slots = ref(Object.assign({}, useSlots(), props.desc.slots))
 const attrs = ref({} as any)

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.106](https://github.com/KDJack/el-plus-crud/compare/v0.1.105...v0.1.106) (2026-08-04)
+
+
+### Bug Fixes
+
+* **form:** transfer 保留原始字段以兼容自定义 key/label 字段名 ([ec0f1df](https://github.com/KDJack/el-plus-crud/commit/ec0f1dfcf5bf4e42580951d99c57621902a86abc))
+
 ### [0.1.105](https://github.com/KDJack/el-plus-crud/compare/v0.1.104...v0.1.105) (2026-08-04)
 
 

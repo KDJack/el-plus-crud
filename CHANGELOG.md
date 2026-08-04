@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.105](https://github.com/KDJack/el-plus-crud/compare/v0.1.104...v0.1.105) (2026-08-04)
+
+
+### Bug Fixes
+
+* **form:** 修复 ElPlusFormTransfer 关闭弹框报错与 el-checkbox 弃用告警 ([6c89683](https://github.com/KDJack/el-plus-crud/commit/6c896837f480bd833f0d8544a1ce888dd0874932))
+
 ### [0.1.104](https://github.com/KDJack/el-plus-crud/compare/v0.1.103...v0.1.104) (2026-08-04)
 
 

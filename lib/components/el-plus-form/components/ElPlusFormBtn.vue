@@ -26,7 +26,7 @@
       <template v-if="props.desc?.confirm">
         <el-popconfirm @confirm="onEvents.click" :title="props.desc?.confirm">
           <template #reference>
-            <el-button :loading="localLoading" :size="props.desc?.size || defaultConf.size || 'default'" v-bind="attrs" :class="{ btnHideLabel: !props.desc?.label }">
+            <el-button :loading="localLoading" :size="props.desc?.size || defaultConf.size || 'default'" v-bind="attrs" :class="{ btnHideLabel: !props.desc?.label && !$slots.default }">
               <slot name="default">
                 <template v-if="!!props.desc?.label">{{ btnShowText }}</template>
               </slot>
@@ -34,7 +34,7 @@
           </template>
         </el-popconfirm>
       </template>
-      <el-button v-else :loading="localLoading" :size="props.desc?.size || defaultConf.size || 'default'" v-bind="attrs" v-on="onEvents" :style="{ pointerEvents: desc?.isTag ? 'none' : 'all' }" :class="{ 'no-label': !props.desc?.label, btnHideLabel: !props.desc?.label }">
+      <el-button v-else :loading="localLoading" :size="props.desc?.size || defaultConf.size || 'default'" v-bind="attrs" v-on="onEvents" :style="{ pointerEvents: desc?.isTag ? 'none' : 'all' }" :class="{ 'no-label': !props.desc?.label, btnHideLabel: !props.desc?.label && !$slots.default }">
         <slot name="default">
           <template v-if="!!props.desc?.label">{{ btnShowText }}</template>
         </slot>

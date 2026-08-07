@@ -6,12 +6,7 @@
         <template v-if="attrMapToTableList?.length">
           <!-- rowspan 跨行布局：CSS Grid（含 rowspan>=2 且非 isTable 时启用） -->
           <div v-if="hasRowspan" class="crud-form-grid" :style="gridContainerStyle">
-            <div
-              v-for="(formItem, idx) in flatFormItems"
-              :key="'grid-' + idx + '-' + (formItem.field || '')"
-              class="el-plus-form-column-panel"
-              :style="[gridItemStyle(formItem), { 'justify-content': 'flex-start' }]"
-            >
+            <div v-for="(formItem, idx) in flatFormItems" :key="'grid-' + idx + '-' + (formItem.field || '')" class="el-plus-form-column-panel" :style="[gridItemStyle(formItem), { 'justify-content': 'flex-start' }]">
               <el-form-item style="min-height: 40px; display: flex" :prop="formItem.field" :style="{ width: formItem._attrs?.width || formItem.width || '100%', marginBottom: itemMB, alignItems: formItem.labelAlign || 'center' }">
                 <template #label v-if="showLabel && formItem.showLabel !== false">
                   <div class="crud-form-label" :style="{ width: formItem.labelWidth || computedFormAttrs._labelWidth || (isDialog ? '100px' : 'auto'), justifyContent: computedFormAttrs.labelPosition === 'right' ? 'flex-end' : 'flex-start' }">
@@ -270,9 +265,9 @@ const computedFormAttrs = computed(() => {
     labelPosition: isMobile() ? 'top' : props.formAttrs?.labelPosition || 'right',
     style: {
       // ponytail: 窄屏(isMobile<768)弹窗表单铺满，避免 80% 宽 + 居中导致表单项未占满整行
-      width: props.maxWidth || (props.isTable ? '100%' : props.isDialog ? (isMobile() ? '100%' : '80%') : '1000px'),
+      width: props.maxWidth || (props.isTable ? '100%' : props.isDialog ? (isMobile() ? '100%' : '100%') : '1000px'),
       // ponytail: 窄屏弹窗铺满(100%)时去除右内边距，避免与父级 padding 叠加导致左右不对称
-      paddingRight: props.isTable ? '0' : (props.isDialog && isMobile() ? '0' : '20px')
+      paddingRight: props.isTable ? '0' : props.isDialog && isMobile() ? '0' : '20px'
     }
   }
 })

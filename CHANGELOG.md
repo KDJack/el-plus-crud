@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.107](https://github.com/KDJack/el-plus-crud/compare/v0.1.106...v0.1.107) (2026-08-07)
+
+
+### Bug Fixes
+
+* **form:** 修复 ElPlusFormBtn 默认插槽文字被隐藏 ([bd2f6c7](https://github.com/KDJack/el-plus-crud/commit/bd2f6c72e7c3819e1cc861807588a37527551ef1))
+* **form:** 消除 el-checkbox label-as-value 弃用告警 ([9dbd79c](https://github.com/KDJack/el-plus-crud/commit/9dbd79c51e4d6559eae65be4011b86caef726cf8))
+
 ### [0.1.106](https://github.com/KDJack/el-plus-crud/compare/v0.1.105...v0.1.106) (2026-08-04)
 
 

@@ -965,7 +965,8 @@ defineExpose({ fid: props.fid, formRef: refElPlusForm, submit: handleSubmitForm,
     }
 
     .el-plus-form-tip {
-      color: #909399;
+      font-size: 12px;
+      color: #c0c4cc;
       line-height: 1.5em;
       margin-top: 3px;
       margin-left: 12px;

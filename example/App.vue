@@ -20,8 +20,38 @@ import { IFormBack, IFormDesc, IFormGroupConfig, ITableConfig } from 'types'
 
 let formData = reactive({
   name: '',
-  transferField: [] as Array<string | number>
+  transferField: [] as Array<string | number>,
+  // ===== 上传字段初始回显数据（IOssInfo[]，用于演示卡片式回显）=====
+  logo: [{ name: '企业Logo.png', url: 'https://picsum.photos/200/200', furl: 'https://picsum.photos/200/200', suffix: '.png', fsize: 524288, uid: 101 }],
+  photos: [
+    { name: '现场照片-01.jpg', url: 'https://picsum.photos/320/200', furl: 'https://picsum.photos/320/200', suffix: '.jpg', fsize: 1048576, uid: 102 },
+    { name: '现场照片-02.jpg', url: 'https://picsum.photos/320/200', furl: 'https://picsum.photos/320/200', suffix: '.jpg', fsize: 819200, uid: 103 }
+  ],
+  contract: [{ name: '中标通知书.pdf', furl: 'https://example.com/中标通知书.pdf', suffix: '.pdf', fsize: 2411724, uid: 201 }],
+  report: [{ name: '季度工作报告.docx', furl: 'https://example.com/季度工作报告.docx', suffix: '.docx', fsize: 1572864, uid: 202 }],
+  budget: [{ name: '年度预算表.xlsx', furl: 'https://example.com/年度预算表.xlsx', suffix: '.xlsx', fsize: 655360, uid: 203 }],
+  slides: [{ name: '项目汇报.pptx', furl: 'https://example.com/项目汇报.pptx', suffix: '.pptx', fsize: 3145728, uid: 204 }],
+  archive: [{ name: '历史资料包.zip', furl: 'https://example.com/历史资料包.zip', suffix: '.zip', fsize: 11534336, uid: 205 }],
+  readme: [{ name: '使用说明.txt', furl: 'https://example.com/使用说明.txt', suffix: '.txt', fsize: 2048, uid: 206 }],
+  pdfDoc: [{ name: '合同正本.pdf', furl: 'https://example.com/合同正本.pdf', suffix: '.pdf', fsize: 8912896, uid: 207 }],
+  oldImg: [{ name: '示例图.png', url: 'https://picsum.photos/200/200', furl: 'https://picsum.photos/200/200', suffix: '.png', fsize: 307200, uid: 301 }],
+  oldFile: [{ name: '老风格文件.pdf', furl: 'https://example.com/老风格文件.pdf', suffix: '.pdf', fsize: 524288, uid: 302 }]
 } as any)
+
+// 示例无后端：模拟上传进度（每 200ms +20%，约 1s 完成），便于观察进度条与成功/失败状态
+const mockUpload = (param: any) =>
+  new Promise((resolve, reject) => {
+    let percent = 0
+    const timer = setInterval(() => {
+      percent += 20
+      param.onProgress?.({ percent })
+      if (percent >= 100) {
+        clearInterval(timer)
+        // 演示失败态可改为：reject(new Error('mock fail'))
+        resolve({})
+      }
+    }, 200)
+  })
 const formGroupConfig = ref({
   column: 2,
   // requestFn: () => {},
@@ -46,16 +76,14 @@ const formGroupConfig = ref({
           btns: [
             {
               type: 'success',
-              label: '',
-              showLabel: false,
-              icon: 'ele-MapLocation'
+              label: '成功',
+              showLabel: false
             },
             {
               type: 'danger',
-              label: '',
+              label: '删除',
               showLabel: false,
-              confirm: '确定要删除该点位？',
-              icon: 'ele-Delete'
+              confirm: '确定要删除该点位？'
             }
           ]
         }
@@ -68,13 +96,49 @@ const formGroupConfig = ref({
         address: { type: 'input', label: '详细地址', require: true, attrs: { maxlength: 50 } }
       } as IFormDesc
     },
-    // {
-    //   title: '文件上传',
-    //   formDesc: {
-    //     businessLicense: { type: 'upload', label: '营业执照', require: true, colspan: 2 },
-    //     appendix: { type: 'upload', upType: 'file', label: '附件', multiple: true, require: true, colspan: 2 }
-    //   } as IFormDesc
-    // },
+    {
+      // column:3 —— 每个 group 可独立设列数（见 ElPlusFormGroup），一行排 3 个单图字段
+      title: '图片上传（胶囊按钮 + 卡片回显）',
+      column: 3,
+      formDesc: {
+        logo: { type: 'upload', label: '企业Logo', require: true, tip: '默认 card 新风格', uploadFn: mockUpload },
+        banner: { type: 'upload', label: '横幅图', uploadFn: mockUpload, addText: '上传横幅', formatHint: '建议尺寸200*300 16:9 最大2M' },
+        qrcode: { type: 'upload', label: '二维码', uploadFn: mockUpload },
+        // colspan:3 跨满整行，演示多图 + 自定义按钮文案
+        photos: { type: 'upload', label: '现场照片', multiple: true, limit: 5, colspan: 3, uploadFn: mockUpload, addText: '继续添加照片', formatHint: '最多 5 张' }
+      } as IFormDesc
+    },
+    {
+      title: '文件上传（多文件 + 跨列）',
+      column: 2,
+      formDesc: {
+        contract: { type: 'upload', upType: 'file', label: '中标通知书', require: true },
+        // colspan:2 跨满整行，演示多文件上传
+        appendix: { type: 'upload', upType: 'file', label: '附件材料', multiple: true, limit: 5, colspan: 2, uploadFn: mockUpload, addText: '添加附件', formatHint: '单个不超过 10MB' }
+      } as IFormDesc
+    },
+    {
+      // 预设回显 + disabled：演示各类型彩色卡片图标，只读无删除按钮
+      title: '文件类型图标全覆盖（彩色卡片图标）',
+      column: 3,
+      formDesc: {
+        report: { type: 'upload', upType: 'file', label: 'Word 文档', disabled: true },
+        budget: { type: 'upload', upType: 'file', label: 'Excel 表格', disabled: true },
+        slides: { type: 'upload', upType: 'file', label: 'PPT 幻灯片', disabled: true },
+        archive: { type: 'upload', upType: 'file', label: 'ZIP 压缩包', disabled: true },
+        readme: { type: 'upload', upType: 'file', label: 'TXT 文本', disabled: true },
+        pdfDoc: { type: 'upload', upType: 'file', label: 'PDF 文档', disabled: true }
+      } as IFormDesc
+    },
+    {
+      // listType 回退老风格，与上面 card 新风格同页对比
+      title: '老风格对比（desc.listType 回退）',
+      column: 2,
+      formDesc: {
+        oldImg: { type: 'upload', label: 'picture-card 缩略图', listType: 'picture-card', uploadFn: mockUpload },
+        oldFile: { type: 'upload', upType: 'file', label: 'text 文件列表', listType: 'text' }
+      } as IFormDesc
+    },
     {
       title: '备注信息',
       formDesc: {

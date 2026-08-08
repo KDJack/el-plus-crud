@@ -3,3 +3,8 @@ html,body,#app {
   width: 100%;
   overflow: hidden;
 }
+
+/* 根容器可纵向滚动（表单内容较长时），html/body 保持 hidden 避免双滚动条 */
+#app {
+  overflow-y: auto;
+}

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.109](https://github.com/KDJack/el-plus-crud/compare/v0.1.108...v0.1.109) (2026-08-08)
+
+
+### Features
+
+* **upload:** 上传组件重设计为胶囊按钮+文件卡片式回显 ([3180125](https://github.com/KDJack/el-plus-crud/commit/318012577d75f2d8638c3c37e7145ad7482fb691))
+
 ### [0.1.108](https://github.com/KDJack/el-plus-crud/compare/v0.1.107...v0.1.108) (2026-08-08)
 
 

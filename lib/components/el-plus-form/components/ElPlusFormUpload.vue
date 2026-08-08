@@ -3,7 +3,7 @@
     <el-upload ref="uploadRef" class="ele-image-upload" v-bind="attrs" v-on="onEvents" :disabled="disabled" :fileList="currentValue || []" :class="{ 'over-limit': currentValue?.length >= attrs.limit, 'upload-disabled': attrs.disabled }">
       <!-- card 模式：胶囊形添加按钮作为触发器 -->
       <div v-if="cardMode" class="upload-add-btn" v-show="(currentValue?.length || 0) + activeCount < realLimit">
-        <span class="plus">+</span>{{ desc.addText || '添加文件' }}
+        <span class="plus">+</span>{{ desc.addText || (isImageType ? '添加图片' : '添加文件') }}
         <span class="format-hint" v-if="desc.formatHint">{{ desc.formatHint }}</span>
       </div>
       <!-- 老模式：原触发器 -->
@@ -419,12 +419,15 @@ function isImage(file: any) {
 }
 
 /**
- * 取图片预览 url（私有 OSS 签名优先）
+ * 取图片缩略图 url（卡片 file-thumb 的 src）
+ * ponytail: 图片可直接 <img> 展示的是 objectUrl（signMap.objectUrlKey → shareUrl），
+ * 而 previewUrl 是「非图片」文件点击在线预览的地址（见 handelPreview 的 window.open），
+ * 对图片缩略图不适用，放末位兜底。签名结果存于 file.raw（顶层无），须一并读取。
  * @param file
  */
 function imgUrl(file: any) {
-  // 私有 OSS 签名 url 优先（与 handelPreview 一致），避免接口老数据 url 未签名导致缩略图裂图
-  return file.signUrl || file.shareUrl || file.previewUrl || file.url || file.furl || file.raw?.url || ''
+  const raw = file?.raw || {}
+  return file.signUrl || raw.signUrl || file.shareUrl || raw.shareUrl || file.url || raw.url || file.furl || raw.furl || file.previewUrl || raw.previewUrl || ''
 }
 
 /**

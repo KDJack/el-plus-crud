@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.108](https://github.com/KDJack/el-plus-crud/compare/v0.1.107...v0.1.108) (2026-08-08)
+
+
+### Bug Fixes
+
+* **form:** 弹窗表单宽度铺满父容器 ([03130c7](https://github.com/KDJack/el-plus-crud/commit/03130c7333ad39168cf6cef9d48ee22b2b1c1566))
+
 ### [0.1.107](https://github.com/KDJack/el-plus-crud/compare/v0.1.106...v0.1.107) (2026-08-07)
 
 

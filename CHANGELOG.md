@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.111](https://github.com/KDJack/el-plus-crud/compare/v0.1.110...v0.1.111) (2026-08-08)
+
+
+### Bug Fixes
+
+* **upload:** OSS 私有桶图片缩略图改取 objectUrl 修复裂图 ([364826a](https://github.com/KDJack/el-plus-crud/commit/364826a2a25697f896385e5ac028e2f24c3064ae))
+
 ### [0.1.110](https://github.com/KDJack/el-plus-crud/compare/v0.1.109...v0.1.110) (2026-08-08)
 
 ### [0.1.109](https://github.com/KDJack/el-plus-crud/compare/v0.1.108...v0.1.109) (2026-08-08)

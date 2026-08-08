@@ -41,7 +41,7 @@ const props = defineProps<{
 
   .no-img-tip {
     width: 100%;
-    color: #999999;
+    color: var(--el-text-color-placeholder);
     padding-left: 20px;
   }
 }

@@ -166,7 +166,7 @@ defineExpose({ initCol: initLocalCheckList })
     width: 100%;
     height: 30px;
     padding: 0 10px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--el-border-color-lighter);
     margin-bottom: 10px;
   }
 }

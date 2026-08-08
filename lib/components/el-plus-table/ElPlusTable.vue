@@ -925,7 +925,7 @@ defineExpose({ tableRef: elPlusTableRef, reload, tableData, changeSelect, resetS
   background-color: transparent !important;
 }
 .el-plus-table-content {
-  background-color: #ffffff;
+  background-color: var(--el-bg-color);
   color: var(--text-color);
   // background-color: var(--bg-color);
   border-radius: 5px;
@@ -945,7 +945,7 @@ defineExpose({ tableRef: elPlusTableRef, reload, tableData, changeSelect, resetS
       left: -10px;
       font-size: 16px;
       top: 2px;
-      color: #ff3b30;
+      color: var(--el-color-danger);
       font-weight: bold;
     }
   }
@@ -1059,9 +1059,9 @@ defineExpose({ tableRef: elPlusTableRef, reload, tableData, changeSelect, resetS
   }
 
   .common-list-export-excel {
-    background: #20a0ff;
+    background: var(--el-color-primary);
     text-decoration: none;
-    color: #ffffff;
+    color: var(--el-color-white);
     font-size: 12px;
     height: 29px;
     line-height: 30px;
@@ -1072,7 +1072,8 @@ defineExpose({ tableRef: elPlusTableRef, reload, tableData, changeSelect, resetS
   }
 
   .common-list-export-excel:hover {
-    background: #58b6ff;
+    // 主色浅变体：color-mix 运行时混白，外部动态切主色时跟随
+    background: color-mix(in srgb, var(--el-color-primary) 85%, white);
   }
 
   .el-table__empty-block {

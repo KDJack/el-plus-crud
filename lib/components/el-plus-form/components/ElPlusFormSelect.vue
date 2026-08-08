@@ -231,7 +231,7 @@ defineExpose({ field: props.field, clear })
   align-items: center;
   & > div {
     // text-align: right;
-    color: #aaaaaa;
+    color: var(--el-text-color-placeholder);
     max-width: 40%;
     font-size: 12px;
     word-break: break-all;

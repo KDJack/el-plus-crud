@@ -39,12 +39,12 @@ const formatValue = ref('' as any)
 const iconStyle = computed(() => {
   if (props.desc.icolor) {
     if (typeof props.desc.icolor === 'function') {
-      return { background: props.desc.icolor(props.formData || {}) || '#909399' }
+      return { background: props.desc.icolor(props.formData || {}) || 'var(--el-color-info)' }
     }
-    return { background: props.desc.icolor || '#909399' }
+    return { background: props.desc.icolor || 'var(--el-color-info)' }
   }
   const optionsItem = options.find((item: any) => (item.value || item.v) == currentValue.value) || {}
-  return { background: optionsItem.c || optionsItem.color || '#909399' }
+  return { background: optionsItem.c || optionsItem.color || 'var(--el-color-info)' }
 })
 
 watch(

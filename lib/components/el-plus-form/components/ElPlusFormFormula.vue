@@ -313,7 +313,7 @@ onUnmounted(() => {
   }
   .formula-input {
     border-radius: 4px;
-    border: 1px solid #dcdfe6;
+    border: 1px solid var(--el-border-color);
     padding: 10px 15px;
     min-height: 50px;
     box-sizing: border-box;
@@ -333,9 +333,9 @@ onUnmounted(() => {
     }
 
     &[contenteditable='false'] {
-      background-color: #f5f7fa;
-      border-color: #e4e7ed;
-      color: #c0c4cc;
+      background-color: var(--el-fill-color-light);
+      border-color: var(--el-disabled-border-color);
+      color: var(--el-disabled-text-color);
       cursor: not-allowed;
     }
 
@@ -345,7 +345,7 @@ onUnmounted(() => {
 
     &:empty::before {
       content: attr(placeholder);
-      color: #c0c4cc;
+      color: var(--el-text-color-placeholder);
     }
 
     br {
@@ -375,8 +375,8 @@ onUnmounted(() => {
     font-size: 12px;
     width: 100%;
     z-index: 10000;
-    background: #fff;
-    border: 1px solid #dcdfe6;
+    background: var(--el-bg-color);
+    border: 1px solid var(--el-border-color);
     margin-top: -1px;
     box-sizing: border-box;
     border-radius: 4px;
@@ -388,10 +388,10 @@ onUnmounted(() => {
       &__inner {
         border-radius: 0 0 0 0;
         border: none;
-        border-bottom: 1px solid #dcdfe6;
+        border-bottom: 1px solid var(--el-border-color);
 
         &:focus {
-          border-bottom: 1px solid #dcdfe6;
+          border-bottom: 1px solid var(--el-color-primary);
         }
       }
     }
@@ -401,7 +401,7 @@ onUnmounted(() => {
       overflow-y: scroll;
 
       .option {
-        background-color: #f5f7fa;
+        background-color: var(--el-fill-color-light);
         padding: 5px 15px;
         border-radius: 100px;
         margin: 5px;

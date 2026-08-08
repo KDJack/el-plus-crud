@@ -284,7 +284,7 @@ onMounted(async () => {})
     .right-title {
       width: 100%;
       font-size: 14px;
-      color: #999999;
+      color: var(--el-text-color-secondary);
       margin-bottom: 20px;
     }
 

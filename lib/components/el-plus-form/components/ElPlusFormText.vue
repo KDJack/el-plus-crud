@@ -99,7 +99,7 @@ watch(
 </script>
 <style lang="scss" scoped>
 .ele-form-text {
-  color: #606266;
+  color: var(--el-text-color-regular);
   word-break: break-all;
   display: flex;
   align-items: center;

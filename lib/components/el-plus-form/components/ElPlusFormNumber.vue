@@ -185,9 +185,9 @@ function handelChangeError() {
 }
 .show-error {
   :deep(.el-input__wrapper) {
-    background-color: #f56c6c;
+    background-color: var(--el-color-danger);
     input {
-      color: #fff;
+      color: var(--el-color-white);
     }
   }
 }

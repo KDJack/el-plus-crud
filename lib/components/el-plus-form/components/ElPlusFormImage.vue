@@ -104,7 +104,7 @@ const styles = computed(() => {
   margin-bottom: 10px;
 
   .no-img-tip {
-    color: #999999;
+    color: var(--el-text-color-placeholder);
   }
 
   .el-image {

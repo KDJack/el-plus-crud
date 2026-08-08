@@ -84,6 +84,6 @@ watch(
   flex-wrap: wrap;
 }
 .null-tip {
-  color: #999;
+  color: var(--el-text-color-placeholder);
 }
 </style>

@@ -8,8 +8,8 @@
       </div>
       <!-- 老模式：原触发器 -->
       <div v-else class="upload-panel-icon">
-        <i v-if="desc.icon" :class="desc.icon" :style="{ fontSize: desc.fontSize || '14px', color: desc.color || '#C0C4CC' }"></i>
-        <el-icon v-else :style="{ fontSize: desc.fontSize || '14px', color: desc.color || '#C0C4CC' }"><Plus /></el-icon>
+        <i v-if="desc.icon" :class="desc.icon" :style="{ fontSize: desc.fontSize || '14px', color: desc.color || 'var(--el-text-color-placeholder)' }"></i>
+        <el-icon v-else :style="{ fontSize: desc.fontSize || '14px', color: desc.color || 'var(--el-text-color-placeholder)' }"><Plus /></el-icon>
         <div class="el-upload__text2" v-if="!!desc.upType && desc.text2">
           {{ desc.text2 }}
         </div>
@@ -610,12 +610,12 @@ watch(
 
     .el-upload__text {
       font-size: 12px !important;
-      color: #999999;
+      color: var(--el-text-color-placeholder);
     }
 
     .el-upload__text2 {
       font-size: 16px;
-      color: #303133;
+      color: var(--el-text-color-primary);
       line-height: 22px;
       margin-top: 16px;
       margin-bottom: 16px;
@@ -663,6 +663,9 @@ watch(
   align-items: flex-start;
   gap: 8px;
 
+  // 按钮浅底：主色 10% 混白，运行时跟随 --el-color-primary（外部动态切主色时实时变化）
+  --upload-add-bg: color-mix(in srgb, var(--el-color-primary) 10%, white);
+
   // card 模式：触发器(胶囊按钮)与文件列表上下排版；触发器只占内容宽，卡片铺满宽度
   .ele-image-upload {
     flex-direction: column;
@@ -709,8 +712,8 @@ watch(
     gap: 4px;
     padding: 6px 16px;
     font-size: 13px;
-    color: #4b7cf7;
-    background: #eef3fe;
+    color: var(--el-color-primary);
+    background: var(--upload-add-bg);
     border: none;
     border-radius: 20px;
     cursor: pointer;
@@ -726,7 +729,7 @@ watch(
 
     .format-hint {
       font-size: 11px;
-      color: #c5c8d0;
+      color: var(--el-text-color-placeholder);
       margin-left: 6px;
       font-weight: 400;
       white-space: normal;
@@ -734,8 +737,8 @@ watch(
     }
 
     &:hover {
-      background: #4b7cf7;
-      color: #fff;
+      background: var(--el-color-primary);
+      color: var(--el-color-white);
     }
   }
 
@@ -744,8 +747,8 @@ watch(
     opacity: 0.6;
 
     &:hover {
-      background: #eef3fe;
-      color: #4b7cf7;
+      background: var(--upload-add-bg);
+      color: var(--el-color-primary);
     }
   }
 
@@ -754,21 +757,22 @@ watch(
     align-items: center;
     gap: 8px;
     padding: 8px 10px;
-    background: #fff;
-    border: 1px solid #eceef2;
+    background: var(--el-fill-color-blank);
+    border: 1px solid var(--el-border-color-light);
     border-radius: 8px;
     transition: all 0.2s;
     cursor: pointer;
     max-width: 100%;
 
     &:hover {
-      border-color: #c5d8fc;
-      background: #fafcff;
+      // 主色浅变体：运行时 color-mix 混白，外部动态切主色时实时跟随（light-N 变量为构建期固化，不跟随）
+      border-color: color-mix(in srgb, var(--el-color-primary) 50%, white);
+      background: color-mix(in srgb, var(--el-color-primary) 5%, white);
     }
 
     &.is-fail {
-      border-color: #fbc4c4;
-      background: #fef0f0;
+      border-color: var(--el-color-danger-light-5);
+      background: var(--el-color-danger-light-9);
     }
   }
 
@@ -814,7 +818,7 @@ watch(
 
   .file-name {
     font-size: 12px;
-    color: #3a3a4e;
+    color: var(--el-text-color-primary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -823,7 +827,7 @@ watch(
 
   .file-meta {
     font-size: 11px;
-    color: #b0b3bf;
+    color: var(--el-text-color-secondary);
     line-height: 1.3;
   }
 
@@ -839,7 +843,7 @@ watch(
     .file-progress-track {
       width: 100%;
       height: 4px;
-      background: #eceef2;
+      background: var(--el-fill-color-light);
       border-radius: 2px;
       overflow: hidden;
 
@@ -855,7 +859,7 @@ watch(
 
   // 失败：红色提示
   .file-error {
-    color: #e8536e;
+    color: var(--el-color-danger);
   }
 
   .file-delete {
@@ -865,7 +869,7 @@ watch(
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #c0c3cc;
+    color: var(--el-text-color-placeholder);
     cursor: pointer;
     transition: all 0.2s;
     flex-shrink: 0;
@@ -873,8 +877,8 @@ watch(
     line-height: 1;
 
     &:hover {
-      background: #fef0f0;
-      color: #e8536e;
+      background: var(--el-color-danger-light-9);
+      color: var(--el-color-danger);
     }
   }
 }

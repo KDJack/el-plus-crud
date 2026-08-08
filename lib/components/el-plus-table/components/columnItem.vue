@@ -3,7 +3,7 @@
     <template v-for="(item, i) in cells" :key="i + (item.options && item.options.length > 0 ? item.options[0].value || item.options[0].v : '0')">
       <el-popover v-if="desc.content && popoverContent" placement="left" :width="200" trigger="hover" effect="dark" :content="popoverContent">
         <template #reference>
-          <el-icon style="color: #f56c6c; font-size: 26px; padding: 0px 8px 0 0"><WarningFilled /></el-icon>
+          <el-icon style="color: var(--el-color-danger); font-size: 26px; padding: 0px 8px 0 0"><WarningFilled /></el-icon>
         </template>
       </el-popover>
       <div style="width: 100%; display: flex" :style="{ 'justify-content': item.align || 'flex-start' }">

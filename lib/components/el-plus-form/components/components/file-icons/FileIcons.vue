@@ -160,15 +160,15 @@ async function handelDownload(file: IOssInfo) {
       height: 28px;
       line-height: 28px;
       padding: 0 10px;
-      background: #f5f7fa;
+      background: var(--el-fill-color-light);
       margin-bottom: 10px;
       cursor: pointer;
       font-size: 13px;
       font-weight: 400;
-      color: #303133;
+      color: var(--el-text-color-primary);
 
       &:hover {
-        background: #e7e8eb;
+        background: var(--el-fill-color);
         color: var(--el-color-primary);
       }
 

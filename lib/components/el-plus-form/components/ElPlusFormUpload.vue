@@ -122,9 +122,10 @@ const showPreview = ref(false)
 const previewIndex = ref(0)
 const previewList = computed(() => {
   const tempList = [] as string[]
-  currentValue.value.map((item: any) => {
-    if (fileTypes.imageSuffixes.indexOf(item.raw?.suffix || item.suffix) >= 0) {
-      tempList.push(item.signUrl || item.url)
+  currentValue.value.forEach((item: any) => {
+    if (isImageItem(item)) {
+      const url = getImgPreviewUrl(item)
+      if (url) tempList.push(url)
     }
   })
   return tempList
@@ -359,14 +360,20 @@ function handelListChange(item: any, type: 0 | 1) {
  * @param file
  */
 function handelPreview(file: any) {
-  if (fileTypes.imageSuffixes.indexOf((file.raw?.suffix || file.suffix || '').toLocaleLowerCase()) >= 0) {
-    previewIndex.value = previewList.value.findIndex((item) => item === (file.signUrl || file.raw?.shareUrl || file.raw?.signUrl || file.furl))
+  if (isImageItem(file)) {
+    const url = getImgPreviewUrl(file)
+    previewIndex.value = previewList.value.findIndex((item) => item === url)
     if (previewIndex.value < 0) {
       previewIndex.value = 0
     }
     showPreview.value = true
   } else {
-    window.open(file.raw?.previewUrl || file.previewUrl, '_blank')
+    const url = file.raw?.previewUrl || file.previewUrl
+    if (url) {
+      window.open(url, '_blank')
+    } else {
+      ElMessage.warning('暂无预览地址')
+    }
   }
 }
 
@@ -428,6 +435,28 @@ function isImage(file: any) {
 function imgUrl(file: any) {
   const raw = file?.raw || {}
   return file.signUrl || raw.signUrl || file.shareUrl || raw.shareUrl || file.url || raw.url || file.furl || raw.furl || file.previewUrl || raw.previewUrl || ''
+}
+
+/**
+ * 取图片预览/缩略 url（不含 previewUrl：后者是非图片文件的在线预览地址，不适用于图片，
+ * 见 oss-upload-url-semantics 记忆）
+ */
+function getImgPreviewUrl(item: any): string {
+  const raw = item?.raw || {}
+  return item.signUrl || raw.signUrl || item.shareUrl || raw.shareUrl || item.url || raw.url || item.furl || raw.furl || ''
+}
+
+/**
+ * 是否为图片项：suffix 命中图片后缀，或 url 为 data:image base64 data URL。
+ * ponytail: base64 data URL 无文件后缀，suffix 解析不可靠，须另以 data: 前缀兜底，
+ * 否则 handelPreview 误判为非图片 → window.open(undefined) → about:blank。
+ */
+function isImageItem(item: any): boolean {
+  const suffix = (item?.raw?.suffix || item?.suffix || '').toString().toLocaleLowerCase()
+  if (suffix && fileTypes.imageSuffixes.indexOf(suffix) >= 0) return true
+  const url = getImgPreviewUrl(item).toLowerCase()
+  if (url.startsWith('data:image/')) return true
+  return false
 }
 
 /**

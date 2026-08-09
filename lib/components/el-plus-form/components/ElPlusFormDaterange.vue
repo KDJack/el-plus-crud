@@ -35,7 +35,10 @@ const attrs = ref({} as any)
 const onEvents = ref(getEvents(props))
 
 onBeforeMount(async () => {
-  attrs.value = await getAttrs(props, { type: 'daterange', format: 'YYYY-MM-DD', valueFormat: 'x', editable: false, ...useAttrs() })
+  // 按 elType 设置默认显示格式（用户在 desc 中显式配置的 format 仍会通过 getAttrs 优先覆盖）
+  const elTypeVal = typeof props.desc.elType === 'function' ? props.desc.elType(props.formData) : props.desc.elType
+  const defaultFormat = elTypeVal === 'monthrange' ? 'YYYY-MM' : elTypeVal === 'yearrange' ? 'YYYY' : 'YYYY-MM-DD'
+  attrs.value = await getAttrs(props, { type: 'daterange', format: defaultFormat, valueFormat: 'x', editable: false, ...useAttrs() })
   isInit.value = true
 })
 </script>

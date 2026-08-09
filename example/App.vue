@@ -8,6 +8,7 @@
         <template #default1>default1插槽</template>
         <template #default2>default2插槽</template>
       </ElPlusFormGroup>
+      {{ formData }}
     </div>
   </el-config-provider>
 </template>
@@ -35,7 +36,11 @@ let formData = reactive({
   readme: [{ name: '使用说明.txt', furl: 'https://example.com/使用说明.txt', suffix: '.txt', fsize: 2048, uid: 206 }],
   pdfDoc: [{ name: '合同正本.pdf', furl: 'https://example.com/合同正本.pdf', suffix: '.pdf', fsize: 8912896, uid: 207 }],
   oldImg: [{ name: '示例图.png', url: 'https://picsum.photos/200/200', furl: 'https://picsum.photos/200/200', suffix: '.png', fsize: 307200, uid: 301 }],
-  oldFile: [{ name: '老风格文件.pdf', furl: 'https://example.com/老风格文件.pdf', suffix: '.pdf', fsize: 524288, uid: 302 }]
+  oldFile: [{ name: '老风格文件.pdf', furl: 'https://example.com/老风格文件.pdf', suffix: '.pdf', fsize: 524288, uid: 302 }],
+  // 日期范围测试初始值（时间戳数组，组件 valueFormat 默认 'x'）
+  dateRange: [new Date(2026, 1, 1).getTime(), new Date(2026, 1, 15).getTime()],
+  monthRange: [new Date(2026, 0, 1).getTime(), new Date(2026, 5, 1).getTime()],
+  yearRange: [new Date(2025, 0, 1).getTime(), new Date(2026, 0, 1).getTime()]
 } as any)
 
 // 示例无后端：模拟上传进度（每 200ms +20%，约 1s 完成），便于观察进度条与成功/失败状态
@@ -56,6 +61,13 @@ const formGroupConfig = ref({
   column: 2,
   // requestFn: () => {},
   beforeRequest: (data: any) => {
+    // 打印日期范围拆分结果，验证 monthrange/yearrange 结束时间是否为当月/当年最后一秒
+    console.log('[日期范围提交数据]', {
+      date: [data.dateStartTime, data.dateEndTime],
+      month: [data.monthStartTime, data.monthEndTime],
+      year: [data.yearStartTime, data.yearEndTime]
+    })
+    console.log(data)
     return data
   },
   success: (formBack: IFormBack) => {
@@ -69,7 +81,7 @@ const formGroupConfig = ref({
       formDesc: {
         name: { type: 'input', label: '名项目劳资负责资负责资负责人称', require: true, attrs: { maxlength: 30 } },
         contactsName: { type: 'input', label: '联系人', require: true, attrs: { maxlength: 20 } },
-        contactsPhone: { type: 'select', label: '项目劳资负责资负责资负责人', required: true, options: [], tip: '带企业劳资负责人信息可修改' },
+        contactsPhone: { type: 'select', label: '项目劳资负责资负责资负责人', options: [], tip: '带企业劳资负责人信息可修改' },
         _tempDelBtns: {
           type: 'btns',
           showLabel: false,
@@ -171,6 +183,15 @@ const formGroupConfig = ref({
         intro: { type: 'textarea', label: '简介', rowspan: 2, require: true },
         nick: { type: 'input', label: '昵称', require: true },
         mobile: { type: 'input', label: '手机', require: true }
+      } as IFormDesc
+    },
+    {
+      // 日期范围测试：验证 daterange / monthrange / yearrange 的显示格式与结束时间（最后一秒）
+      title: '日期范围测试（daterange / monthrange / yearrange）',
+      formDesc: {
+        dateRange: { type: 'daterange', label: '日期范围', colspan: 2, require: true, propPrefix: 'date' },
+        monthRange: { type: 'daterange', elType: 'monthrange', label: '月份范围', colspan: 2, require: true, propPrefix: 'month' },
+        yearRange: { type: 'daterange', elType: 'yearrange', label: '年份范围', colspan: 2, require: true, propPrefix: 'year' }
       } as IFormDesc
     }
   ]

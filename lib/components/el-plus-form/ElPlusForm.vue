@@ -625,10 +625,29 @@ const handelValToForm = (desc: IFormDescItem, field: string, val: any) => {
     if (val && val.length === 2) {
       const startTimeKey = desc.startTimeKey ? desc.startTimeKey : desc.propPrefix ? desc.propPrefix + 'StartTime' : 'startTime'
       const endTimeKey = desc.endTimeKey ? desc.endTimeKey : desc.propPrefix ? desc.propPrefix + 'EndTime' : 'endTime'
-      // 获取0点数据
-      result[startTimeKey] = new Date(new Date(val[0]).setHours(0, 0, 0, 0))
-      // 获取每天结束时间
-      result[endTimeKey] = new Date(new Date(val[1]).setHours(0, 0, 0, 0) + 24 * 60 * 60 * 1000 - 1)
+      // 解析 elType（支持动态函数，与 mixins/index.ts 一致；props.modelValue 即表单数据，等价于子组件的 formData）
+      const rangeElType = typeof desc.elType === 'function' ? desc.elType(props.modelValue) : desc.elType
+      const startBase = new Date(val[0])
+      const endBase = new Date(val[1])
+      // 按 elType 规范化起止时间到所选范围的边界
+      // 说明：el-date-picker 的 year 模式会用「当前月日」填充所选年（非 1 月 1 日），month 模式则规范化到 1 号，
+      // 故统一用 getFullYear/getMonth 重新构造边界，不依赖 val 的具体月日
+      switch (rangeElType) {
+        case 'monthrange':
+          // 起：当月1日0点；止：下月1日0点 - 1ms = 当月最后一秒（JS Date 自动处理 12 月溢出）
+          result[startTimeKey] = new Date(startBase.getFullYear(), startBase.getMonth(), 1)
+          result[endTimeKey] = new Date(new Date(endBase.getFullYear(), endBase.getMonth() + 1, 1).getTime() - 1)
+          break
+        case 'yearrange':
+          // 起：当年1月1日0点；止：下一年1月1日0点 - 1ms = 当年最后一秒
+          result[startTimeKey] = new Date(startBase.getFullYear(), 0, 1)
+          result[endTimeKey] = new Date(new Date(endBase.getFullYear() + 1, 0, 1).getTime() - 1)
+          break
+        default:
+          // 默认 daterange：起为当天0点，止为当天最后一秒
+          result[startTimeKey] = new Date(startBase.setHours(0, 0, 0, 0))
+          result[endTimeKey] = new Date(endBase.setHours(0, 0, 0, 0) + 24 * 60 * 60 * 1000 - 1)
+      }
       // 再处理一下时间戳
       result[startTimeKey] = time(result[startTimeKey], desc.valueFormat)
       result[endTimeKey] = time(result[endTimeKey], desc.valueFormat)

@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.114](https://github.com/KDJack/el-plus-crud/compare/v0.1.113...v0.1.114) (2026-08-11)
+
+
+### Bug Fixes
+
+* **form:** daterange 支持 monthrange/yearrange 的起止时间与显示格式 ([d1a588d](https://github.com/KDJack/el-plus-crud/commit/d1a588daf64ad4b3dfc29621b0a43fb7126105e3))
+* **form:** 修复上传组件图片预览与 base64 data URL 判定 ([7907779](https://github.com/KDJack/el-plus-crud/commit/79077793623169f64eaf7495eb35e5333c9461c8))
+
 ### [0.1.113](https://github.com/KDJack/el-plus-crud/compare/v0.1.112...v0.1.113) (2026-08-09)
 
 ### [0.1.112](https://github.com/KDJack/el-plus-crud/compare/v0.1.111...v0.1.112) (2026-08-08)

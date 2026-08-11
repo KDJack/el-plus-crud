@@ -37,9 +37,13 @@ const onEvents = ref(getEvents(props))
 
 const currentValue = useVModel(props, 'modelValue', emits)
 
-// 快捷填充项：兼容 string 与 {l,v}/{label,value} 两种写法，未配置或非数组时返回空数组（不渲染）
+// 快捷填充项：支持函数式 (formData, field) => array 动态返回，或静态数组（string/{l,v}/{label,value}）；未配置/空数组时不渲染
 const quickFillItems = computed(() => {
-  const list = props.desc?.quickFill
+  let list = props.desc?.quickFill
+  // 函数式动态 quickFill：按表单数据返回候选词，与 required/vif 同范式
+  if (typeof list === 'function') {
+    list = list(props.formData || {}, props.field)
+  }
   if (!Array.isArray(list) || !list.length) return []
   return list.map((it: any) => {
     if (it == null) return ''

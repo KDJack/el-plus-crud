@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.115](https://github.com/KDJack/el-plus-crud/compare/v0.1.114...v0.1.115) (2026-08-12)
+
+
+### Features
+
+* **form:** textarea quickFill 支持函数式动态返回候选词 ([baba7b3](https://github.com/KDJack/el-plus-crud/commit/baba7b3aaea1a35d27e2d17d05a89c646563e6bc))
+* **table:** 表头默认居中并支持左/右对齐 ([845ad80](https://github.com/KDJack/el-plus-crud/commit/845ad80a356d8b059adcc05d00b5f114021f76b2))
+
 ### [0.1.114](https://github.com/KDJack/el-plus-crud/compare/v0.1.113...v0.1.114) (2026-08-11)
 
 

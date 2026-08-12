@@ -37,6 +37,26 @@ let formData = reactive({
   pdfDoc: [{ name: '合同正本.pdf', furl: 'https://example.com/合同正本.pdf', suffix: '.pdf', fsize: 8912896, uid: 207 }],
   oldImg: [{ name: '示例图.png', url: 'https://picsum.photos/200/200', furl: 'https://picsum.photos/200/200', suffix: '.png', fsize: 307200, uid: 301 }],
   oldFile: [{ name: '老风格文件.pdf', furl: 'https://example.com/老风格文件.pdf', suffix: '.pdf', fsize: 524288, uid: 302 }],
+  // ===== file 只读展示字段初始数据（演示新圆角卡片样式：图片直接显示缩略图 + 非图片彩色类型徽标）=====
+  fileImgs: [
+    { name: '产品主图.jpg', url: 'https://picsum.photos/200/200', furl: 'https://picsum.photos/200/200', suffix: '.jpg', fsize: 102400, uid: 401 },
+    { name: '细节图.png', url: 'https://picsum.photos/240/240', furl: 'https://picsum.photos/240/240', suffix: '.png', fsize: 204800, uid: 402 },
+    { name: '场景图.jpeg', url: 'https://picsum.photos/280/280', furl: 'https://picsum.photos/280/280', suffix: '.jpeg', fsize: 153600, uid: 403 }
+  ],
+  fileMixed: [
+    { name: '封面.jpg', url: 'https://picsum.photos/300/200', furl: 'https://picsum.photos/300/200', suffix: '.jpg', fsize: 51200, uid: 411 },
+    { name: '设计方案.pdf', furl: 'https://example.com/设计方案.pdf', previewUrl: 'https://example.com/设计方案.pdf', suffix: '.pdf', fsize: 1843200, uid: 412 },
+    { name: '报价单.xlsx', furl: 'https://example.com/报价单.xlsx', previewUrl: 'https://example.com/报价单.xlsx', suffix: '.xlsx', fsize: 327680, uid: 413 }
+  ],
+  fileDocs: [
+    { name: '合同正本.pdf', furl: 'https://example.com/合同正本.pdf', previewUrl: 'https://example.com/合同正本.pdf', suffix: '.pdf', fsize: 1048576, uid: 421 },
+    { name: '服务协议.docx', furl: 'https://example.com/服务协议.docx', previewUrl: 'https://example.com/服务协议.docx', suffix: '.docx', fsize: 262144, uid: 422 },
+    { name: '物料清单.xlsx', furl: 'https://example.com/物料清单.xlsx', previewUrl: 'https://example.com/物料清单.xlsx', suffix: '.xlsx', fsize: 131072, uid: 423 },
+    { name: '项目汇报.pptx', furl: 'https://example.com/项目汇报.pptx', previewUrl: 'https://example.com/项目汇报.pptx', suffix: '.pptx', fsize: 2097152, uid: 424 },
+    { name: '源码包.zip', furl: 'https://example.com/源码包.zip', previewUrl: 'https://example.com/源码包.zip', suffix: '.zip', fsize: 5242880, uid: 425 },
+    { name: 'README.txt', furl: 'https://example.com/README.txt', previewUrl: 'https://example.com/README.txt', suffix: '.txt', fsize: 4096, uid: 426 }
+  ],
+  fileEmpty: [],
   // 日期范围测试初始值（时间戳数组，组件 valueFormat 默认 'x'）
   dateRange: [new Date(2026, 1, 1).getTime(), new Date(2026, 1, 15).getTime()],
   monthRange: [new Date(2026, 0, 1).getTime(), new Date(2026, 5, 1).getTime()],
@@ -149,6 +169,17 @@ const formGroupConfig = ref({
       formDesc: {
         oldImg: { type: 'upload', label: 'picture-card 缩略图', listType: 'picture-card', uploadFn: mockUpload },
         oldFile: { type: 'upload', upType: 'file', label: 'text 文件列表', listType: 'text' }
+      } as IFormDesc
+    },
+    {
+      // type:'file' 只读展示组件 —— 新圆角卡片样式（图片直接显示缩略图，非图片显示彩色类型徽标，点击图片可预览/文档可预览）
+      title: '文件只读展示（file 圆角卡片样式）',
+      column: 2,
+      formDesc: {
+        fileImgs: { type: 'file', label: '产品图片', colspan: 2 },
+        fileMixed: { type: 'file', label: '图文混合', colspan: 2 },
+        fileDocs: { type: 'file', label: '文档合集', colspan: 2 },
+        fileEmpty: { type: 'file', label: '空数据示例' }
       } as IFormDesc
     },
     {

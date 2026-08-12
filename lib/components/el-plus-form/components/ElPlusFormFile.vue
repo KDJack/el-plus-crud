@@ -1,9 +1,29 @@
 <template>
-  <div class="ele-form-file" :style="{ marginTop: props.modelValue && props.modelValue.length > 0 ? '10px' : '0' }">
-    <template v-if="props.modelValue && props.modelValue.length > 0">
-      <FileIcons :files="props.modelValue" showName preview />
+  <div class="ele-form-file">
+    <template v-if="files.length">
+      <div
+        v-for="(item, i) in files"
+        :key="item.uid ?? i"
+        class="ele-form-file-card"
+        role="button"
+        tabindex="0"
+        :aria-label="item.name ? '预览：' + item.name : '预览文件'"
+        @click="handleCardClick(item)"
+        @keydown.enter="handleCardClick(item)"
+        @keydown.space.prevent="handleCardClick(item)"
+      >
+        <img v-if="isImageFile(item) && getImageUrl(item)" class="file-thumb" :src="getImageUrl(item)" />
+        <div v-else class="file-type-icon" :class="typeClass(item)">{{ typeLabel(item) }}</div>
+        <div class="file-info">
+          <span class="file-name">{{ item.name }}</span>
+          <span v-if="formatSize(item.fsize)" class="file-meta">{{ formatSize(item.fsize) }}</span>
+        </div>
+      </div>
     </template>
     <span v-else class="no-img-tip">暂无内容</span>
+
+    <!-- 图片预览 -->
+    <el-image-viewer v-if="showPreview" @close="showPreview = false" teleported :initialIndex="previewIndex" :url-list="previewList" />
   </div>
 </template>
 <script lang="ts">
@@ -15,8 +35,10 @@ export default {
 }
 </script>
 <script lang="ts" setup>
+import { ref, computed } from 'vue'
+import { ElMessage } from 'element-plus'
 import { IOssInfo } from '../../../../types'
-import FileIcons from './components/file-icons/FileIcons.vue'
+import { typeClass, typeLabel, isImageFile, isImageItem, getImageUrl, formatSize } from './fileType'
 
 const props = defineProps<{
   modelValue?: Array<IOssInfo>
@@ -25,24 +47,142 @@ const props = defineProps<{
   desc: { [key: string]: any }
   formData?: { [key: string]: any }
 }>()
+
+// 兜底：modelValue 期望为 IOssInfo[]；非数组（误传 string/null 等）安全降级为空，避免按字符迭代渲染脏数据
+const files = computed(() => (Array.isArray(props.modelValue) ? props.modelValue : []))
+
+const showPreview = ref(false)
+const previewIndex = ref(0)
+
+// 图片预览列表（仅图片项的缩略图 url，取址同 fileType.getImageUrl）
+const previewList = computed(() => files.value.filter((item: any) => isImageItem(item)).map((item: any) => getImageUrl(item)).filter(Boolean))
+
+/**
+ * 卡片点击：图片 → 图片查看器；非图片 → window.open(previewUrl) 在线预览。
+ * 与 ElPlusFormUpload.handelPreview 对齐：非图片取 previewUrl，缺失则提示。
+ */
+function handleCardClick(item: any) {
+  if (isImageItem(item)) {
+    previewIndex.value = Math.max(0, previewList.value.indexOf(getImageUrl(item)))
+    showPreview.value = true
+  } else {
+    const url = item.previewUrl
+    if (url) {
+      window.open(url, '_blank', 'noopener,noreferrer')
+    } else {
+      ElMessage.warning('暂无预览地址')
+    }
+  }
+}
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 .ele-form-file {
   width: 100%;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
   margin-top: 10px;
-
-  .form-file-list {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-  }
 
   .no-img-tip {
     width: 100%;
     color: var(--el-text-color-placeholder);
     padding-left: 20px;
+  }
+}
+
+.ele-form-file-card {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  background: var(--el-fill-color-blank);
+  border: 1px solid var(--el-border-color-light);
+  border-radius: 8px;
+  transition: all 0.2s;
+  cursor: pointer;
+
+  &:hover {
+    border-color: color-mix(in srgb, var(--el-color-primary) 50%, white);
+    background: color-mix(in srgb, var(--el-color-primary) 5%, white);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--el-color-primary);
+    outline-offset: 2px;
+  }
+
+  .file-type-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 9px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.5px;
+
+    &.pdf {
+      background: #e8536e;
+    }
+    &.img {
+      background: #8b7cf6;
+    }
+    &.word {
+      background: #4b7cf7;
+    }
+    &.excel {
+      background: #36b37e;
+    }
+    &.ppt {
+      background: #ef8a3d;
+    }
+    &.txt {
+      background: #909399;
+    }
+    &.zip {
+      background: #9b8b7e;
+    }
+    &.file {
+      background: #909399;
+    }
+  }
+
+  .file-thumb {
+    width: 32px;
+    height: 32px;
+    border-radius: 7px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .file-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .file-name {
+    font-size: 12px;
+    color: var(--el-text-color-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.4;
+  }
+
+  .file-meta {
+    font-size: 11px;
+    color: var(--el-text-color-secondary);
+    line-height: 1.3;
   }
 }
 </style>

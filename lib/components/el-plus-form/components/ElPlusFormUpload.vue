@@ -672,7 +672,7 @@ watch(
   }
 
   .el-upload-list__item {
-    margin: 0 !important;
+    // margin: 0 !important;
   }
 
   .el-form-item--default .el-form-item__content {
@@ -715,7 +715,7 @@ watch(
     }
 
     .el-upload-list__item {
-      margin: 0 0 8px;
+      margin: 0 0 4px;
       padding: 0;
       border: none;
       background: transparent;
@@ -785,7 +785,7 @@ watch(
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 10px;
+    padding: 4px 6px;
     background: var(--el-fill-color-blank);
     border: 1px solid var(--el-border-color-light);
     border-radius: 8px;
@@ -818,14 +818,30 @@ watch(
     color: #fff;
     letter-spacing: 0.5px;
 
-    &.pdf { background: #e8536e; }
-    &.img { background: #8b7cf6; }
-    &.word { background: #4b7cf7; }
-    &.excel { background: #36b37e; }
-    &.ppt { background: #ef8a3d; }
-    &.txt { background: #909399; }
-    &.zip { background: #9b8b7e; }
-    &.file { background: #909399; }
+    &.pdf {
+      background: #e8536e;
+    }
+    &.img {
+      background: #8b7cf6;
+    }
+    &.word {
+      background: #4b7cf7;
+    }
+    &.excel {
+      background: #36b37e;
+    }
+    &.ppt {
+      background: #ef8a3d;
+    }
+    &.txt {
+      background: #909399;
+    }
+    &.zip {
+      background: #9b8b7e;
+    }
+    &.file {
+      background: #909399;
+    }
   }
 
   // 图片类型：图标位直接显示缩略图（32×32，cover 填充）

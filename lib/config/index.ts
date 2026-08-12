@@ -61,5 +61,10 @@ export default {
       objectUrlKey: 'objectUrl',
       previewUrlKey: 'previewUrl'
     }
+  },
+  // 表格相关配置
+  table: {
+    // 表格默认对齐方式（表头+单元格）- 默认居中，使用方可覆盖为 left/right
+    headerAlign: 'center'
   }
 } as ICRUDConfig

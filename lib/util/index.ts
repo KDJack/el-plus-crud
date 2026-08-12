@@ -208,12 +208,15 @@ export function handelListColumn(columnList: Array<IColumnItem> | undefined, def
     columnList.map((item: IColumnItem, i: number) => {
       // 如果有子集
       if (item.children) {
-        // 表头居中
+        // 多级表头父列（分组标题）恒居中：跨列标题与子列内容对齐无关
         item.headerAlign = item.headerAlign || 'center'
-        item.children = handelListColumn(item.children, defaultConf, tbName, 'center', minWidth)
+        // 子列跟随全局 headerAlign，与单层表头行为一致
+        item.children = handelListColumn(item.children, defaultConf, tbName, headerAlign || 'center', minWidth)
       } else {
-        // 表头居中
-        item.headerAlign = item.headerAlign || headerAlign || 'left'
+        // 表头默认对齐-跟随 headerAlign 参数（默认 center）
+        item.headerAlign = item.headerAlign || headerAlign || 'center'
+        // 单元格默认对齐-跟随表头
+        item.align = item.align || headerAlign || 'center'
       }
 
       // 处理下一个单元格显示多个数据
@@ -229,8 +232,8 @@ export function handelListColumn(columnList: Array<IColumnItem> | undefined, def
       switch (item.type) {
         case 'image':
           item.width = item.width || '110px'
-          item.align = item.align || 'left'
-          item.headerAlign = item.headerAlign || headerAlign || 'left'
+          item.align = item.align || headerAlign || 'center'
+          item.headerAlign = item.headerAlign || headerAlign || 'center'
           break
         case 'btns':
           if (!item.minWidth && item.btns && item.btns.length >= 2) {
@@ -245,8 +248,8 @@ export function handelListColumn(columnList: Array<IColumnItem> | undefined, def
             }
             item.width = item.width || labelLength * 24 + 'px'
           }
-          item.align = item.align || 'left'
-          item.headerAlign = item.headerAlign || headerAlign || 'left'
+          item.align = item.align || headerAlign || 'center'
+          item.headerAlign = item.headerAlign || headerAlign || 'center'
           item.text = true
           break
       }

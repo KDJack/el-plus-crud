@@ -81,7 +81,7 @@
         <!-- 复选框 -->
         <el-table-column v-if="type === 'selection'" type="selection" fixed="left" width="55px" :selectable="selectable" header-align="center" align="center" />
         <!-- 下标 -->
-        <el-table-column v-if="isIndex" type="index" width="60" fixed="left" :label="indexLabel || '序号'" :headerAlign="headerAlign" />
+        <el-table-column v-if="isIndex" type="index" width="60" fixed="left" :label="indexLabel || '序号'" :align="finalHeaderAlign" :headerAlign="finalHeaderAlign" />
         <!-- 首列 -->
         <template v-if="useSlots().firstColumn">
           <slot name="firstColumn" />
@@ -197,7 +197,6 @@ const props = withDefaults(
     isDIYMain: false,
     selectList: () => [],
     colMinWidth: 'auto',
-    headerAlign: 'left',
     isTempId: true,
     loading: false,
     initLoad: true,
@@ -255,6 +254,9 @@ const loadingTab = ref(!!props.tableConfig?.tabConf?.fetch)
 const listLoading = ref(false)
 const size = defaultConf.size || 'default'
 
+// 最终的表头/单元格对齐方式：prop 优先 → 全局配置 → 默认 center
+const finalHeaderAlign = computed<'left' | 'right' | 'center'>(() => props.headerAlign || defaultConf.table?.headerAlign || 'center')
+
 // 最终的loading
 const compLoading = computed(() => props.loading || localLoading.value)
 
@@ -285,7 +287,7 @@ const treeProps = (props.tableConfig?.explan?.treeProps || { children: 'children
 
 // 处理后的列显示
 const headerColumns = computed(() => {
-  const tempList = handelListColumn(lodash.cloneDeep(props.tableConfig?.column), defaultConf, props.tableConfig?.tbName || '', props.headerAlign, props.colMinWidth || 'auto')
+  const tempList = handelListColumn(lodash.cloneDeep(props.tableConfig?.column), defaultConf, props.tableConfig?.tbName || '', finalHeaderAlign.value, props.colMinWidth || 'auto')
   // 这里重构一下合并行算法
   // 获取所有列
   const allColumn = getColumList(tempList)
@@ -1005,6 +1007,16 @@ defineExpose({ tableRef: elPlusTableRef, reload, tableData, changeSelect, resetS
         .cell {
           align-items: center;
           justify-content: center;
+        }
+      }
+      .is-right {
+        .cell {
+          justify-content: flex-end;
+        }
+      }
+      .is-left {
+        .cell {
+          justify-content: flex-start;
         }
       }
     }

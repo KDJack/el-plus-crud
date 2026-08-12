@@ -6,7 +6,7 @@
           <el-icon style="color: var(--el-color-danger); font-size: 26px; padding: 0px 8px 0 0"><WarningFilled /></el-icon>
         </template>
       </el-popover>
-      <div style="width: 100%; display: flex" :style="{ 'justify-content': item.align || 'flex-start' }">
+      <div style="width: 100%; display: flex" :style="{ 'justify-content': alignToJustify[item.align || ''] || 'flex-start' }">
         <component v-if="item.vshow === undefined || item.vshow" v-bind="item" :isTable="true" :formData="props.scope?.row" :size="item.size || size" :rowIndex="rowIndex" v-model="props.scope.row[item.field]" :is="'el-plus-form-' + item.desc.type"> </component>
       </div>
     </template>
@@ -16,6 +16,9 @@
 import { ref, onMounted, computed } from 'vue'
 import { WarningFilled } from '@element-plus/icons-vue'
 import { IColumnItem } from '../../../../types'
+
+// element 的 left/center/right 映射成 flex 标准的 justify-content 值，确保 right 真正生效
+const alignToJustify: Record<string, string> = { left: 'flex-start', center: 'center', right: 'flex-end' }
 
 const props = defineProps<{
   modelValue?: any

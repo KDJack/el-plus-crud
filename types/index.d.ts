@@ -45,6 +45,8 @@ export interface IFetchTableMap {
     // 最大显示条数
     pageSize?: string
   }
+  // 表格默认对齐方式（表头+单元格），默认 center，使用方可覆盖为 left/right
+  headerAlign?: 'left' | 'center' | 'right'
 }
 
 /**

@@ -118,22 +118,6 @@ function recalcAllParents(nodes: any[], cfg: TreeConfig): void {
   }
 }
 
-function recalcIndeterminateOnly(nodes: any[], cfg: TreeConfig): void {
-  for (const node of nodes) {
-    const children = getChildren(node, cfg)
-    if (children.length) {
-      recalcIndeterminateOnly(children, cfg)
-      const actionable = children.filter((c: any) => !isForceControlled(c, cfg))
-      if (actionable.length === 0) {
-        node._indeterminate = false
-      } else {
-        const someChecked = actionable.some((c: any) => c._checked || c._indeterminate)
-        node._indeterminate = !node._checked && someChecked
-      }
-    }
-  }
-}
-
 function computeVisibility(nodes: any[], keyword: string, cfg: TreeConfig): boolean {
   let hasVisible = false
   for (const node of nodes) {
@@ -232,6 +216,14 @@ function clearAllChecked(nodes: any[], cfg: TreeConfig): void {
     node._indeterminate = false
     const children = getChildren(node, cfg)
     if (children.length) clearAllChecked(children, cfg)
+  }
+}
+
+function clearAllIndeterminate(nodes: any[], cfg: TreeConfig): void {
+  for (const node of nodes) {
+    node._indeterminate = false
+    const children = getChildren(node, cfg)
+    if (children.length) clearAllIndeterminate(children, cfg)
   }
 }
 
@@ -385,7 +377,7 @@ function toggleCheck(node: any, checked: boolean): boolean {
     }
   }
   if (cascadeMode.value) recalcAllParents(options.value, c)
-  else recalcIndeterminateOnly(options.value, c)
+  else clearAllIndeterminate(options.value, c)
   refreshCache()
   return true
 }
@@ -399,21 +391,36 @@ function toggleExpand(node: any): void {
 
 function toggleSelectAll(checked: boolean): void {
   const c = cfg()
-  const targetIds = searchText.value ? collectVisibleLeafIds(options.value, c) : collectAllLeafIds(options.value, c)
-  const actionableIds = targetIds.filter((id) => !c.fsIds.includes(id) && !c.nsIds.includes(id))
-  if (checked) {
-    const currentChecked = new Set(collectCheckedLeafIds(options.value, c))
-    for (const id of actionableIds) {
-      if (c.maxCount < Infinity && currentChecked.size >= c.maxCount) break
-      currentChecked.add(id)
+  if (cascadeMode.value) {
+    // 级联模式：以叶子为准，父节点状态由 recalcAllParents 推导
+    const targetIds = searchText.value ? collectVisibleLeafIds(options.value, c) : collectAllLeafIds(options.value, c)
+    const actionableIds = targetIds.filter((id) => !c.fsIds.includes(id) && !c.nsIds.includes(id))
+    if (checked) {
+      const currentChecked = new Set(collectCheckedLeafIds(options.value, c))
+      for (const id of actionableIds) {
+        if (c.maxCount < Infinity && currentChecked.size >= c.maxCount) break
+        currentChecked.add(id)
+      }
+      batchSyncChecked(options.value, currentChecked, c)
+    } else {
+      batchUncheckByIds(options.value, new Set(actionableIds), c)
     }
-    batchSyncChecked(options.value, currentChecked, c)
   } else {
-    batchUncheckByIds(options.value, new Set(actionableIds), c)
+    // 独立模式（checkStrictly）：父节点与叶子各自独立可选，全选需覆盖所有可选节点
+    // ponytail: 不在此处理 maxCount；checkStrictly + maxCount 组合罕见，需要时再按「总勾选数」限流
+    const setAllNodes = (nodes: any[]) => {
+      for (const node of nodes) {
+        // 搜索过滤时仅操作可见节点，与级联模式 collectVisibleLeafIds 行为对齐
+        if (node._visible !== false && !isForceControlled(node, c)) node._checked = checked
+        const children = getChildren(node, c)
+        if (children.length) setAllNodes(children)
+      }
+    }
+    setAllNodes(options.value)
   }
   enforceForceIds(options.value, c)
   if (cascadeMode.value) recalcAllParents(options.value, c)
-  else recalcIndeterminateOnly(options.value, c)
+  else clearAllIndeterminate(options.value, c)
   refreshCache()
 }
 
@@ -435,7 +442,7 @@ function syncFromModelValue(ids: string[]): void {
   } else {
     setNodesByIdSet(options.value, newIdSet, c)
     enforceForceIds(options.value, c)
-    recalcIndeterminateOnly(options.value, c)
+    clearAllIndeterminate(options.value, c)
   }
   refreshCache()
   if (searchText.value) computeVisibility(options.value, searchText.value, c)
@@ -453,7 +460,8 @@ function doOptionsChanged(newOptions: any[]): void {
   options.value = cloned
   initNodeState(options.value, c, c.expandAll)
   enforceForceIds(options.value, c)
-  recalcAllParents(options.value, c)
+  if (cascadeMode.value) recalcAllParents(options.value, c)
+  else clearAllIndeterminate(options.value, c)
   refreshCache()
   if (searchText.value) computeVisibility(options.value, searchText.value, c)
 }
@@ -462,7 +470,8 @@ function initOptions(): void {
   const c = cfg()
   initNodeState(options.value, c, c.expandAll)
   enforceForceIds(options.value, c)
-  recalcAllParents(options.value, c)
+  if (cascadeMode.value) recalcAllParents(options.value, c)
+  else clearAllIndeterminate(options.value, c)
   refreshCache()
 }
 
@@ -552,7 +561,7 @@ onBeforeMount(async () => {
 watch(cascadeMode, () => {
   if (!treeConfig.value) return
   if (cascadeMode.value) recalcAllParents(options.value, cfg())
-  else recalcIndeterminateOnly(options.value, cfg())
+  else clearAllIndeterminate(options.value, cfg())
   refreshCache()
 })
 

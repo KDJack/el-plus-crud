@@ -60,8 +60,46 @@ let formData = reactive({
   // 日期范围测试初始值（时间戳数组，组件 valueFormat 默认 'x'）
   dateRange: [new Date(2026, 1, 1).getTime(), new Date(2026, 1, 15).getTime()],
   monthRange: [new Date(2026, 0, 1).getTime(), new Date(2026, 5, 1).getTime()],
-  yearRange: [new Date(2025, 0, 1).getTime(), new Date(2026, 0, 1).getTime()]
+  yearRange: [new Date(2025, 0, 1).getTime(), new Date(2026, 0, 1).getTime()],
+  // Tree 测试：独立模式预勾根节点 '1'（复现「全选→取消全选」后根节点残留），级联模式预勾两个叶子
+  treeStrict: ['1'],
+  treeCascade: ['1-1-1', '1-1-2']
 } as any)
+
+// Tree 测试数据：三层结构（根 → 子 → 叶），便于验证勾选/半选/全选
+const treeOptions = [
+  {
+    id: '1',
+    label: '系统管理',
+    children: [
+      {
+        id: '1-1',
+        label: '用户管理',
+        children: [
+          { id: '1-1-1', label: '新增用户' },
+          { id: '1-1-2', label: '编辑用户' },
+          { id: '1-1-3', label: '删除用户' }
+        ]
+      },
+      {
+        id: '1-2',
+        label: '角色管理',
+        children: [
+          { id: '1-2-1', label: '新增角色' },
+          { id: '1-2-2', label: '分配权限' }
+        ]
+      }
+    ]
+  },
+  {
+    id: '2',
+    label: '内容管理',
+    children: [
+      { id: '2-1', label: '文章列表' },
+      { id: '2-2', label: '分类管理' }
+    ]
+  }
+]
 
 // 示例无后端：模拟上传进度（每 200ms +20%，约 1s 完成），便于观察进度条与成功/失败状态
 const mockUpload = (param: any) =>
@@ -223,6 +261,27 @@ const formGroupConfig = ref({
         dateRange: { type: 'daterange', label: '日期范围', colspan: 2, require: true, propPrefix: 'date' },
         monthRange: { type: 'daterange', elType: 'monthrange', label: '月份范围', colspan: 2, require: true, propPrefix: 'month' },
         yearRange: { type: 'daterange', elType: 'yearrange', label: '年份范围', colspan: 2, require: true, propPrefix: 'year' }
+      } as IFormDesc
+    },
+    {
+      // Tree 测试：左侧独立模式（checkStrictly，父/子独立、无半选），右侧级联模式（默认）对比
+      title: 'Tree 测试（勾选 / 半选 / 全选）',
+      column: 2,
+      formDesc: {
+        treeStrict: {
+          type: 'tree',
+          label: '独立模式(checkStrictly)',
+          colspan: 2,
+          options: treeOptions,
+          attrs: { checkStrictly: true, showCascadeSwitch: true, enableSearch: true, defaultExpandAll: true }
+        },
+        treeCascade: {
+          type: 'tree',
+          label: '级联模式(默认)',
+          colspan: 2,
+          options: treeOptions,
+          attrs: { showCascadeSwitch: true, enableSearch: true, defaultExpandAll: true }
+        }
       } as IFormDesc
     }
   ]

@@ -47,13 +47,14 @@ export function isImageFile(file: any): boolean {
 
 /**
  * 图片可直接 <img> 展示的 url（缩略图 / 预览器共用）。
- * 与 ElPlusFormUpload.getImgPreviewUrl 取址完全一致：
- * signUrl → shareUrl → url → furl，含 raw 兜底；不含 previewUrl
- *（后者是「非图片」文件的在线预览地址，不适用于图片缩略图，见 oss-upload-url-semantics 记忆）。
+ * 取址顺序：signUrl → shareUrl → url → furl → previewUrl（末位兜底），含 raw 兜底。
+ * 末位 previewUrl 用于兼容「图片仅带 previewUrl、无 objectUrl 直链」的异常数据——
+ * 否则缩略图能显示、但预览器 url-list 取空 → el-image-viewer 打开后 img 不渲染。
+ * 正常 OSS 图片首选仍是 shareUrl(objectUrl)，previewUrl 仅在全空时兜底，不改变首选语义。
  */
 export function getImageUrl(item: any): string {
   const raw = item?.raw || {}
-  return item.signUrl || raw.signUrl || item.shareUrl || raw.shareUrl || item.url || raw.url || item.furl || raw.furl || ''
+  return item.signUrl || raw.signUrl || item.shareUrl || raw.shareUrl || item.url || raw.url || item.furl || raw.furl || item.previewUrl || raw.previewUrl || ''
 }
 
 /**

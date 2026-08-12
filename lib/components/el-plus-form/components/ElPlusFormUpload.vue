@@ -370,7 +370,7 @@ function handelPreview(file: any) {
   } else {
     const url = file.raw?.previewUrl || file.previewUrl
     if (url) {
-      window.open(url, '_blank')
+      window.open(url, '_blank', 'noopener,noreferrer')
     } else {
       ElMessage.warning('暂无预览地址')
     }
@@ -438,12 +438,13 @@ function imgUrl(file: any) {
 }
 
 /**
- * 取图片预览/缩略 url（不含 previewUrl：后者是非图片文件的在线预览地址，不适用于图片，
- * 见 oss-upload-url-semantics 记忆）
+ * 取图片预览 url（previewList / 缩略图共用）。
+ * 与 imgUrl 取址一致：signUrl → shareUrl → url → furl → previewUrl（末位兜底），含 raw 兜底。
+ * 末位 previewUrl 兜底「图片仅带 previewUrl」的异常数据，避免缩略图显示但 viewer 预览空白。
  */
 function getImgPreviewUrl(item: any): string {
   const raw = item?.raw || {}
-  return item.signUrl || raw.signUrl || item.shareUrl || raw.shareUrl || item.url || raw.url || item.furl || raw.furl || ''
+  return item.signUrl || raw.signUrl || item.shareUrl || raw.shareUrl || item.url || raw.url || item.furl || raw.furl || item.previewUrl || raw.previewUrl || ''
 }
 
 /**

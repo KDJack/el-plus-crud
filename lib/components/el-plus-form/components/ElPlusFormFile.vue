@@ -66,7 +66,7 @@ function handleCardClick(item: any) {
     previewIndex.value = Math.max(0, previewList.value.indexOf(getImageUrl(item)))
     showPreview.value = true
   } else {
-    const url = item.previewUrl
+    const url = item.raw?.previewUrl || item.previewUrl
     if (url) {
       window.open(url, '_blank', 'noopener,noreferrer')
     } else {

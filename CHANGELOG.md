@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.119](https://github.com/KDJack/el-plus-crud/compare/v0.1.118...v0.1.119) (2026-08-12)
+
+
+### Bug Fixes
+
+* **form:** 修复 tree 组件 checkStrictly 模式下的全选/半选缺陷 ([bdcd0a8](https://github.com/KDJack/el-plus-crud/commit/bdcd0a805c52b01ce382b1626fde63aab4d07a16))
+
 ### [0.1.118](https://github.com/KDJack/el-plus-crud/compare/v0.1.117...v0.1.118) (2026-08-12)
 
 

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.117](https://github.com/KDJack/el-plus-crud/compare/v0.1.116...v0.1.117) (2026-08-12)
+
+
+### Features
+
+* **form:** file 组件改为圆角卡片样式，与 upload 卡片统一 ([9109043](https://github.com/KDJack/el-plus-crud/commit/9109043a62dc992e87744731749492e784c3e04b))
+
 ### [0.1.116](https://github.com/KDJack/el-plus-crud/compare/v0.1.115...v0.1.116) (2026-08-12)
 
 ### [0.1.115](https://github.com/KDJack/el-plus-crud/compare/v0.1.114...v0.1.115) (2026-08-12)

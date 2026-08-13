@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.121](https://github.com/KDJack/el-plus-crud/compare/v0.1.120...v0.1.121) (2026-08-13)
+
+
+### Bug Fixes
+
+* **form:** 表单项内容默认顶部对齐 ([058873c](https://github.com/KDJack/el-plus-crud/commit/058873ca9abd852d370cbf7223bba4b2e35e1fef))
+
 ### [0.1.120](https://github.com/KDJack/el-plus-crud/compare/v0.1.119...v0.1.120) (2026-08-13)
 
 ### [0.1.119](https://github.com/KDJack/el-plus-crud/compare/v0.1.118...v0.1.119) (2026-08-12)

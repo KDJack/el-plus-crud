@@ -39,9 +39,25 @@ let formData = reactive({
   oldFile: [{ name: '老风格文件.pdf', furl: 'https://example.com/老风格文件.pdf', suffix: '.pdf', fsize: 524288, uid: 302 }],
   // ===== file 只读展示字段初始数据（演示新圆角卡片样式：图片直接显示缩略图 + 非图片彩色类型徽标）=====
   fileImgs: [
-    { name: '产品主图.jpg', url: 'https://picsum.photos/200/200', furl: 'https://picsum.photos/200/200', suffix: '.jpg', fsize: 102400, uid: 401 },
-    { name: '细节图.png', url: 'https://picsum.photos/240/240', furl: 'https://picsum.photos/240/240', suffix: '.png', fsize: 204800, uid: 402 },
-    { name: '场景图.jpeg', url: 'https://picsum.photos/280/280', furl: 'https://picsum.photos/280/280', suffix: '.jpeg', fsize: 153600, uid: 403 }
+    {
+      id: '2087516468428644352',
+      name: 'IMG_0094.jpeg',
+      furl: 'http://47.109.49.171:9000/2087516335312424960.jpeg',
+      signUrl: 'http://47.109.49.171:9000/labor-dev/2087516335312424960.jpeg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=EzvgDRShuyqafXZm%2F20260812%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20260812T122733Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=f627129864c7e209039ac0bdc7323bec06f13fb5229cfdfc2ce359cb0db1fbd4',
+      mimeType: 'image/jpeg',
+      fsize: '9269',
+      suffix: '.jpeg',
+      objectName: '',
+      busId: '2087516465559740416',
+      busType: 57,
+      createBy: '李四',
+      createTime: '2026-08-12 20:28:05',
+      updateBy: ' ',
+      updateTime: null,
+      previewUrl:
+        'http://47.109.49.171:10003/preview/onlinePreview?url=aHR0cDovLzQ3LjEwOS40OS4xNzE6OTAwMC9sYWJvci1kZXYvMjA4NzUxNjMzNTMxMjQyNDk2MC5qcGVnP1gtQW16LUFsZ29yaXRobT1BV1M0LUhNQUMtU0hBMjU2JlgtQW16LUNyZWRlbnRpYWw9RXp2Z0RSU2h1eXFhZlhabSUyRjIwMjYwODEyJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI2MDgxMlQxMjI3MzNaJlgtQW16LUV4cGlyZXM9MzYwMCZYLUFtei1TaWduZWRIZWFkZXJzPWhvc3QmWC1BbXotU2lnbmF0dXJlPWY2MjcxMjk4NjRjN2UyMDkwMzlhYzBiZGM3MzIzYmVjMDZmMTNmYjUyMjljZmRmYzJjZTM1OWNiMGRiMWZiZDQ=',
+      remark: ''
+    }
   ],
   fileMixed: [
     { name: '封面.jpg', url: 'https://picsum.photos/300/200', furl: 'https://picsum.photos/300/200', suffix: '.jpg', fsize: 51200, uid: 411 },

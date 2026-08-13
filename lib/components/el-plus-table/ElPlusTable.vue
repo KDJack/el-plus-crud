@@ -81,7 +81,7 @@
         <!-- 复选框 -->
         <el-table-column v-if="type === 'selection'" type="selection" fixed="left" width="55px" :selectable="selectable" header-align="center" align="center" />
         <!-- 下标 -->
-        <el-table-column v-if="isIndex" type="index" width="60" fixed="left" :label="indexLabel || '序号'" :align="finalHeaderAlign" :headerAlign="finalHeaderAlign" />
+        <el-table-column v-if="isIndex" type="index" width="70" fixed="left" :label="indexLabel || '序号'" :align="finalHeaderAlign" :headerAlign="finalHeaderAlign" />
         <!-- 首列 -->
         <template v-if="useSlots().firstColumn">
           <slot name="firstColumn" />

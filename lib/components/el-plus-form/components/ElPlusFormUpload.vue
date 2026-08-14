@@ -1,5 +1,5 @@
 <template>
-  <div class="ele-form-upload-image" :class="{ 'ele-form-upload-file': !!desc.upType, 'ele-form-upload-card': cardMode }" v-if="isInit">
+  <div class="ele-form-upload-image" :class="{ 'ele-form-upload-file': !!desc.upType, 'ele-form-upload-card': cardMode }" :style="{ '--file-card-max-width': desc.cardMaxWidth || '200px' }" v-if="isInit">
     <el-upload ref="uploadRef" class="ele-image-upload" v-bind="attrs" v-on="onEvents" :disabled="disabled" :fileList="currentValue || []" :class="{ 'over-limit': currentValue?.length >= attrs.limit, 'upload-disabled': attrs.disabled }">
       <!-- card 模式：胶囊形添加按钮作为触发器 -->
       <div v-if="cardMode" class="upload-add-btn" v-show="(currentValue?.length || 0) + activeCount < realLimit">
@@ -696,7 +696,7 @@ watch(
   // 按钮浅底：主色 10% 混白，运行时跟随 --el-color-primary（外部动态切主色时实时变化）
   --upload-add-bg: color-mix(in srgb, var(--el-color-primary) 10%, white);
 
-  // card 模式：触发器(胶囊按钮)与文件列表上下排版；触发器只占内容宽，卡片铺满宽度
+  // card 模式：触发器(胶囊按钮)与文件列表上下排版；触发器只占内容宽，卡片横向排列、排不下换行（限宽见 desc.cardMaxWidth）
   .ele-image-upload {
     flex-direction: column;
     align-items: stretch;
@@ -713,16 +713,23 @@ watch(
       padding: 0;
       overflow: visible;
       line-height: normal;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
     }
 
     .el-upload-list__item {
-      margin: 0 0 4px;
+      margin: 0;
       padding: 0;
       border: none;
       background: transparent;
       border-radius: 0;
       box-shadow: none;
       transition: none;
+      flex: 0 1 auto;
+      min-width: 0;
+      // 限宽挂在 li（flex 子项）上，宽度经 CSS 变量透传（desc.cardMaxWidth），卡片 width:100% 填充
+      max-width: var(--file-card-max-width, 200px);
 
       &:last-child {
         margin-bottom: 0;
@@ -792,7 +799,8 @@ watch(
     border-radius: 8px;
     transition: all 0.2s;
     cursor: pointer;
-    max-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
 
     &:hover {
       // 主色浅变体：运行时 color-mix 混白，外部动态切主色时实时跟随（light-N 变量为构建期固化，不跟随）

@@ -1,17 +1,7 @@
 <template>
   <div class="ele-form-file">
     <template v-if="files.length">
-      <div
-        v-for="(item, i) in files"
-        :key="item.uid ?? i"
-        class="ele-form-file-card"
-        role="button"
-        tabindex="0"
-        :aria-label="item.name ? '预览：' + item.name : '预览文件'"
-        @click="handleCardClick(item)"
-        @keydown.enter="handleCardClick(item)"
-        @keydown.space.prevent="handleCardClick(item)"
-      >
+      <div v-for="(item, i) in files" :key="item.uid ?? i" class="ele-form-file-card" role="button" tabindex="0" :aria-label="item.name ? '预览：' + item.name : '预览文件'" :style="{ maxWidth: desc.cardMaxWidth || '200px', minWidth: desc.cardMinWidth || desc.cardMaxWidth || '200px' }" @click="handleCardClick(item)" @keydown.enter="handleCardClick(item)" @keydown.space.prevent="handleCardClick(item)">
         <img v-if="isImageFile(item) && getImageUrl(item)" class="file-thumb" :src="getImageUrl(item)" />
         <div v-else class="file-type-icon" :class="typeClass(item)">{{ typeLabel(item) }}</div>
         <div class="file-info">
@@ -55,7 +45,12 @@ const showPreview = ref(false)
 const previewIndex = ref(0)
 
 // 图片预览列表（仅图片项的缩略图 url，取址同 fileType.getImageUrl）
-const previewList = computed(() => files.value.filter((item: any) => isImageItem(item)).map((item: any) => getImageUrl(item)).filter(Boolean))
+const previewList = computed(() =>
+  files.value
+    .filter((item: any) => isImageItem(item))
+    .map((item: any) => getImageUrl(item))
+    .filter(Boolean)
+)
 
 /**
  * 卡片点击：图片 → 图片查看器；非图片 → window.open(previewUrl) 在线预览。
@@ -79,7 +74,7 @@ function handleCardClick(item: any) {
 .ele-form-file {
   width: 100%;
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   align-items: flex-start;
   gap: 8px;
   margin-top: 10px;
@@ -92,8 +87,8 @@ function handleCardClick(item: any) {
 }
 
 .ele-form-file-card {
-  width: 100%;
-  max-width: 100%;
+  flex: 0 1 auto;
+  min-width: 0;
   box-sizing: border-box;
   display: flex;
   align-items: center;

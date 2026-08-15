@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.124](https://github.com/KDJack/el-plus-crud/compare/v0.1.123...v0.1.124) (2026-08-15)
+
+
+### Features
+
+* **form:** file 组件附件卡片增加下载按钮 ([4c4dcc5](https://github.com/KDJack/el-plus-crud/commit/4c4dcc5090ea5b81bba804d790ff0acd0c080e1e))
+
+
+### Bug Fixes
+
+* **form:** 修复上传成功后仍误报「请上传」的校验时序问题 ([a4601a3](https://github.com/KDJack/el-plus-crud/commit/a4601a3b794d7f2b0cde9723554be16c8634c534))
+
 ### [0.1.123](https://github.com/KDJack/el-plus-crud/compare/v0.1.122...v0.1.123) (2026-08-15)
 
 

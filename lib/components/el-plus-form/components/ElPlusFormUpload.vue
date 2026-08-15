@@ -1,6 +1,6 @@
 <template>
   <div class="ele-form-upload-image" :class="{ 'ele-form-upload-file': !!desc.upType, 'ele-form-upload-card': cardMode }" :style="{ '--file-card-max-width': desc.cardMaxWidth || '200px' }" v-if="isInit">
-    <el-upload ref="uploadRef" class="ele-image-upload" v-bind="attrs" v-on="onEvents" :disabled="disabled" :fileList="currentValue || []" :class="{ 'over-limit': currentValue?.length >= attrs.limit, 'upload-disabled': attrs.disabled }">
+    <el-upload ref="uploadRef" class="ele-image-upload" v-bind="attrs" v-on="onEvents" :disabled="disabled" :fileList="Array.isArray(currentValue) ? currentValue : []" :class="{ 'over-limit': currentValue?.length >= attrs.limit, 'upload-disabled': attrs.disabled }">
       <!-- card 模式：胶囊形添加按钮作为触发器 -->
       <div v-if="cardMode" class="upload-add-btn" v-show="(currentValue?.length || 0) + activeCount < realLimit">
         <span class="plus">+</span>{{ desc.addText || (isImageType ? '添加图片' : '添加文件') }}
@@ -95,8 +95,9 @@ const props = defineProps<{
 }>()
 
 const emits = defineEmits(['update:modelValue', 'validateThis'])
-// ponytail: 内部 currentValue 恒为文件数组（modelValue 多态，由下方 watch 归一化），用 Ref<Array> 断言保留 .push/.map 用法
-const currentValue = useVModel(props, 'modelValue', emits) as Ref<Array<any>>
+// ponytail: passive 本地 ref，赋值恒留本地数组；父级 modelValue 为字符串时也不会透传给 el-upload。
+// deep 必须开：归一化 watch 的 map 会产生 detached 副本，此后的 push/splice 原地改动需靠 deep watch 才能 emit 给父级
+const currentValue = useVModel(props, 'modelValue', emits, { passive: true, deep: true, defaultValue: [] }) as Ref<Array<any>>
 
 const attrs = ref({} as any)
 const isInit = ref(false)
@@ -552,16 +553,17 @@ watch(
           currentValue.value = []
         }
       } else {
-        currentValue.value =
-          data?.map((item: IOssInfo) => {
-            if (isImageType.value) {
-              item.url = getFileIcon(item) || getValue(defaultConf.upload?.signMap?.previewUrlKey || [], item)
-              item.furl = item.furl || getFileIcon(item)
-            }
-            item.suffix = `${(item.suffix || item.url?.substring(item.url?.lastIndexOf('.') || 0) || '').toLocaleLowerCase()}`.split('?')[0]
-            item.previewUrl = getValue(defaultConf.upload?.signMap?.previewUrlKey || [], item) || item.furl || item.url
-            return item
-          }) || []
+        currentValue.value = Array.isArray(data)
+          ? data.map((item: IOssInfo) => {
+              if (isImageType.value) {
+                item.url = getFileIcon(item) || getValue(defaultConf.upload?.signMap?.previewUrlKey || [], item)
+                item.furl = item.furl || getFileIcon(item)
+              }
+              item.suffix = `${(item.suffix || item.url?.substring(item.url?.lastIndexOf('.') || 0) || '').toLocaleLowerCase()}`.split('?')[0]
+              item.previewUrl = getValue(defaultConf.upload?.signMap?.previewUrlKey || [], item) || item.furl || item.url
+              return item
+            })
+          : []
       }
     }
   },

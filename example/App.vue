@@ -153,8 +153,8 @@ const formGroupConfig = ref({
     {
       title: '基本信息',
       formDesc: {
-        name: { type: 'input', label: '名项目劳资负责资负责资负责人称', require: true, attrs: { maxlength: 30 } },
-        contactsName: { type: 'input', label: '联系人', require: true, attrs: { maxlength: 20 } },
+        name: { type: 'input', label: '名项目劳资负责资负责资负责人称', required: true, attrs: { maxlength: 30 } },
+        contactsName: { type: 'input', label: '联系人', required: true, attrs: { maxlength: 20 } },
         contactsPhone: { type: 'select', label: '项目劳资负责资负责资负责人', options: [], tip: '带企业劳资负责人信息可修改' },
         _tempDelBtns: {
           type: 'btns',
@@ -178,8 +178,8 @@ const formGroupConfig = ref({
     {
       title: '地址信息',
       formDesc: {
-        // _area: { type: 'area', label: '所在地区', require: true },
-        address: { type: 'input', label: '详细地址', require: true, attrs: { maxlength: 50 } }
+        // _area: { type: 'area', label: '所在地区', required: true },
+        address: { type: 'input', label: '详细地址', required: true, attrs: { maxlength: 50 } }
       } as IFormDesc
     },
     {
@@ -187,18 +187,18 @@ const formGroupConfig = ref({
       title: '图片上传（胶囊按钮 + 卡片回显）',
       column: 3,
       formDesc: {
-        logo: { type: 'upload', label: '企业Logo', require: true, tip: '默认 card 新风格', uploadFn: mockUpload },
-        banner: { type: 'upload', label: '横幅图', uploadFn: mockUpload, addText: '上传横幅', formatHint: '建议尺寸200*300 16:9 最大2M' },
-        qrcode: { type: 'upload', label: '二维码', uploadFn: mockUpload },
+        logo: { type: 'upload', label: '企业Logo', required: true, tip: '默认 card 新风格', uploadFn: mockUpload },
+        banner: { type: 'upload', label: '横幅图', required: true, uploadFn: mockUpload, addText: '上传横幅', formatHint: '建议尺寸200*300 16:9 最大2M' },
+        qrcode: { type: 'upload', label: '二维码', required: true, uploadFn: mockUpload },
         // colspan:3 跨满整行，演示多图 + 自定义按钮文案
-        photos: { type: 'upload', label: '现场照片', multiple: true, limit: 5, colspan: 3, uploadFn: mockUpload, addText: '继续添加照片', formatHint: '最多 5 张' }
+        photos: { type: 'upload', label: '现场照片', required: true, multiple: true, limit: 5, colspan: 3, uploadFn: mockUpload, addText: '继续添加照片', formatHint: '最多 5 张' }
       } as IFormDesc
     },
     {
       title: '文件上传（多文件 + 跨列）',
       column: 2,
       formDesc: {
-        contract: { type: 'upload', upType: 'file', label: '中标通知书', require: true },
+        contract: { type: 'upload', upType: 'file', label: '中标通知书', required: true },
         // colspan:2 跨满整行，演示多文件上传
         appendix: { type: 'upload', upType: 'file', label: '附件材料', multiple: true, limit: 5, colspan: 2, uploadFn: mockUpload, addText: '添加附件', formatHint: '单个不超过 10MB' }
       } as IFormDesc
@@ -239,7 +239,7 @@ const formGroupConfig = ref({
     {
       title: '备注信息',
       formDesc: {
-        remark: { type: 'textarea', label: '备注', colspan: 2, require: true }
+        remark: { type: 'textarea', label: '备注', colspan: 2, required: true }
       } as IFormDesc
     },
     {
@@ -265,18 +265,18 @@ const formGroupConfig = ref({
     {
       title: '跨行布局(rowspan)',
       formDesc: {
-        intro: { type: 'textarea', label: '简介', rowspan: 2, require: true },
-        nick: { type: 'input', label: '昵称', require: true },
-        mobile: { type: 'input', label: '手机', require: true }
+        intro: { type: 'textarea', label: '简介', rowspan: 2, required: true },
+        nick: { type: 'input', label: '昵称', required: true },
+        mobile: { type: 'input', label: '手机', required: true }
       } as IFormDesc
     },
     {
       // 日期范围测试：验证 daterange / monthrange / yearrange 的显示格式与结束时间（最后一秒）
       title: '日期范围测试（daterange / monthrange / yearrange）',
       formDesc: {
-        dateRange: { type: 'daterange', label: '日期范围', colspan: 2, require: true, propPrefix: 'date' },
-        monthRange: { type: 'daterange', elType: 'monthrange', label: '月份范围', colspan: 2, require: true, propPrefix: 'month' },
-        yearRange: { type: 'daterange', elType: 'yearrange', label: '年份范围', colspan: 2, require: true, propPrefix: 'year' }
+        dateRange: { type: 'daterange', label: '日期范围', colspan: 2, required: true, propPrefix: 'date' },
+        monthRange: { type: 'daterange', elType: 'monthrange', label: '月份范围', colspan: 2, required: true, propPrefix: 'month' },
+        yearRange: { type: 'daterange', elType: 'yearrange', label: '年份范围', colspan: 2, required: true, propPrefix: 'year' }
       } as IFormDesc
     },
     {

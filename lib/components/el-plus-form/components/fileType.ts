@@ -1,3 +1,4 @@
+import { ElMessage } from 'element-plus'
 import { imageSuffixes, suffixTypes } from '../data/file'
 
 /**
@@ -66,6 +67,48 @@ export function getImageUrl(item: any): string {
 export function isImageItem(item: any): boolean {
   if (getFileType(item) === 'img') return true
   return getImageUrl(item).toLowerCase().startsWith('data:image/')
+}
+
+/**
+ * 下载取址：与 getImageUrl 同序（signUrl → shareUrl → url → furl → previewUrl），
+ * 语义独立便于后续分化（如下载需强制签名链接时只改这里）
+ */
+export function getDownloadUrl(item: any): string {
+  return getImageUrl(item)
+}
+
+/**
+ * fetch blob 下载（保证保存为文件 + 自定义文件名）；
+ * 失败（CORS/网络/签名过期）回退 window.open 直链打开。
+ * data:image base64 项同样可走 fetch→blob（fetch 支持 data URL），无需特判。
+ */
+export function downloadFile(item: any): void {
+  const url = getDownloadUrl(item)
+  if (!url) {
+    ElMessage.warning('暂无下载地址')
+    return
+  }
+  fetch(url)
+    .then((res) => {
+      if (!res.ok) throw new Error(String(res.status))
+      return res.blob()
+    })
+    .then((blob) => {
+      const a = document.createElement('a')
+      a.href = URL.createObjectURL(blob)
+      a.download = item?.name || item?.raw?.name || '文件'
+      a.click()
+      // ponytail: 延迟释放，旧 Safari 同步 revoke 会中断刚触发的下载
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000)
+    })
+    .catch(() => {
+      // fetch 失败（常见于 OSS 未配 CORS）回退直链打开；
+      // 此处已脱离用户手势上下文，弹窗拦截器可能拦截，须检测并提示
+      const w = window.open(url, '_blank', 'noopener,noreferrer')
+      if (!w) {
+        ElMessage.warning('浏览器拦截了弹窗，且无法直接下载，请检查网络或稍后重试')
+      }
+    })
 }
 
 /**

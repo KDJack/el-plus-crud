@@ -8,6 +8,11 @@
           <span class="file-name">{{ item.name }}</span>
           <span v-if="formatSize(item.fsize)" class="file-meta">{{ formatSize(item.fsize) }}</span>
         </div>
+        <el-tooltip content="下载" placement="top">
+          <span class="file-download-btn" role="button" tabindex="0" aria-label="下载文件" @click.stop="downloadFile(item)" @keydown.enter.stop.prevent="downloadFile(item)" @keydown.space.stop.prevent="downloadFile(item)">
+            <el-icon><Download /></el-icon>
+          </span>
+        </el-tooltip>
       </div>
     </template>
     <span v-else class="no-img-tip">暂无内容</span>
@@ -27,8 +32,9 @@ export default {
 <script lang="ts" setup>
 import { ref, computed } from 'vue'
 import { ElMessage } from 'element-plus'
+import { Download } from '@element-plus/icons-vue'
 import { IOssInfo } from '../../../../types'
-import { typeClass, typeLabel, isImageFile, isImageItem, getImageUrl, formatSize } from './fileType'
+import { typeClass, typeLabel, isImageFile, isImageItem, getImageUrl, formatSize, downloadFile } from './fileType'
 
 const props = defineProps<{
   modelValue?: Array<IOssInfo>
@@ -163,6 +169,32 @@ function handleCardClick(item: any) {
     display: flex;
     flex-direction: column;
     gap: 1px;
+  }
+
+  .file-download-btn {
+    // 用 visibility 占位而非 display 切换，避免 hover 时按钮出现挤压文件名导致布局跳动
+    visibility: hidden;
+    opacity: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    color: var(--el-text-color-secondary);
+    cursor: pointer;
+    flex-shrink: 0;
+
+    &:hover {
+      color: var(--el-color-primary);
+      background: var(--el-fill-color-light);
+    }
+  }
+
+  &:hover .file-download-btn,
+  .file-download-btn:focus-visible {
+    visibility: visible;
+    opacity: 1;
   }
 
   .file-name {

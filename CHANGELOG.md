@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.123](https://github.com/KDJack/el-plus-crud/compare/v0.1.122...v0.1.123) (2026-08-15)
+
+
+### Bug Fixes
+
+* **form:** 修复 upload 父级 modelValue 为字符串时组件卸载报错 ([2ec5ada](https://github.com/KDJack/el-plus-crud/commit/2ec5ada477941c6748e9a952330522c0b0bad71a))
+* **table:** size 默认不再硬编码 default，未配置时继承 EP 全局 size ([803760c](https://github.com/KDJack/el-plus-crud/commit/803760cb7b135887c63bdfd208eeaadd95acbf02))
+
 ### [0.1.122](https://github.com/KDJack/el-plus-crud/compare/v0.1.121...v0.1.122) (2026-08-14)
 
 

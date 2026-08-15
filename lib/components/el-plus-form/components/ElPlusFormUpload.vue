@@ -54,7 +54,7 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { ref, computed, useAttrs, onBeforeMount, watch, inject, type Ref } from 'vue'
+import { ref, computed, useAttrs, onBeforeMount, watch, inject, nextTick, type Ref } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
 import { ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
@@ -353,7 +353,8 @@ function handelListChange(item: any, type: 0 | 1) {
       currentValue.value.splice(index, 1)
     }
   }
-  emits('validateThis')
+  // passive+deep v-model 下父级值要等 deep watch flush 后才同步，同步 validate 会读到旧值误报「请上传」；推迟到下一 tick
+  nextTick(() => emits('validateThis'))
 }
 
 /**
@@ -494,7 +495,7 @@ function onCardRemove(file: any) {
   } else {
     const idx = currentValue.value.findIndex((f: any) => (file.uid && f.uid === file.uid) || (f.furl || f.url) === (file.furl || file.url))
     if (idx >= 0) currentValue.value.splice(idx, 1)
-    emits('validateThis')
+    nextTick(() => emits('validateThis'))
   }
 }
 

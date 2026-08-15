@@ -70,7 +70,7 @@ const handelItem = (prop: string, item: any, i: number) => {
     desc: {
       prop: prop,
       default: '',
-      size: item.size || props.size || 'default'
+      size: item.size || props.size
     }
   } as any
   Object.assign(tempCell.desc, item)

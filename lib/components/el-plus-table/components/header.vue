@@ -91,13 +91,13 @@ const props = withDefaults(
     isDialog: boolean
     loading: boolean
     isShowRefresh: boolean
-    size: string
+    size?: string
     queryDataFn?: Function
     layoutSelect?: boolean
     initLoad?: boolean
     isInitLoad?: boolean
   }>(),
-  { tbName: '', isDialog: false, loading: false, isShowRefresh: true, size: 'default' }
+  { tbName: '', isDialog: false, loading: false, isShowRefresh: true }
 )
 
 const elPlusFormRef = ref()

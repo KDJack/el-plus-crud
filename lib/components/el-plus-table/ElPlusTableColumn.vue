@@ -34,7 +34,7 @@ const lodash = inject('lodash') as any
 
 const props = defineProps<{
   item: IColumnItem
-  size: string
+  size?: string
   index: number
 }>()
 

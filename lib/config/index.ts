@@ -3,8 +3,8 @@ import { ICRUDConfig } from '../../types'
 export default {
   // 是否开始debug调试模式,目前主要时一些console信息打印
   debug: false,
-  // element plus组件的size
-  size: 'default',
+  // element plus组件的size（不设置时undefined，组件自动继承EP全局size）
+  size: undefined,
   // 本地存储的key前缀
   storagePrefix: 'el-plus-crud_',
   // 表单相关配置

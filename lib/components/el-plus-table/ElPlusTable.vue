@@ -252,7 +252,7 @@ const tableHeaderRef = ref()
 const localLoading = ref(false)
 const loadingTab = ref(!!props.tableConfig?.tabConf?.fetch)
 const listLoading = ref(false)
-const size = defaultConf.size || 'default'
+const size = defaultConf.size
 
 // 最终的表头/单元格对齐方式：prop 优先 → 全局配置 → 默认 center
 const finalHeaderAlign = computed<'left' | 'right' | 'center'>(() => props.headerAlign || defaultConf.table?.headerAlign || 'center')

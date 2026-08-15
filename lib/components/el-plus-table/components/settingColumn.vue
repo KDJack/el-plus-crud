@@ -28,7 +28,7 @@ const defaultConf = inject('defaultConf') as ICRUDConfig
 const props = defineProps<{
   column: Array<IColumnItem>
   tbName: string
-  size: string
+  size?: string
   showText?: boolean
 }>()
 

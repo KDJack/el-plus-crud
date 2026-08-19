@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.126](https://github.com/KDJack/el-plus-crud/compare/v0.1.124...v0.1.126) (2026-08-19)
+
+
+### Bug Fixes
+
+* **form:** suffix 归一化补点，dotless 后缀不再退化 FILE 图标或预览误判 ([4a8566e](https://github.com/KDJack/el-plus-crud/commit/4a8566e03cc60ca0086b9c1bafab7fa364c00a26))
+
 ### [0.1.125](https://github.com/KDJack/el-plus-crud/compare/v0.1.124...v0.1.125) (2026-08-19)
 
 

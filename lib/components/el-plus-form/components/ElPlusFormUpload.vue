@@ -60,6 +60,7 @@ import { ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 
 import * as fileTypes from '../data/file'
+import { normalizeSuffix } from './fileType'
 
 // 引入图标
 import excel from '../images/icon/excel.png'
@@ -398,7 +399,7 @@ const TYPE_META: Record<string, { cls: string; label: string }> = {
 function getFileType(file: any) {
   // suffix 优先取业务字段；但 el-upload 内部 file 及 handelListChange 存入 currentValue 的项均无可靠 suffix
   // （raw 是 File 对象无 suffix 属性），故从文件名提取扩展名兜底，否则类型图标会全部退化成 FILE
-  let suffix = (file?.suffix || file?.raw?.suffix || '').toLocaleLowerCase()
+  let suffix = normalizeSuffix(file?.suffix || file?.raw?.suffix || '')
   if (!suffix) {
     const name = (file?.name || file?.raw?.name || '').toLowerCase()
     const dot = name.lastIndexOf('.')
@@ -453,9 +454,10 @@ function getImgPreviewUrl(item: any): string {
  * 是否为图片项：suffix 命中图片后缀，或 url 为 data:image base64 data URL。
  * ponytail: base64 data URL 无文件后缀，suffix 解析不可靠，须另以 data: 前缀兜底，
  * 否则 handelPreview 误判为非图片 → window.open(undefined) → about:blank。
+ * suffix 经 normalizeSuffix 归一化补点（同 getFileType），dotless 后缀不再误判。
  */
 function isImageItem(item: any): boolean {
-  const suffix = (item?.raw?.suffix || item?.suffix || '').toString().toLocaleLowerCase()
+  const suffix = normalizeSuffix(item?.raw?.suffix || item?.suffix || '')
   if (suffix && fileTypes.imageSuffixes.indexOf(suffix) >= 0) return true
   const url = getImgPreviewUrl(item).toLowerCase()
   if (url.startsWith('data:image/')) return true

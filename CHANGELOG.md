@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.125](https://github.com/KDJack/el-plus-crud/compare/v0.1.124...v0.1.125) (2026-08-19)
+
+
+### Bug Fixes
+
+* **form:** suffix 归一化补点（normalizeSuffix 单一来源），dotless 后缀（"png"）不再退化 FILE 图标、点击预览不再误判（file/upload 的 getFileType 与 isImageItem 三处）
+* **form:** textSuffixes 中 html 补前导点，与全表口径一致（.html 此前不在 fileSuffixes 内）
+
 ### [0.1.124](https://github.com/KDJack/el-plus-crud/compare/v0.1.123...v0.1.124) (2026-08-15)
 
 

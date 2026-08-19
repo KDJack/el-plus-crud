@@ -16,12 +16,22 @@ export const TYPE_META: Record<string, { cls: string; label: string }> = {
 }
 
 /**
+ * suffix 归一化：小写 + 统一前导点（'.png'）。
+ * 后端/调用方存在 dotless（"png"）口径，而后缀表（imageSuffixes/suffixTypes）全带点，
+ * dotless 匹配必失败 → 图片退化 FILE 图标 / 预览误判。getFileType 与 Upload.isImageItem 共用。
+ */
+export function normalizeSuffix(suffix: any): string {
+  const s = (suffix || '').toString().toLocaleLowerCase()
+  return s && !s.startsWith('.') ? '.' + s : s
+}
+
+/**
  * 取文件类型 key（img/pdf/word/excel/ppt/txt/zip/file）
  * 兼容 IOssInfo 与 el-upload 内部 file：suffix 优先取业务字段，缺失则从文件名提取扩展名兜底，
  * 否则类型图标会全部退化成 file
  */
 export function getFileType(file: any): string {
-  let suffix = (file?.suffix || file?.raw?.suffix || '').toLocaleLowerCase()
+  let suffix = normalizeSuffix(file?.suffix || file?.raw?.suffix || '')
   if (!suffix) {
     const name = (file?.name || file?.raw?.name || '').toLowerCase()
     const dot = name.lastIndexOf('.')

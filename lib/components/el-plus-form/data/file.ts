@@ -41,7 +41,7 @@ export const textTypes = ['application/xml', 'application/x-sh', 'application/js
 /**
  * 能够上传的文档后缀名称
  */
-export const textSuffixes = ['.xml', '.sh', '.json', '.js', '.class', '.jar', 'html', '.txt', '.wdb', '.wps']
+export const textSuffixes = ['.xml', '.sh', '.json', '.js', '.class', '.jar', '.html', '.txt', '.wdb', '.wps']
 
 /**
  * 能够上传的文档类型

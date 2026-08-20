@@ -19,6 +19,8 @@
 
     <!-- 图片预览 -->
     <el-image-viewer v-if="showPreview" @close="showPreview = false" teleported :initialIndex="previewIndex" :url-list="previewList" />
+    <!-- 非图片附件预览：抽屉内嵌 iframe -->
+    <FilePreviewDrawer ref="previewDrawerRef" />
   </div>
 </template>
 <script lang="ts">
@@ -31,10 +33,10 @@ export default {
 </script>
 <script lang="ts" setup>
 import { ref, computed } from 'vue'
-import { ElMessage } from 'element-plus'
 import { Download } from '@element-plus/icons-vue'
 import { IOssInfo } from '../../../../types'
 import { typeClass, typeLabel, isImageFile, isImageItem, getImageUrl, formatSize, downloadFile } from './fileType'
+import FilePreviewDrawer from './FilePreviewDrawer.vue'
 
 const props = defineProps<{
   modelValue?: Array<IOssInfo>
@@ -58,21 +60,19 @@ const previewList = computed(() =>
     .filter(Boolean)
 )
 
+// 非图片预览抽屉（desc.previewDrawer 控制：默认抽屉 iframe，false 回退新窗口，对象可调 size/title）
+const previewDrawerRef = ref()
+
 /**
- * 卡片点击：图片 → 图片查看器；非图片 → window.open(previewUrl) 在线预览。
- * 与 ElPlusFormUpload.handelPreview 对齐：非图片取 previewUrl，缺失则提示。
+ * 卡片点击：图片 → 图片查看器；非图片 → 抽屉内嵌 iframe 在线预览。
+ * 与 ElPlusFormUpload.handelPreview 对齐：取址/提示/回退逻辑收编在 FilePreviewDrawer.openPreview。
  */
 function handleCardClick(item: any) {
   if (isImageItem(item)) {
     previewIndex.value = Math.max(0, previewList.value.indexOf(getImageUrl(item)))
     showPreview.value = true
   } else {
-    const url = item.raw?.previewUrl || item.previewUrl
-    if (url) {
-      window.open(url, '_blank', 'noopener,noreferrer')
-    } else {
-      ElMessage.warning('暂无预览地址')
-    }
+    previewDrawerRef.value?.openPreview(item, props.desc.previewDrawer)
   }
 }
 </script>

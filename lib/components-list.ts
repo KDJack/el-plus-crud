@@ -38,6 +38,7 @@ import ElPlusFormTree from './components/el-plus-form/components/ElPlusFormTree.
 import ElPlusFormTreeSelect from './components/el-plus-form/components/ElPlusFormTreeSelect.vue'
 import ElPlusFormUpbtn from './components/el-plus-form/components/ElPlusFormUpbtn.vue'
 import ElPlusFormUpload from './components/el-plus-form/components/ElPlusFormUpload.vue'
+import FilePreviewDrawer from './components/el-plus-form/components/FilePreviewDrawer.vue'
 
 export default [
    ElPlusFormArea,
@@ -80,4 +81,5 @@ export default [
    ElPlusFormTreeSelect,
    ElPlusFormUpbtn,
    ElPlusFormUpload,
+   FilePreviewDrawer,
 ] as any[]

@@ -72,6 +72,8 @@ export type IDescItem = {
   style?: IBaseObj | ((data?: any) => IBaseObj)
   // 事件
   on?: { [key: string]: Function }
+  // 非图片附件预览方式（upload/file 组件）：不传默认抽屉内嵌 iframe；false 回退新窗口；对象可调 size/title（抽屉无 header，title 仅作 iframe 无障碍标签）
+  previewDrawer?: boolean | { size?: string; title?: string }
   // 查看详情
   linkId?: string | ((val: any, formData: any) => string)
   linkType?: string | ((val: any, formData: any) => string)

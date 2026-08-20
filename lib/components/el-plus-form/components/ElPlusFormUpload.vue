@@ -40,6 +40,9 @@
     <!-- 图片查看的站位标签 -->
     <el-image-viewer v-if="showPreview" @close="showPreview = false" teleported :initialIndex="previewIndex" :url-list="previewList" />
 
+    <!-- 非图片附件预览：抽屉内嵌 iframe -->
+    <FilePreviewDrawer ref="previewDrawerRef" />
+
     <div v-if="!attrs.autoUpload" class="upload-hands-submit">
       <el-button style="margin-left: 10px" size="small" type="success" @click="submit" :disabled="attrs.disabled"> 上传到服务器 </el-button>
     </div>
@@ -61,6 +64,7 @@ import { Plus } from '@element-plus/icons-vue'
 
 import * as fileTypes from '../data/file'
 import { normalizeSuffix } from './fileType'
+import FilePreviewDrawer from './FilePreviewDrawer.vue'
 
 // 引入图标
 import excel from '../images/icon/excel.png'
@@ -362,8 +366,12 @@ function handelListChange(item: any, type: 0 | 1) {
   nextTick(() => emits('validateThis'))
 }
 
+// 非图片预览抽屉（desc.previewDrawer 控制：默认抽屉 iframe，false 回退新窗口，对象可调 size/title）
+const previewDrawerRef = ref()
+
 /**
- * 浏览图片
+ * 浏览图片 / 预览附件
+ * 图片 → 图片查看器；非图片 → 抽屉内嵌 iframe 在线预览，取址/提示/回退逻辑收编在 FilePreviewDrawer.openPreview
  * @param file
  */
 function handelPreview(file: any) {
@@ -375,12 +383,7 @@ function handelPreview(file: any) {
     }
     showPreview.value = true
   } else {
-    const url = file.raw?.previewUrl || file.previewUrl
-    if (url) {
-      window.open(url, '_blank', 'noopener,noreferrer')
-    } else {
-      ElMessage.warning('暂无预览地址')
-    }
+    previewDrawerRef.value?.openPreview(file, props.desc.previewDrawer)
   }
 }
 

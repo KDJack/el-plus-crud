@@ -232,7 +232,8 @@ const formGroupConfig = ref({
       formDesc: {
         fileImgs: { type: 'file', label: '产品图片', colspan: 2 },
         fileMixed: { type: 'file', label: '图文混合', colspan: 2 },
-        fileDocs: { type: 'file', label: '文档合集', colspan: 2 },
+        // previewDrawer 对象配置：非图片点击抽屉宽度 80%、标题固定「附件预览」；不传默认 40%/文件名
+        fileDocs: { type: 'file', label: '文档合集', colspan: 2, previewDrawer: { size: '80%', title: '附件预览' } },
         fileEmpty: { type: 'file', label: '空数据示例' }
       } as IFormDesc
     },

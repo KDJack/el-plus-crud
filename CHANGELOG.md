@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.127](https://github.com/KDJack/el-plus-crud/compare/v0.1.126...v0.1.127) (2026-08-20)
+
+
+### Features
+
+* **form:** file/upload 非图片附件预览改为抽屉内嵌 iframe ([c3d46cb](https://github.com/KDJack/el-plus-crud/commit/c3d46cb76c417d7d9c19b60fbc72a8d16db54ad4))
+
+
+### Bug Fixes
+
+* **form:** tag 组件 v-model 类型放宽为 any，兼容表格单元格绑定对象/数组原始值 ([522ba27](https://github.com/KDJack/el-plus-crud/commit/522ba27459ee679b31cfffdbc48d1d4a98588f3d))
+* **form:** upload 上传项补落 previewUrl/shareUrl，附件预览不再回退原始地址 ([63a5388](https://github.com/KDJack/el-plus-crud/commit/63a53888d89cb78152c0ae8d723e9c896c471705))
+
 ### [0.1.126](https://github.com/KDJack/el-plus-crud/compare/v0.1.124...v0.1.126) (2026-08-19)
 
 

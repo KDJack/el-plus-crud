@@ -211,12 +211,30 @@ const columns: Array<IColumnItem> = [
 
 When `tbName` is set, column show/hide settings are persisted to localStorage with key `{storagePrefix}{tbName}`.
 
+### Query State Cache (cacheQuery)
+
+Restore search conditions and pagination when the user navigates back to the list page (list → detail → back), then re-fetch fresh data automatically.
+
+```html
+<ElPlusTable cacheQuery="uniqueListKey" :tableConfig="tableConfig" />
+<!-- or: cache-query + tableConfig.tbName used as the cache key -->
+```
+
+- `cacheQuery: string` — explicit cache key (globally unique per table, required for multiple cached tables on one page)
+- `cacheQuery: true` — use `tableConfig.tbName` as the cache key
+- Restored state: search form values, pagination (`current`/`size`), active tab (`tableConfig.tabConf`), and the collapse state of the search form (`toolbar.collapsible`).
+- Back navigation is detected via `popstate` (browser back button / `router.back()`). No router dependency inside the library.
+- Snapshots are in-memory only: F5 refresh resets to defaults; no serialization issues with dates/arrays.
+- Detail pages should return via `router.back()`; `router.push('/list')` is treated as a fresh entry (reset).
+- Not active for `isDialog` tables or `isStorePageData` (accumulate-page) mode.
+
 ### Expose Methods
 
 ```typescript
 const tableRef = ref()
 
 await tableRef.value.reload()           // Reload data (reset to page 1)
+await tableRef.value.refresh()          // Re-fetch keeping current search + page (e.g. on keep-alive onActivated)
 tableRef.value.tableData               // Current page data
 tableRef.value.changeSelect(items, true)  // Select rows
 tableRef.value.resetSelect()           // Reset selection

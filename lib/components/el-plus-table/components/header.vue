@@ -96,6 +96,10 @@ const props = withDefaults(
     layoutSelect?: boolean
     initLoad?: boolean
     isInitLoad?: boolean
+    // cacheQuery返回恢复时回填的折叠状态初值
+    defaultCollapsed?: boolean
+    // cacheQuery返回恢复时回填的布局初值（DIYMain模式）
+    defaultLayout?: string
   }>(),
   { tbName: '', isDialog: false, loading: false, isShowRefresh: true }
 )
@@ -105,6 +109,22 @@ const settingColumnRef = ref()
 const layoutType = ref('card')
 const isCollapsed = ref(true)
 const totalFormRows = ref(0)
+
+// cacheQuery 返回恢复：初值可能在挂载后才送达（popstate 异步确认），用 immediate watch 兼容两种时序
+watch(
+  () => props.defaultCollapsed,
+  (val) => {
+    if (val !== undefined) isCollapsed.value = val
+  },
+  { immediate: true }
+)
+watch(
+  () => props.defaultLayout,
+  (val) => {
+    if (val) layoutType.value = val
+  },
+  { immediate: true }
+)
 
 const headerBtns = computed(() => {
   const btns = [] as any[]
@@ -406,7 +426,7 @@ watch(
   { deep: true }
 )
 
-defineExpose({ getData: () => elPlusFormRef.value?.getData(), initCol, resetQuery: handelReset })
+defineExpose({ getData: () => elPlusFormRef.value?.getData(), initCol, resetQuery: handelReset, isCollapsed, layoutType })
 </script>
 <style lang="scss">
 .el-plus-table-header-info {

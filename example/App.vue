@@ -1,6 +1,9 @@
 <template>
   <el-config-provider :locale="zhCn">
     <div class="layout-padding">
+      <p style="margin-bottom: 10px">
+        <router-link to="/demo-list">列表状态保留（cacheQuery）演示 →</router-link>
+      </p>
       <!-- <ElPlusTable ref="listTableRef" :tableConfig="tableConfig" colMinWidth="100px" :isIndex="false" headerAlign="center"></ElPlusTable> -->
 
       <ElPlusFormGroup v-model="formData" :formGroup="formGroupConfig">

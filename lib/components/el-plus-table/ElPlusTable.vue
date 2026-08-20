@@ -24,6 +24,8 @@
       @layoutChange="handelLayoutChange"
       :initLoad="initLoad"
       :isInitLoad="isInitLoad"
+      :defaultCollapsed="headerRestore.collapsed"
+      :defaultLayout="headerRestore.layout"
     />
 
     <!-- tabTop插槽 -->
@@ -119,10 +121,12 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { ref, reactive, onMounted, computed, watch, nextTick, useSlots, inject, provide } from 'vue'
+import { ref, reactive, onMounted, onBeforeUnmount, computed, watch, nextTick, useSlots, inject, provide } from 'vue'
 import EleTabletHeader from './components/header.vue'
 import ElPlusTableColumn from './ElPlusTableColumn.vue'
 import { handelListColumn, is, isEqual } from '../../util'
+import { getQuerySnapshot, saveQuerySnapshot, wasRecentBackNav, waitForBackNav } from '../../util/queryCache'
+import type { IQuerySnapshot } from '../../util/queryCache'
 import { Loading } from '@element-plus/icons-vue'
 import type { TableColumnCtx } from 'element-plus'
 import { ICRUDConfig, ITableConfig, ITableTabItem, ITreeProps } from '../../../types'
@@ -182,6 +186,8 @@ const props = withDefaults(
     initLoad?: boolean
     // 是否存储分页数据-主要是给DIYMain用的
     isStorePageData?: boolean
+    // 是否缓存查询状态（返回本页时恢复筛选和分页）。传字符串作为缓存key，或true时使用tableConfig.tbName作为key
+    cacheQuery?: boolean | string
   }>(),
   {
     modelValue: null,
@@ -200,7 +206,8 @@ const props = withDefaults(
     isTempId: true,
     loading: false,
     initLoad: true,
-    isStorePageData: false
+    isStorePageData: false,
+    cacheQuery: false
   }
 )
 
@@ -265,6 +272,40 @@ const compLoading = computed(() => props.loading || localLoading.value)
 
 // 数据
 let toolFormData = reactive({} as any)
+
+// 查询状态缓存key：cacheQuery传字符串直接用，否则取tbName
+const cacheQueryKey = typeof props.cacheQuery === 'string' ? props.cacheQuery : props.cacheQuery === true ? props.tableConfig?.tbName || '' : ''
+if (props.cacheQuery === true && !props.tableConfig?.tbName && defaultConf.debug) {
+  // eslint-disable-next-line no-console
+  console.warn('[el-plus-crud] cacheQuery 开启但未提供 key：请传字符串或配置 tableConfig.tbName')
+}
+// 是否可缓存（弹框/累加分页模式不参与）
+const canCacheQuery = !!cacheQueryKey && !props.isDialog && !props.isStorePageData
+// 恢复快照后首次加载保持页码不重置的一次性标记
+let keepPageOnNextLoad = false
+// header 内部状态（折叠/布局）的恢复值，作为初值传给 header
+const headerRestore = reactive({ collapsed: undefined as boolean | undefined, layout: '' })
+
+// 应用快照：筛选表单 + 分页（写入toolFormData供pageInfo初始化读取）+ tab + 折叠/布局
+function applyQuerySnapshot(snapshot: IQuerySnapshot) {
+  Object.assign(toolFormData, snapshot.form, { current: snapshot.current, size: snapshot.size })
+  if (snapshot.tab !== undefined && props.tableConfig?.tabConf) tableTabVal.value = snapshot.tab
+  if (snapshot.collapsed !== undefined) headerRestore.collapsed = snapshot.collapsed
+  // 布局仅DIYMain模式有意义；isShowDIYMain是真正的视图状态，需与radio选中态一起恢复
+  if (snapshot.layout && props.isDIYMain) {
+    headerRestore.layout = snapshot.layout
+    isShowDIYMain.value = snapshot.layout === 'card'
+  }
+}
+
+// 返回本页时（popstate识别）恢复上次筛选和分页，之后照常自动查询即拿到最新数据。
+// 浏览器返回按钮：popstate 先于挂载，这里同步恢复（赶在下方 pageInfo 初始化前注入分页）
+const pendingSnapshot = canCacheQuery ? getQuerySnapshot(cacheQueryKey) : undefined
+if (pendingSnapshot && wasRecentBackNav()) {
+  applyQuerySnapshot(pendingSnapshot)
+  keepPageOnNextLoad = true
+}
+
 const tableData = ref((props.modelValue || []) as any[])
 const haveClassRowList = reactive([])
 
@@ -282,6 +323,19 @@ const pageInfo = reactive({
   total: 0,
   size: !props.isDialog && toolFormData.size ? parseInt(toolFormData.size as any) : props.pageSize
 })
+
+// vue-router 的 back() 是乐观导航：组件挂载先于 popstate 到达，此时无法同步判断是否返回导航。
+// 等待短暂的 popstate 窗口再决定是否恢复，首次查询（loadData）会 await 该决策，保证恢复先于请求。
+const restoreReady = (() => {
+  if (!pendingSnapshot || keepPageOnNextLoad) return Promise.resolve()
+  return waitForBackNav().then((isBack) => {
+    if (!isBack) return
+    applyQuerySnapshot(pendingSnapshot)
+    pageInfo.current = pendingSnapshot.current
+    pageInfo.size = pendingSnapshot.size
+    keepPageOnNextLoad = true
+  })
+})()
 // 数型解析
 const treeProps = (props.tableConfig?.explan?.treeProps || { children: 'children', hasChildren: 'hasChildren' }) as ITreeProps
 
@@ -699,6 +753,8 @@ function handelTreeIndex(list: any[], pIndexList: number[]) {
  * @param isInit
  */
 async function loadData(isInit: Boolean) {
+  // 先等返回恢复决策完成（无待恢复快照时立即通过）
+  await restoreReady
   if (!props.tableConfig.fetch) {
     loadingStatus.value = 2
     // if (props.modelValue) {
@@ -710,7 +766,12 @@ async function loadData(isInit: Boolean) {
   loadingStatus.value = 1
   localLoading.value = true
   if (isInit) {
-    pageInfo.current = 1
+    // 恢复快照后的首次查询保持页码
+    if (keepPageOnNextLoad) {
+      keepPageOnNextLoad = false
+    } else {
+      pageInfo.current = 1
+    }
     if (props.isStorePageData) {
       tableData.value = []
     }
@@ -920,7 +981,29 @@ onMounted(() => {
   }
 })
 
-defineExpose({ tableRef: elPlusTableRef, reload, tableData, changeSelect, resetSelect, initCol, resetQuery, nextPage, hasNextPage })
+// 离开本页时保存查询状态快照（仅返回导航回来时才会恢复）
+onBeforeUnmount(() => {
+  if (canCacheQuery) {
+    saveQuerySnapshot(cacheQueryKey, {
+      form: lodash.cloneDeep(toolFormData),
+      current: pageInfo.current,
+      size: pageInfo.size,
+      tab: tableTabVal.value,
+      collapsed: tableHeaderRef.value?.isCollapsed,
+      layout: tableHeaderRef.value?.layoutType
+    })
+  }
+})
+
+/**
+ * 保持当前筛选和分页重新查询最新数据
+ */
+async function refresh() {
+  await loadData(false)
+  return tableData.value
+}
+
+defineExpose({ tableRef: elPlusTableRef, reload, tableData, refresh, changeSelect, resetSelect, initCol, resetQuery, nextPage, hasNextPage })
 </script>
 <style lang="scss">
 .dark .el-plus-table-content {

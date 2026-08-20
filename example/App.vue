@@ -281,7 +281,7 @@ const formGroupConfig = ref({
       } as IFormDesc
     },
     {
-      // Tree 测试：左侧独立模式（checkStrictly，父/子独立、无半选），右侧级联模式（默认）对比
+      // Tree 测试：左侧独立模式（checkStrictly，勾父级联子集+勾子集联动父级，取消子集不影响父级、无半选），右侧级联模式（默认）对比
       title: 'Tree 测试（勾选 / 半选 / 全选）',
       column: 2,
       formDesc: {

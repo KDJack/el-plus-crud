@@ -99,6 +99,27 @@ function cascadeSelect(node: any, checked: boolean, checkedIds: Set<string>, cfg
   }
 }
 
+/** 独立模式（checkStrictly）：父级勾选/取消时向下级联所有后代（含中间父级），父级状态不随子集推导 */
+function cascadeSelectAllNodes(node: any, checked: boolean, cfg: TreeConfig): void {
+  for (const child of getChildren(node, cfg)) {
+    if (!isForceControlled(child, cfg)) child._checked = checked
+    cascadeSelectAllNodes(child, checked, cfg)
+  }
+}
+
+/** 独立模式（checkStrictly）：勾选子集时向上联动，将目标节点的所有祖先置为勾选（取消子集不影响父级） */
+function checkAncestors(nodes: any[], targetNode: any, cfg: TreeConfig): boolean {
+  for (const node of nodes) {
+    if (node === targetNode) return true
+    const children = getChildren(node, cfg)
+    if (children.length && checkAncestors(children, targetNode, cfg)) {
+      if (!isForceControlled(node, cfg)) node._checked = true
+      return true
+    }
+  }
+  return false
+}
+
 function recalcAllParents(nodes: any[], cfg: TreeConfig): void {
   for (const node of nodes) {
     const children = getChildren(node, cfg)
@@ -366,6 +387,8 @@ function toggleCheck(node: any, checked: boolean): boolean {
   if (isLeaf) {
     if (checked && c.maxCount < Infinity && checkedLeafCount.value >= c.maxCount) return false
     syncIdInTree(options.value, id, checked, c)
+    // 独立模式：勾选子集时向上联动所有祖先（取消子集不影响父级）
+    if (!cascadeMode.value && checked) checkAncestors(options.value, node, c)
   } else {
     if (cascadeMode.value) {
       const currentChecked = new Set(collectCheckedLeafIds(options.value, c))
@@ -373,7 +396,10 @@ function toggleCheck(node: any, checked: boolean): boolean {
       const newCheckedIds = new Set(collectCheckedLeafIds(options.value, c))
       batchSyncChecked(options.value, newCheckedIds, c)
     } else {
+      // 独立模式（checkStrictly）：勾/取消向下级联所有后代；勾选时向上联动祖先，取消子集不影响父级
       if (!isForceControlled(node, c)) node._checked = checked
+      cascadeSelectAllNodes(node, checked, c)
+      if (checked) checkAncestors(options.value, node, c)
     }
   }
   if (cascadeMode.value) recalcAllParents(options.value, c)

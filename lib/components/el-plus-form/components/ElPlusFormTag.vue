@@ -21,7 +21,8 @@ import { isPromiseLike } from '../../../util'
 const format = inject('format') as any
 
 const props = defineProps<{
-  modelValue?: string | number | '' | null
+  // 表格单元格上下文 ColumnItem 以 v-model 绑 row[prop] 原始值，对象/数组合法（对齐 ElPlusFormText）
+  modelValue?: any
   field?: string
   loading?: boolean
   desc: { [key: string]: any }

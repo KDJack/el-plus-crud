@@ -341,6 +341,10 @@ function handelListChange(item: any, type: 0 | 1) {
       name: item.name,
       furl: item.raw.furl || item.furl || item.url,
       url: isImageType.value ? getFileIcon(item.raw) : item?.raw?.shareUrl || item.url,
+      // 签名结果须随数据落库：归一化 watch 会用新数组替换 el-upload 内部 uploadFiles（无 raw），
+      // 若此处丢失 previewUrl/shareUrl，归一化的 || item.furl 兜底会把预览地址回填成原始地址
+      previewUrl: item.raw?.previewUrl || item.previewUrl || '',
+      shareUrl: item.raw?.shareUrl || item.shareUrl || '',
       fsize: item.size,
       uid: item.uid,
       mimeType: item.raw?.type,
@@ -563,7 +567,8 @@ watch(
                 item.furl = item.furl || getFileIcon(item)
               }
               item.suffix = `${(item.suffix || item.url?.substring(item.url?.lastIndexOf('.') || 0) || '').toLocaleLowerCase()}`.split('?')[0]
-              item.previewUrl = getValue(defaultConf.upload?.signMap?.previewUrlKey || [], item) || item.furl || item.url
+              // 已有 previewUrl（新上传 push 项/业务回显项）优先于 furl 兜底，避免预览地址被原始地址覆盖
+              item.previewUrl = getValue(defaultConf.upload?.signMap?.previewUrlKey || [], item) || item.previewUrl || item.furl || item.url
               return item
             })
           : []

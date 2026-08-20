@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.128](https://github.com/KDJack/el-plus-crud/compare/v0.1.127...v0.1.128) (2026-08-20)
+
+
+### Features
+
+* **form:** tree 组件 checkStrictly 模式支持勾选双向联动 ([3f4b592](https://github.com/KDJack/el-plus-crud/commit/3f4b592ff78add47a689b1dbd481f35af918fe3a))
+
 ### [0.1.127](https://github.com/KDJack/el-plus-crud/compare/v0.1.126...v0.1.127) (2026-08-20)
 
 

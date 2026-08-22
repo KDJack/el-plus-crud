@@ -35,9 +35,9 @@
 
     <!-- 中部的Tabs -->
     <div class="table-tabs-panel" v-if="tableConfig?.tabConf?.tabs?.length">
-      <el-radio-group v-model="tableTabVal" :size="size" @change="handelTabChange">
+      <el-radio-group v-model="tableTabVal" :size="size" :disabled="compLoading" @change="handelTabChange">
         <template v-for="(item, i) in tableConfig.tabConf?.tabs" :key="i">
-          <el-radio-button :value="item.value" :label="item.value" :loading="compLoading">
+          <el-radio-button :value="item.value" :label="item.value">
             {{ item.label }}
             <template v-if="loadingTab && compLoading">
               <el-icon class="is-loading"><Loading /></el-icon>

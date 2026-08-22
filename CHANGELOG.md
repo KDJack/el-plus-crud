@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.132](https://github.com/KDJack/el-plus-crud/compare/v0.1.131...v0.1.132) (2026-08-22)
+
+
+### Features
+
+* **form:** textarea quickFill 候选词由 el-tag 改为 el-button 朴素按钮 ([d665b60](https://github.com/KDJack/el-plus-crud/commit/d665b607d781090cae5981692af2613b3664b0e9))
+
+
+### Bug Fixes
+
+* **table:** Tab loading 期间禁用切换，移除 radio-button 无效 loading 属性 ([822043f](https://github.com/KDJack/el-plus-crud/commit/822043f683b95f865e409190e76a0aff69761308))
+
 ### [0.1.131](https://github.com/KDJack/el-plus-crud/compare/v0.1.130...v0.1.131) (2026-08-22)
 
 

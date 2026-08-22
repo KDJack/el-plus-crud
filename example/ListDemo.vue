@@ -67,8 +67,8 @@ const tableConfig = ref({
           type: 'select',
           label: '类型',
           options: [
-            { l: '类型A', v: 0 },
-            { l: '类型B', v: 1 }
+            { label: '类型A', value: '0' },
+            { label: '类型B', value: '1' }
           ]
         },
         code: { type: 'input', label: '编码' },

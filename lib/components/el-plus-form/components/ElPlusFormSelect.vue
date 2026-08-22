@@ -1,5 +1,5 @@
 <template>
-  <el-select v-if="isInit" class="el-plus-form-select" :class="desc.class" :style="desc.style" :disabled="disabled" v-bind="attrs" v-model="currentValue" :loading="loading" v-on="onEvents">
+  <el-select v-if="isInit" ref="selectRef" class="el-plus-form-select" :class="desc.class" :style="desc.style" :disabled="disabled" v-bind="attrs" v-model="currentValue" :loading="loading" v-on="onEvents">
     <template v-for="(option, i) in options" :key="i">
       <el-option v-if="option && option.value" v-bind="option">
         <div class="el-plus-form-select-options">
@@ -48,6 +48,7 @@ const emits = defineEmits(['update:modelValue'])
 const currentValue = useVModel(props, 'modelValue', emits)
 
 const attrs = ref({} as any)
+const selectRef = ref()
 const options = reactive([] as any[])
 // remote 场景 options 易变（focus 重查/clear 整体替换），选中瞬间 options.find(item.value===currentValue)
 // 可能落空，致 on.change 第二参 undefined。维护历史 option 累计映射，find 失败时回退，保证第二参稳定。
@@ -88,6 +89,12 @@ const onEvents = computed(() => {
         })
       }
     })
+  }
+  // 选中候选项后自动失焦（仅 filterable 单选；多选下拉需保持展开连续选择）
+  const userChange = tempOn.change
+  tempOn.change = () => {
+    if (attrs.value.filterable && !attrs.value.multiple) blurIfFilterable()
+    userChange?.()
   }
   // 这里要判断下数据清空
   tempOn.clear = clear
@@ -152,6 +159,13 @@ function initDefault() {
   }
 }
 
+/**
+ * filterable 选中/清空后自动失焦，避免光标滞留输入框导致再次点击下拉无效
+ */
+function blurIfFilterable() {
+  if (attrs.value.filterable) nextTick(() => selectRef.value?.blur())
+}
+
 function clear() {
   isClear.value = true
   props.desc?.on?.clear && typeof props.desc?.on?.clear === 'function' && props.desc.on.clear()
@@ -160,6 +174,8 @@ function clear() {
   if (props.desc.remote) {
     options.splice(0, options.length)
   }
+  // 清空后自动失焦（单选多选都处理）
+  blurIfFilterable()
 }
 
 onBeforeMount(async () => {

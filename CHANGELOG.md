@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.131](https://github.com/KDJack/el-plus-crud/compare/v0.1.130...v0.1.131) (2026-08-22)
+
+
+### Features
+
+* **table:** 新增 cacheQuery，返回列表时恢复筛选/分页/Tab/折叠状态并重查最新数据 ([e2500c0](https://github.com/KDJack/el-plus-crud/commit/e2500c0fdfc00b0a8f7b22ef3c34eb898e9edd6d))
+
 ### [0.1.130](https://github.com/KDJack/el-plus-crud/compare/v0.1.129...v0.1.130) (2026-08-20)
 
 ### [0.1.129](https://github.com/KDJack/el-plus-crud/compare/v0.1.128...v0.1.129) (2026-08-20)

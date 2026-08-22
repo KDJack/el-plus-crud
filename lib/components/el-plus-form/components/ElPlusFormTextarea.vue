@@ -1,7 +1,7 @@
 <template>
   <el-input v-if="isInit" :class="desc.class" :style="desc.style" type="textarea" v-bind="attrs" :disabled="disabled" v-model="currentValue" v-on="onEvents"> </el-input>
   <div v-if="quickFillItems.length" class="el-plus-form-textarea-quickfill">
-    <el-tag v-for="(text, index) in quickFillItems" :key="index" type="info" @click="onQuickFill(text)">{{ text }}</el-tag>
+    <el-button v-for="(text, index) in quickFillItems" :key="index" type="info" size="small" plain @click="onQuickFill(text)">{{ text }}</el-button>
   </div>
 </template>
 <script lang="ts">
@@ -108,9 +108,14 @@ watch(
   align-items: center;
   flex-wrap: wrap;
   margin-top: 10px;
-  .el-tag {
+  .el-button {
     margin-right: 10px;
+    margin-bottom: 6px;
     cursor: pointer;
+    // EP 相邻按钮自带 margin-left: 12px，与 margin-right 叠加会双倍间距
+    + .el-button {
+      margin-left: 0;
+    }
   }
 }
 </style>

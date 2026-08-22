@@ -24,6 +24,9 @@ import { IFormBack, IFormDesc, IFormGroupConfig, ITableConfig } from 'types'
 
 let formData = reactive({
   name: '',
+  remark: '',
+  remarkObj: '',
+  remarkDyn: '',
   transferField: [] as Array<string | number>,
   // ===== 上传字段初始回显数据（IOssInfo[]，用于演示卡片式回显）=====
   logo: [{ name: '企业Logo.png', url: 'https://picsum.photos/200/200', furl: 'https://picsum.photos/200/200', suffix: '.png', fsize: 524288, uid: 101 }],
@@ -241,9 +244,21 @@ const formGroupConfig = ref({
       } as IFormDesc
     },
     {
-      title: '备注信息',
+      // textarea 快捷填充 quickFill：静态数组 / {l,v} 对象 / 函数式动态，点击候选词追加到末尾（自动补分隔符）
+      title: '备注信息（quickFill 快捷填充）',
       formDesc: {
-        remark: { type: 'textarea', label: '备注', colspan: 2, required: true }
+        // 1. 静态字符串数组
+        remark: { type: 'textarea', label: '静态候选', colspan: 2, required: true, quickFill: ['情况属实', '材料齐全', '已现场核验'] },
+        // 2. {label, value} 对象数组：候选按钮展示 label，点击追加 label 文本
+        remarkObj: { type: 'textarea', label: '对象候选', colspan: 2, quickFill: [{ label: '手续齐全' }, { label: '证件有效' }] },
+        // 3. 函数式 (formData, field) => array：按表单数据动态返回候选词；quickFillSeparator 自定义追加分隔符（默认全角逗号）
+        remarkDyn: {
+          type: 'textarea',
+          label: '动态候选',
+          colspan: 2,
+          quickFillSeparator: '、',
+          quickFill: (data: any) => (data.name ? [`${data.name}确认无误`, '信息一致'] : ['请先填写名称'])
+        }
       } as IFormDesc
     },
     {

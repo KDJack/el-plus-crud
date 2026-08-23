@@ -287,9 +287,15 @@ let keepPageOnNextLoad = false
 const headerRestore = reactive({ collapsed: undefined as boolean | undefined, layout: '' })
 
 // 应用快照：筛选表单 + 分页（写入toolFormData供pageInfo初始化读取）+ tab + 折叠/布局
+// 恢复的 tab 记入 restoredTab：消费页常以 @tab-change 驱动列 vif 等派生状态，程序化改 tableTabVal 不触发
+// el-radio-group 的 change——快照恢复须补发一次 tabChange（挂载后，见 restoreReady），否则返回本页后页面状态停在默认 tab
+let restoredTab: string | number | boolean | undefined
 function applyQuerySnapshot(snapshot: IQuerySnapshot) {
   Object.assign(toolFormData, snapshot.form, { current: snapshot.current, size: snapshot.size })
-  if (snapshot.tab !== undefined && props.tableConfig?.tabConf) tableTabVal.value = snapshot.tab
+  if (snapshot.tab !== undefined && props.tableConfig?.tabConf) {
+    tableTabVal.value = snapshot.tab
+    restoredTab = snapshot.tab
+  }
   if (snapshot.collapsed !== undefined) headerRestore.collapsed = snapshot.collapsed
   // 布局仅DIYMain模式有意义；isShowDIYMain是真正的视图状态，需与radio选中态一起恢复
   if (snapshot.layout && props.isDIYMain) {
@@ -327,13 +333,22 @@ const pageInfo = reactive({
 // vue-router 的 back() 是乐观导航：组件挂载先于 popstate 到达，此时无法同步判断是否返回导航。
 // 等待短暂的 popstate 窗口再决定是否恢复，首次查询（loadData）会 await 该决策，保证恢复先于请求。
 const restoreReady = (() => {
-  if (!pendingSnapshot || keepPageOnNextLoad) return Promise.resolve()
+  // 快照恢复过 tab 时补发 tabChange（nextTick：同步恢复路径处于 setup 段，延到挂载后父组件 handler 才稳）；
+  // 只 emit 同步页面派生状态、不重查——首次查询 getListQueryData 已读恢复后的 tableTabVal 带对 tab 参数
+  const emitRestoredTab = () => {
+    if (restoredTab !== undefined) nextTick(() => emits('tabChange', restoredTab, initCol))
+  }
+  if (!pendingSnapshot || keepPageOnNextLoad) {
+    emitRestoredTab()
+    return Promise.resolve()
+  }
   return waitForBackNav().then((isBack) => {
     if (!isBack) return
     applyQuerySnapshot(pendingSnapshot)
     pageInfo.current = pendingSnapshot.current
     pageInfo.size = pendingSnapshot.size
     keepPageOnNextLoad = true
+    emitRestoredTab()
   })
 })()
 // 数型解析

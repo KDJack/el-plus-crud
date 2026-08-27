@@ -114,7 +114,8 @@ const upActionInfo = ref({} as any)
 const isImageType = computed(() => !props.desc.upType || props.desc.upType === 'image')
 // card 模式：胶囊按钮 + 文件卡片式回显（默认新风格；desc.listType 传 'picture-card'/'text' 回退老风格）
 const cardMode = computed(() => props.desc.listType !== 'picture-card' && props.desc.listType !== 'text')
-// 真实上传数量上限：card 模式下 el-upload 内部 limit 会被放大(放行失败重传)，名额判断统一用此值
+// 真实上传数量上限：与 attrs.limit 同源（multiple ? limit || 20 : 1），胶囊按钮 v-show 名额判断用；
+// 超量拦截由 el-upload 原生 limit/onExceed 负责（同值）
 const realLimit = computed(() => (props.desc.multiple ? props.desc.limit || 20 : 1))
 // 正在上传中(ready/uploading)的文件数，计入 limit 名额；失败(status=fail)不计入 → 失败即释放名额、恢复按钮
 const activeCount = ref(0)
@@ -175,9 +176,8 @@ onBeforeMount(async () => {
   if (cardMode.value) {
     attrs.value.drag = false
     attrs.value.listType = 'text'
-    // 放大 el-upload 内部 limit：失败文件会留在 uploadFiles 显示失败卡片，但不应占名额阻止重传。
-    // 真正的名额控制交给胶囊按钮 v-show（realLimit + activeCount），el-upload 自身不再 exceed 拦截。
-    attrs.value.limit = 9999
+    // limit 维持真实值：超量批次由 el-upload 原生 onExceed 整批拦截（element-plus handleError 会移除失败文件、不占名额，重传不受阻）；
+    // 胶囊按钮 v-show（realLimit + activeCount）仅用于达限时提前隐藏入口
     // el-upload 的 onChange 是 prop 回调(非 emit)，须挂到 attrs 上才能在文件状态变化时统计上传中数量
     attrs.value.onChange = onUploadChange
   }

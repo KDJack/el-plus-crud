@@ -172,14 +172,15 @@ onBeforeMount(async () => {
     }
     attrs.value.action = upAction
   }
+  // el-upload 的 onChange 是 prop 回调(非 emit)，须挂到 attrs 上才能在文件状态变化时统计上传中数量；
+  // 新老模式统一挂线：activeCount 是「在途挂起」守卫与胶囊按钮名额判断的共用数据源
+  attrs.value.onChange = onUploadChange
   // card 模式：去掉拖拽；保留 el-upload 列表（用 #file 插槽自定义卡片），以复用其上传中进度/成功/失败状态
   if (cardMode.value) {
     attrs.value.drag = false
     attrs.value.listType = 'text'
     // limit 维持真实值：超量批次由 el-upload 原生 onExceed 整批拦截（element-plus handleError 会移除失败文件、不占名额，重传不受阻）；
     // 胶囊按钮 v-show（realLimit + activeCount）仅用于达限时提前隐藏入口
-    // el-upload 的 onChange 是 prop 回调(非 emit)，须挂到 attrs 上才能在文件状态变化时统计上传中数量
-    attrs.value.onChange = onUploadChange
   }
   isInit.value = true
 })
@@ -330,7 +331,12 @@ function getFileIcon(file?: any): string {
  * @param file
  * @param fileList
  */
-function handelUploadRemove(file: any) {
+function handelUploadRemove(file: any, fileList?: any[]) {
+  // el-upload 的 handleRemove 不触发 onChange（无 emitChange），删除后须按回调自带的删除后列表重算，
+  // 防删在途文件后 activeCount 卡死、挂起的归一化永不补放。
+  // doRemove 恒传删除后列表（beforeUpload 拒绝路径经 upload-content→handleRemove→doRemove 亦然），
+  // Array.isArray 仅作旧版/变体防御
+  if (Array.isArray(fileList)) onUploadChange(file, fileList)
   handelListChange(file, 0)
 }
 
@@ -551,35 +557,62 @@ function validateFile(file: any, types: Array<any>, maxSize: number) {
   return true
 }
 
+// 归一化替换的「在途挂起」：替换会换 currentValue 引用 → :fileList 引用变化 → el-upload 内部 uploadFiles 整组替换，
+// 丢掉在途文件的包装项 → 其成功回调 getFile 落空（上传成功却不进列表）且 activeCount 卡死。
+// 父级若对 v-model 回写新引用（clone/computed 等），每次成功 push 都会触发该替换，故在途时挂起、归零后补放最终值；
+// 在途期间外部对 modelValue 的变更（如表单重置）不生效，以在途上传结果为准
+let pendingModelValue: string | Array<IOssInfo> | undefined | null = null
+
 watch(
   () => props.modelValue,
   (data: string | Array<IOssInfo> | undefined, oldData: any) => {
     if (JSON.stringify(data) !== JSON.stringify(oldData)) {
-      // 这里初始化一下
-      if (typeof data === 'string') {
-        if (data !== '') {
-          currentValue.value = [{ url: data, furl: data, suffix: `${data.substring(data.lastIndexOf('.')).toLocaleLowerCase()}`.split('?')[0] }]
-        } else {
-          currentValue.value = []
-        }
-      } else {
-        currentValue.value = Array.isArray(data)
-          ? data.map((item: IOssInfo) => {
-              if (isImageType.value) {
-                item.url = getFileIcon(item) || getValue(defaultConf.upload?.signMap?.previewUrlKey || [], item)
-                item.furl = item.furl || getFileIcon(item)
-              }
-              item.suffix = `${(item.suffix || item.url?.substring(item.url?.lastIndexOf('.') || 0) || '').toLocaleLowerCase()}`.split('?')[0]
-              // 已有 previewUrl（新上传 push 项/业务回显项）优先于 furl 兜底，避免预览地址被原始地址覆盖
-              item.previewUrl = getValue(defaultConf.upload?.signMap?.previewUrlKey || [], item) || item.previewUrl || item.furl || item.url
-              return item
-            })
-          : []
+      if (activeCount.value > 0) {
+        pendingModelValue = data
+        return
       }
+      applyModelValue(data)
+      pendingModelValue = null
     }
   },
   { immediate: true }
 )
+
+// 在途归零（最后一个 ready/uploading 文件结束）后补放挂起的归一化（放最终值即可，中间态无意义）
+watch(activeCount, (count) => {
+  if (count === 0 && pendingModelValue !== null) {
+    applyModelValue(pendingModelValue)
+    pendingModelValue = null
+  }
+})
+
+/**
+ * 归一化并整组替换 currentValue（原主 watch body）
+ * @param data
+ */
+function applyModelValue(data: string | Array<IOssInfo> | undefined) {
+  // 这里初始化一下
+  if (typeof data === 'string') {
+    if (data !== '') {
+      currentValue.value = [{ url: data, furl: data, suffix: `${data.substring(data.lastIndexOf('.')).toLocaleLowerCase()}`.split('?')[0] }]
+    } else {
+      currentValue.value = []
+    }
+  } else {
+    currentValue.value = Array.isArray(data)
+      ? data.map((item: IOssInfo) => {
+          if (isImageType.value) {
+            item.url = getFileIcon(item) || getValue(defaultConf.upload?.signMap?.previewUrlKey || [], item)
+            item.furl = item.furl || getFileIcon(item)
+          }
+          item.suffix = `${(item.suffix || item.url?.substring(item.url?.lastIndexOf('.') || 0) || '').toLocaleLowerCase()}`.split('?')[0]
+          // 已有 previewUrl（新上传 push 项/业务回显项）优先于 furl 兜底，避免预览地址被原始地址覆盖
+          item.previewUrl = getValue(defaultConf.upload?.signMap?.previewUrlKey || [], item) || item.previewUrl || item.furl || item.url
+          return item
+        })
+      : []
+  }
+}
 
 /**
  * 回显补全（v0.1.97+）：父组件 push 进来的附件对象（如详情接口返回的 FileAnnexVO）

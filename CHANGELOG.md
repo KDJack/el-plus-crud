@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.135](https://github.com/KDJack/el-plus-crud/compare/v0.1.134...v0.1.135) (2026-08-27)
+
+
+### Bug Fixes
+
+* **form:** initFormAttrs 防抖补 trailing，formDesc 整体替换后字段不再空白（leading-only 下新引用的 \_vif 初始化被静默丢弃，致 attrMapToTableList 过滤为空、整组字段不渲染）
+
 ### [0.1.134](https://github.com/KDJack/el-plus-crud/compare/v0.1.133...v0.1.134) (2026-08-27)
 
 

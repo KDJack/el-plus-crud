@@ -498,7 +498,9 @@ const initFormAttrs = lodash.debounce(
     }
   },
   100,
-  { leading: true, trailing: false }
+  // trailing 必须为 true：leading-only 防抖下，100ms 窗口内 formDesc 被整体替换（新引用无 _vif）时，
+  // 唯一一次 leading 执行落在旧引用上，新引用的调用被静默丢弃 → attrMapToTableList 过滤后为空 → 整组字段不渲染
+  { leading: true, trailing: true }
 )
 
 // 表单底部按钮

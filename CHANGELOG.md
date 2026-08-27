@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.133](https://github.com/KDJack/el-plus-crud/compare/v0.1.132...v0.1.133) (2026-08-27)
+
+
+### Bug Fixes
+
+* **el-plus-table:** cacheQuery 快照恢复 tab 后挂载补发 tabChange ([88ef946](https://github.com/KDJack/el-plus-crud/commit/88ef946aca222e2b4d7a9c2b91c3eb5ffb3c91ec))
+* **form:** select filterable 选中/清空后自动失焦，修复再次点击无法展开下拉 ([3f8c435](https://github.com/KDJack/el-plus-crud/commit/3f8c435040ce3795fdf40b59a84a71e6db0f3e85))
+
 ### [0.1.132](https://github.com/KDJack/el-plus-crud/compare/v0.1.131...v0.1.132) (2026-08-22)
 
 

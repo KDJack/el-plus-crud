@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.134](https://github.com/KDJack/el-plus-crud/compare/v0.1.133...v0.1.134) (2026-08-27)
+
+
+### Bug Fixes
+
+* **form:** upload card 模式移除 limit=9999，恢复原生超量整批拦截 ([064f1da](https://github.com/KDJack/el-plus-crud/commit/064f1da67a6e2217d51b76fdeeefe13792311bb5))
+
 ### [0.1.133](https://github.com/KDJack/el-plus-crud/compare/v0.1.132...v0.1.133) (2026-08-27)
 
 

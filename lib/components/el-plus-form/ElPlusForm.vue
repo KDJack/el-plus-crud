@@ -91,7 +91,7 @@ export default {
 </script>
 <script lang="ts" setup>
 import { ref, computed, useAttrs, nextTick, onMounted, watch, inject, Ref, useSlots } from 'vue'
-import { castArray, isMobile, time, isPromiseLike } from '../../util'
+import { castArray, isMobile, time, parseDate, isPromiseLike } from '../../util'
 import * as validates from './util/validate'
 import { typeList } from './components/index'
 import ElPlusFormBtn from './components/ElPlusFormBtn.vue'
@@ -326,7 +326,13 @@ const computedRules = computed(() => {
             case 'tree':
               rules = 'select'
               break
+            // 数组值类型：落默认 notAllBlank 只拦 undefined/''/null，空数组/全 null 数组也放行（required 失效），改用 cascader 校验
+            // 注：monthrange/yearrange 按 lib 约定配置为 type 'daterange' + elType 'monthrange'/'yearrange'（见 example），type 恒为 daterange，无需单独列出
+            case 'area':
+            case 'category':
             case 'daterange':
+            case 'timerange':
+            case 'datetimerange':
               rules = 'cascader'
               break
           }
@@ -629,8 +635,9 @@ const handelValToForm = (desc: IFormDescItem, field: string, val: any) => {
       const endTimeKey = desc.endTimeKey ? desc.endTimeKey : desc.propPrefix ? desc.propPrefix + 'EndTime' : 'endTime'
       // 解析 elType（支持动态函数，与 mixins/index.ts 一致；props.modelValue 即表单数据，等价于子组件的 formData）
       const rangeElType = typeof desc.elType === 'function' ? desc.elType(props.modelValue) : desc.elType
-      const startBase = new Date(val[0])
-      const endBase = new Date(val[1])
+      // Safari/WebKit 拒绝空格分隔的 ISO 日期串，统一走 parseDate 归一化解析（与 time() 同源）
+      const startBase = parseDate(val[0])
+      const endBase = parseDate(val[1])
       // 按 elType 规范化起止时间到所选范围的边界
       // 说明：el-date-picker 的 year 模式会用「当前月日」填充所选年（非 1 月 1 日），month 模式则规范化到 1 号，
       // 故统一用 getFullYear/getMonth 重新构造边界，不依赖 val 的具体月日

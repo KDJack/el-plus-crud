@@ -390,6 +390,37 @@ export const mapToUrlStr = (map: any, excludeList?: any) => {
 }
 
 /**
+ * 跨浏览器安全的日期解析
+ * Safari/WebKit 拒绝空格分隔的 ISO 日期串（'2000-01-01 08:00:00' → Invalid Date），
+ * 但盲目把首个空格替换成 'T' 会破坏斜杠格式/Date.toString()/前导空格等本就可解析的串，
+ * 故只对严格匹配 'YYYY-MM-DD HH:mm:ss' 形态的串做归一化，其余交原生解析兜底。
+ * 另覆盖两类原生解析不了的字面量：纯数字时间戳字符串与 'HH:mm:ss' 纯时间串。
+ * @param value Date | 时间戳(number) | 日期串 | 时间戳串 | 纯时间串
+ */
+export const parseDate = (value: any): Date => {
+  if (value instanceof Date) return value
+  if (typeof value === 'string') {
+    const str = value.trim()
+    // 时间戳字符串（'1577836800000'）：各浏览器按字符串解析行为不一致，转数字构造
+    if (/^\d+$/.test(str)) return new Date(Number(str))
+    // 纯时间串（'08:00:00'）：V8/WebKit 均为 Invalid Date，语义为"当天该时刻"
+    const timeOnly = str.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/)
+    if (timeOnly) {
+      const d = new Date()
+      d.setHours(Number(timeOnly[1]), Number(timeOnly[2]), Number(timeOnly[3] || 0), 0)
+      return d
+    }
+    // 'YYYY-MM-DD HH:mm:ss' 归一化为 'T' 分隔（Safari 不认空格分隔；斜杠/toString 等格式不匹配此则不受影响）
+    const normalized = str.replace(/^(\d{4}-\d{2}-\d{2}) /, '$1T')
+    const date = new Date(normalized)
+    if (!isNaN(date.getTime())) return date
+    // 兜底：'YYYY/MM/DD HH:mm:ss'、Date.toString() 等原生可解析格式
+    return new Date(str)
+  }
+  return new Date(value)
+}
+
+/**
  * 格式化指定时间格式
  * @param value
  * @param valueFormat
@@ -405,5 +436,5 @@ export const time = (value: any, valueFormat?: Function | string) => {
       _valueFormat = valueFormat(value) as string
     }
   }
-  return formatTime(new Date(value), _valueFormat)
+  return formatTime(parseDate(value), _valueFormat)
 }

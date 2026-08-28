@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.136](https://github.com/KDJack/el-plus-crud/compare/v0.1.134...v0.1.136) (2026-08-28)
+
+
+### Features
+
+* **form:** 预览抽屉加载遮罩，自绘扫描文档页 + 20s 慢态升级提示 ([6891c18](https://github.com/KDJack/el-plus-crud/commit/6891c18d85d33ef07243b24be3fbb958a723eb07))
+
+
+### Bug Fixes
+
+* **form:** initFormAttrs 防抖补 trailing，根治 formDesc 整体替换后整组字段空白 ([8492509](https://github.com/KDJack/el-plus-crud/commit/849250956a5e65696971496059d9687112c5ec97))
+* **form:** upload 在途挂起归一化防引用替换丢文件，onChange 统一挂线补删除重算 ([4328771](https://github.com/KDJack/el-plus-crud/commit/432877146563d89e771057029a1957350c18037e))
+
 ### [0.1.135](https://github.com/KDJack/el-plus-crud/compare/v0.1.134...v0.1.135) (2026-08-27)
 
 

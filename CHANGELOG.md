@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.137](https://github.com/KDJack/el-plus-crud/compare/v0.1.136...v0.1.137) (2026-08-28)
+
+
+### Bug Fixes
+
+* **form:** 新增 parseDate 统一日期解析，数组值类型必填补 cascader 校验 ([2264509](https://github.com/KDJack/el-plus-crud/commit/226450905241c6a4d4683c277cc11c33f457e286))
+
 ### [0.1.136](https://github.com/KDJack/el-plus-crud/compare/v0.1.134...v0.1.136) (2026-08-28)
 
 

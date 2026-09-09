@@ -107,6 +107,7 @@ export interface IFormDescItem extends IDescItem {
   defaultKey?: { value: string; label: string }
   rules?: string | Array<any>
   valueFormat?: Function | string
+  // 纯占位项（须无 type）：多列布局中占位对齐；单列(column<=1)或窄屏(移动端)下自动隐藏
   isBlank?: boolean
   colspan?: number
   rowspan?: number

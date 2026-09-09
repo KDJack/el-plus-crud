@@ -161,6 +161,8 @@ const formGroupConfig = ref({
       formDesc: {
         name: { type: 'input', label: '名项目劳资负责资负责资负责人称', required: true, attrs: { maxlength: 30 } },
         contactsName: { type: 'input', label: '联系人', required: true, attrs: { maxlength: 20 } },
+        // isBlank 纯占位项（无 type）：多列布局中占一列用于对齐——此处让下一项「项目劳资负责人」排到右列；单列(column<=1)/窄屏(移动端)下自动隐藏不留空白
+        blank1: { isBlank: true },
         contactsPhone: { type: 'select', label: '项目劳资负责资负责资负责人', options: [], tip: '带企业劳资负责人信息可修改' },
         _tempDelBtns: {
           type: 'btns',

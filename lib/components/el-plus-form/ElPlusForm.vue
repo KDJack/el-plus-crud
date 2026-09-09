@@ -371,6 +371,8 @@ const attrMapToTableList = computed(() => {
     let tempCount = 0
     tempData.map((item) => {
       if (item._vif) {
+        // 单列布局（窄屏/移动端 或 column<=1，与 gridColumnCount 同源）下跳过 isBlank 纯占位项：多列时它用于列对齐，单列下只留一行空白
+        if (!item.type && item.isBlank && gridColumnCount.value <= 1) return
         rowItemList.push(item)
         tempCount++
         if (item.colspan) {
@@ -449,7 +451,7 @@ const initFormAttrs = lodash.debounce(
             // 设置 _type
             formItem._type = compTypeList.includes(formItem.type.toLowerCase()) ? 'el-plus-form-' + formItem.type : formItem.type
             // 触发 v-if 显示 / 隐藏 设置_vif
-            formItem._vif = handelKeyValue(formItem, 'vif', field, !formItem.isBlank || true)
+            formItem._vif = handelKeyValue(formItem, 'vif', field, true)
             // 触发 disabled 禁用 / 启用 设置_disabled
             formItem._disabled = handelKeyValue(formItem, 'disabled', field, props.disabled ?? false)
             // 动态属性 attrs

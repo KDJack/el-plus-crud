@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.139](https://github.com/KDJack/el-plus-crud/compare/v0.1.138...v0.1.139) (2026-09-09)
+
 ### [0.1.138](https://github.com/KDJack/el-plus-crud/compare/v0.1.137...v0.1.138) (2026-09-09)
 
 

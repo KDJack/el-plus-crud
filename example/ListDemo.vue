@@ -30,8 +30,7 @@ const mockFetch = (query: any) => {
     name: `商品-${String(i + 1).padStart(3, '0')}`,
     type: i % 2,
     status: i % 3 === 0 ? 1 : 0,
-    updatedAt: loadedAt.value,
-    ...Object.fromEntries(Array.from({ length: 10 }, (_, k) => [`ext${k + 1}`, `数据${i + 1}-${k + 1}`]))
+    updatedAt: loadedAt.value
   }))
     .filter((item) => !query.keyword || item.name.includes(query.keyword))
     .filter((item) => query.type === undefined || query.type === '' || item.type === query.type)
@@ -97,7 +96,4 @@ const tableConfig = ref({
     }
   ]
 } as ITableConfig)
-
-// 测试横向滚动：追加10列固定宽度字段
-tableConfig.value.column.push(...Array.from({ length: 10 }, (_, i) => ({ prop: `ext${i + 1}`, label: `扩展列${i + 1}`, width: '130' })))
 </script>

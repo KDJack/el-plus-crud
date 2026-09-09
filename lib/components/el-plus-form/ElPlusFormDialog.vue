@@ -165,3 +165,13 @@ defineExpose({
   init: () => refForm.value?.init()
 })
 </script>
+<style lang="scss">
+// 窄屏兜底：固定 700px 宽的弹窗在手机上不超出视口（width 仍由用户/默认值控制，仅做上限钳制；
+// 只在窄屏生效，不钳制桌面刻意配置的超宽弹窗。断点与 util 的 MOBILE_BREAKPOINT 对齐，两处需同步改）
+@media (max-width: 991.98px) {
+  .el-plus-form-dialog {
+    // 24px = 视口两侧各 12px 呼吸边距
+    max-width: calc(100vw - 24px);
+  }
+}
+</style>

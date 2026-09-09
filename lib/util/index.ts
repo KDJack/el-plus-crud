@@ -202,9 +202,9 @@ export function handelBtnType(item: any): Object {
  */
 export function handelListColumn(columnList: Array<IColumnItem> | undefined, defaultConf: ICRUDConfig, tbName: string, headerAlign?: string, minWidth?: string): any[] {
   const tempColumnList = [] as any[]
-  const nowTime = new Date().getTime()
   if (columnList && columnList.length > 0) {
-    // 不影响原有的对象，这里进行拷贝
+    // 注意：本函数直接就地修改传入的列对象（补 type/width/align 等，含移动端删除 fixed），
+    // 调用方须传入副本（ElPlusTable 已 cloneDeep）
     columnList.map((item: IColumnItem, i: number) => {
       // 如果有子集
       if (item.children) {
@@ -224,6 +224,10 @@ export function handelListColumn(columnList: Array<IColumnItem> | undefined, def
       //   const tempList = (handelListColumn(item.nodes, minWidth) as any)[0].children
       //   item.nodes = tempList || item.nodes
       // }
+      // 移动端窄屏取消固定列：固定列挤占横向空间，让所有列随横向滚动
+      if (isMobile()) {
+        delete item.fixed
+      }
       // 检查type属性,没有type属性的自动补一个text类型
       if (!item.type) {
         item.type = 'text'
@@ -263,7 +267,8 @@ export function handelListColumn(columnList: Array<IColumnItem> | undefined, def
       handelVIf(item, defaultConf, tbName)
 
       // 设定id
-      item.__id = `${nowTime + i}`
+      // 稳定 id：勿用时间戳——headerColumns 依赖视口(isMobile)重算时，时间戳会改变所有 key 导致整表列重挂载、排序态丢失
+      item.__id = `${i}-${item.prop || item.label || 'col'}`
 
       tempColumnList.push(item)
     })
@@ -324,8 +329,8 @@ export function isUnDef(val: any) {
   return val === null || val === undefined
 }
 
-// 窄屏断点：与 Element Plus 的 xs 断点一致；若想让标签在「单列平板范围( <992 )」也上移，可调大此处
-const MOBILE_BREAKPOINT = 768
+// 窄屏断点：与 Element Plus 的 md 断点(min-width: 992)互补，即 el-col 单列(xs/sm=24)的整个区间都按窄屏处理
+const MOBILE_BREAKPOINT = '991.98px'
 
 /**
  * 判断是否为窄屏（移动端布局）
@@ -336,7 +341,7 @@ const MOBILE_BREAKPOINT = 768
 const _isMobile = ref(false)
 const _mobileMQ =
   typeof window !== 'undefined' && typeof window.matchMedia === 'function'
-    ? window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`)
+    ? window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT})`)
     : null
 if (_mobileMQ) {
   _isMobile.value = _mobileMQ.matches

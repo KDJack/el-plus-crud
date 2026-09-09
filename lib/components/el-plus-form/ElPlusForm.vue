@@ -7,7 +7,7 @@
           <!-- rowspan 跨行布局：CSS Grid（含 rowspan>=2 且非 isTable 时启用） -->
           <div v-if="hasRowspan" class="crud-form-grid" :style="gridContainerStyle">
             <div v-for="(formItem, idx) in flatFormItems" :key="'grid-' + idx + '-' + (formItem.field || '')" class="el-plus-form-column-panel" :style="[gridItemStyle(formItem), { 'justify-content': 'flex-start' }]">
-              <el-form-item style="min-height: 40px; display: flex" :prop="formItem.field" :style="{ width: formItem._attrs?.width || formItem.width || '100%', marginBottom: itemMB, alignItems: formItem.labelAlign || 'center' }">
+              <el-form-item style="min-height: 40px; display: flex" :prop="formItem.field" :style="{ width: formItem._attrs?.width || formItem.width || '100%', marginBottom: itemMB, alignItems: formItem.labelAlign || (computedFormAttrs.labelPosition === 'top' ? 'stretch' : 'center') }">
                 <template #label v-if="showLabel && formItem.showLabel !== false">
                   <div class="crud-form-label" :style="{ width: formItem.labelWidth || computedFormAttrs._labelWidth || (isDialog ? '100px' : 'auto'), justifyContent: computedFormAttrs.labelPosition === 'right' ? 'flex-end' : 'flex-start' }">
                     <span class="required-dot">{{ formItem._required ? '*' : ' ' }}</span>
@@ -37,7 +37,7 @@
             <el-row :gutter="10" v-for="(formList, index) in attrMapToTableList" :key="index" v-show="maxShowRowIndex < 0 || index < maxShowRowIndex" :style="{ marginRight: isTable ? '20px' : 0 }">
               <el-col v-for="(formItem, y) in formList" :key="index + '-' + y + '-' + formItem.field" :xs="24" :sm="24" :md="formItem.colspan && formItem.colspan >= column ? 24 : column >= 2 ? 12 : 24" :lg="formItem.colspan && formItem.colspan >= column ? 24 : Math.floor((24 / column) * (formItem.colspan || 1))" :xl="formItem.colspan && formItem.colspan >= column ? 24 : Math.floor((24 / column) * (formItem.colspan || 1))">
                 <div v-if="formItem._vif" class="el-plus-form-column-panel" :style="{ 'justify-content': isTable ? 'flex-end' : 'flex-start' }">
-                  <el-form-item style="min-height: 40px; display: flex" :prop="formItem.field" :style="{ width: formItem._attrs?.width || formItem.width || (isTable ? '150px' : '100%'), marginBottom: itemMB, alignItems: formItem.labelAlign || (isTable ? 'center' : 'flex-start') }">
+                  <el-form-item style="min-height: 40px; display: flex" :prop="formItem.field" :style="{ width: formItem._attrs?.width || formItem.width || (isTable ? '150px' : '100%'), marginBottom: itemMB, alignItems: formItem.labelAlign || (computedFormAttrs.labelPosition === 'top' ? 'stretch' : isTable ? 'center' : 'flex-start') }">
                     <template #label v-if="showLabel && formItem.showLabel !== false">
                       <div class="crud-form-label" :style="{ width: formItem.labelWidth || computedFormAttrs._labelWidth || (isDialog ? '100px' : 'auto'), justifyContent: computedFormAttrs.labelPosition === 'right' ? 'flex-end' : 'flex-start' }">
                         <span class="required-dot">{{ formItem._required ? '*' : ' ' }}</span>
@@ -264,8 +264,8 @@ const computedFormAttrs = computed(() => {
     rules: computedRules,
     labelPosition: isMobile() ? 'top' : props.formAttrs?.labelPosition || 'right',
     style: {
-      // ponytail: 窄屏(isMobile<768)弹窗表单铺满，避免 80% 宽 + 居中导致表单项未占满整行
-      width: props.maxWidth || (props.isTable ? '100%' : props.isDialog ? (isMobile() ? '100%' : '100%') : '1000px'),
+      // ponytail: 窄屏(isMobile<992)弹窗表单铺满，避免 80% 宽 + 居中导致表单项未占满整行
+      width: props.maxWidth || (props.isTable ? '100%' : props.isDialog ? '100%' : '1000px'),
       // ponytail: 窄屏弹窗铺满(100%)时去除右内边距，避免与父级 padding 叠加导致左右不对称
       paddingRight: props.isTable ? '0' : props.isDialog && isMobile() ? '0' : '20px'
     }
@@ -432,10 +432,10 @@ const gridContainerStyle = computed(() => ({
   columnGap: '10px',
   rowGap: '0px'
 }))
-// 单个表单项的跨格样式
+// 单个表单项的跨格样式（窄屏单列时 colspan/rowspan 均钳制为 1，否则跨格会在单列 grid 里留下空白轨道）
 const gridItemStyle = (item: IFormDescItem) => ({
-  gridColumn: `span ${Math.max(1, Number(item.colspan) || 1)}`,
-  gridRow: `span ${Math.max(1, Number(item.rowspan) || 1)}`
+  gridColumn: `span ${Math.min(Math.max(1, Number(item.colspan) || 1), gridColumnCount.value)}`,
+  gridRow: `span ${gridColumnCount.value === 1 ? 1 : Math.max(1, Number(item.rowspan) || 1)}`
 })
 
 // 整体初始化属性
@@ -1045,9 +1045,14 @@ defineExpose({ fid: props.fid, formRef: refElPlusForm, submit: handleSubmitForm,
   .el-form--label-top {
     .el-form-item {
       flex-direction: column;
-      .crud-form-label {
-        width: 100% !important;
-      }
+    }
+    // 覆盖 .el-plus-form-column-panel 里的 line-height: 40px（同为 (0,5,0) 平级，靠 &.el-plus-form-panel
+    // 复合类抬高到 (0,6,0) 稳赢源码顺序，label 上移后不再占一整行高）
+    &.el-plus-form-panel .el-plus-form-column-panel > .el-form-item > .el-form-item__label {
+      line-height: 1.5;
+    }
+    .crud-form-label {
+      width: 100% !important;
     }
   }
 }

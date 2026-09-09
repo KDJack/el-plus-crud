@@ -440,6 +440,26 @@ defineExpose({ getData: () => elPlusFormRef.value?.getData(), initCol, resetQuer
       justify-content: flex-start;
       flex-wrap: wrap;
 
+      // 筛选表单流式布局：el-row 设 display:contents 从布局树移除，el-col 直接参与
+      // el-form（flex-wrap）的同一条流——按 column 预分行的所有筛选项汇入一条流，
+      // 按固定宽挨个排列、排满自动换行，无分组换行边界；
+      // 折叠 v-show 写在内联 display:none 上，优先级高于 contents，折叠功能不受影响
+      & > .el-row {
+        display: contents;
+        & > .el-col {
+          flex: 0 0 auto;
+          width: auto;
+          // 解除 EP 栅格 span 类的 max-width 钳制（如 el-col-md-12 的 50%），宽于 span 比例的项不再被压
+          max-width: none;
+          // contents 丢弃了 row 的 gutter 负 margin 对冲，col 内联 padding 归零、间距改由 margin 提供（等价 gutter:10）
+          padding: 0 !important;
+          margin-right: 10px;
+        }
+      }
+      & > .crud-form-grid {
+        flex-basis: 100%;
+      }
+
       .el-form-item {
         margin-bottom: 5px !important;
         .el-form-item__label {
@@ -474,6 +494,26 @@ defineExpose({ getData: () => elPlusFormRef.value?.getData(), initCol, resetQuer
         & > * {
           margin-bottom: 16px;
         }
+      }
+    }
+
+    // 窄屏：搜索字段堆叠占满整行（覆盖 formConfig 强制的 300px 内联宽与右对齐）
+    // 断点与 util 的 MOBILE_BREAKPOINT('991.98px') 对齐——CSS 引不到 JS 常量，两处需同步改
+    @media (max-width: 991.98px) {
+      // 只命中筛选字段本体（col > panel > form-item 直链），避免误伤自定义字段内容里嵌套的 el-col/el-form-item
+      .el-form > .el-row > .el-col > .el-plus-form-column-panel > .el-form-item {
+        width: 100% !important;
+      }
+      // 对位覆盖 ElPlusForm 的 .el-form--inline 12px 规则（(0,4,0)），须更高特异性才能赢
+      .el-plus-form-panel .el-form--inline .el-form-item {
+        margin-right: 0 !important;
+      }
+      .el-form > .el-row > .el-col > .el-plus-form-column-panel {
+        justify-content: flex-start !important;
+      }
+      // col 走流式 auto 时 form-item 的 100% 会循环参照塌缩，窄屏必须锁定满宽
+      .el-form > .el-row > .el-col {
+        width: 100% !important;
       }
     }
   }

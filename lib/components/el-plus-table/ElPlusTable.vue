@@ -81,9 +81,9 @@
         @header-dragend="handelHeaderDragend"
       >
         <!-- 复选框 -->
-        <el-table-column v-if="type === 'selection'" type="selection" fixed="left" width="55px" :selectable="selectable" header-align="center" align="center" />
+        <el-table-column v-if="type === 'selection'" type="selection" :fixed="isMobile() ? false : 'left'" width="55px" :selectable="selectable" header-align="center" align="center" />
         <!-- 下标 -->
-        <el-table-column v-if="isIndex" type="index" width="70" fixed="left" :label="indexLabel || '序号'" :align="finalHeaderAlign" :headerAlign="finalHeaderAlign" />
+        <el-table-column v-if="isIndex" type="index" width="70" :fixed="isMobile() ? false : 'left'" :label="indexLabel || '序号'" :align="finalHeaderAlign" :headerAlign="finalHeaderAlign" />
         <!-- 首列 -->
         <template v-if="useSlots().firstColumn">
           <slot name="firstColumn" />
@@ -108,7 +108,7 @@
       </el-table>
     </div>
     <div class="bottom-page-static-info" v-if="isPager || tableConfig.statistic">
-      <el-pagination class="page-info" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="+pageInfo.current" :page-sizes="pageSizes || [5, 10, 20, 50, 100]" :page-size="pageInfo.size" layout="total, sizes, prev, pager, next, jumper" :total="pageInfo.total" />
+      <el-pagination class="page-info" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="+pageInfo.current" :page-sizes="pageSizes || [5, 10, 20, 50, 100]" :page-size="pageInfo.size" :layout="isMobile() ? 'total, prev, pager, next' : 'total, sizes, prev, pager, next, jumper'" :pager-count="isMobile() ? 5 : 7" :total="pageInfo.total" />
     </div>
     <slot name="bottom" :tableData="tableData"></slot>
   </div>
@@ -124,7 +124,7 @@ export default {
 import { ref, reactive, onMounted, onBeforeUnmount, computed, watch, nextTick, useSlots, inject, provide } from 'vue'
 import EleTabletHeader from './components/header.vue'
 import ElPlusTableColumn from './ElPlusTableColumn.vue'
-import { handelListColumn, is, isEqual } from '../../util'
+import { handelListColumn, is, isMobile, isEqual } from '../../util'
 import { getQuerySnapshot, saveQuerySnapshot, wasRecentBackNav, waitForBackNav } from '../../util/queryCache'
 import type { IQuerySnapshot } from '../../util/queryCache'
 import { Loading } from '@element-plus/icons-vue'

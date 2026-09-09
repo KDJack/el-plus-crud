@@ -15,6 +15,8 @@ import { useRouter } from 'vue-router'
 import { ITableConfig } from 'types'
 
 const router = useRouter()
+
+
 const tableRef = ref()
 const lastQuery = ref('{}')
 const loadedAt = ref('')
@@ -28,7 +30,8 @@ const mockFetch = (query: any) => {
     name: `商品-${String(i + 1).padStart(3, '0')}`,
     type: i % 2,
     status: i % 3 === 0 ? 1 : 0,
-    updatedAt: loadedAt.value
+    updatedAt: loadedAt.value,
+    ...Object.fromEntries(Array.from({ length: 10 }, (_, k) => [`ext${k + 1}`, `数据${i + 1}-${k + 1}`]))
   }))
     .filter((item) => !query.keyword || item.name.includes(query.keyword))
     .filter((item) => query.type === undefined || query.type === '' || item.type === query.type)
@@ -67,12 +70,16 @@ const tableConfig = ref({
           type: 'select',
           label: '类型',
           options: [
-            { label: '类型A', value: '0' },
-            { label: '类型B', value: '1' }
+            { label: '类型A', value: 0 },
+            { label: '类型B', value: 1 }
           ]
         },
-        code: { type: 'input', label: '编码' },
-        code2: { type: 'input', label: '编码' }
+        code: { type: 'input', label: '编码1' },
+        code2: { type: 'input', label: '编码2' },
+        code3: { type: 'input', label: '编码3' },
+        code4: { type: 'input', label: '编码4' },
+        code5: { type: 'input', label: '编码5' },
+        code6: { type: 'input', label: '编码6' }
       }
     }
   },
@@ -90,4 +97,7 @@ const tableConfig = ref({
     }
   ]
 } as ITableConfig)
+
+// 测试横向滚动：追加10列固定宽度字段
+tableConfig.value.column.push(...Array.from({ length: 10 }, (_, i) => ({ prop: `ext${i + 1}`, label: `扩展列${i + 1}`, width: '130' })))
 </script>

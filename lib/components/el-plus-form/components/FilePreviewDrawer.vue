@@ -48,7 +48,7 @@ import { Close } from '@element-plus/icons-vue'
 const visible = ref(false)
 const currentUrl = ref('')
 const currentName = ref('')
-const currentSize = ref('40%')
+const currentSize = ref('1000px')
 const currentTitle = ref('附件预览')
 
 // 预览加载遮罩：抽屉打开即遮，iframe load 后固定延迟撤（覆盖预览服务首屏后的内部初始化）
@@ -94,7 +94,7 @@ function openPreview(item: any, cfg?: boolean | { size?: string; title?: string 
     window.open(url, '_blank', 'noopener,noreferrer')
     return
   }
-  currentSize.value = (cfg && typeof cfg === 'object' && cfg.size) || '40%'
+  currentSize.value = (cfg && typeof cfg === 'object' && cfg.size) || '1000px'
   currentTitle.value = (cfg && typeof cfg === 'object' && cfg.title) || item?.name || '附件预览'
   currentUrl.value = url
   currentName.value = item?.name || ''

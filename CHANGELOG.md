@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.138](https://github.com/KDJack/el-plus-crud/compare/v0.1.137...v0.1.138) (2026-09-09)
+
+
+### Features
+
+* **form:** 表单/表格/弹窗移动端窄屏适配，断点统一 992 ([90274b0](https://github.com/KDJack/el-plus-crud/commit/90274b0e03f1bf0be4e664acddc3a1d010c5029a))
+* 移动端适配——窄屏断点对齐 el-col 单列区间(992)，表格去固定列/精简分页，筛选表单流式布局 ([2f6eaca](https://github.com/KDJack/el-plus-crud/commit/2f6eaca127a5017be65514f5984e3733cbb4ad14))
+
 ### [0.1.137](https://github.com/KDJack/el-plus-crud/compare/v0.1.136...v0.1.137) (2026-08-28)
 
 

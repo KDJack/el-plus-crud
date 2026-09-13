@@ -333,6 +333,7 @@ const computedRules = computed(() => {
             case 'daterange':
             case 'timerange':
             case 'datetimerange':
+            case 'transfer':
               rules = 'cascader'
               break
           }

@@ -125,6 +125,10 @@ function onUploadChange(_file: any, fileList: any[]) {
 // el-upload 实例引用，供卡片删除时同步其内部 uploadFiles
 const uploadRef = ref()
 
+// 压缩结果暂存：key 为 el-upload raw file 的 uid；handelUploadBefore 压缩后存入，
+// handelRequest 上传前替换、handelUploadSuccess 记录压缩后大小并清理，handelUploadRemove 兜底清理
+const compressedFiles = new Map<number, File>()
+
 const showPreview = ref(false)
 const previewIndex = ref(0)
 const previewList = computed(() => {
@@ -191,14 +195,32 @@ onBeforeMount(async () => {
  */
 async function handelUploadBefore(file: any) {
   file.suffix = `${(file.name as string).substring(file.name.lastIndexOf('.'))}`.split('?')[0]
-  const message = validateFile(file, (fileTypes as any)[`${props.desc.upType || 'image'}Suffixes`], attrs.value.maxSize)
+  // 压缩钩子：在大小校验/占位/取预签名之前先压缩（否则超限图片没机会被压就被拦截）；
+  // 压缩实现由 config.upload.compress 或 desc.compress 注入，库本身不引压缩依赖；
+  // 压缩失败/未变小（实现方回传原文件）时静默按原文件走后续流程
+  const compressFn = props.desc?.compress || defaultConf.upload?.compress
+  let uploadFile: File = file
+  if (compressFn) {
+    try {
+      const compressed = await compressFn(file)
+      if (compressed && compressed !== file && compressed.size > 0) {
+        ;(compressed as any).suffix = file.suffix
+        compressedFiles.set(file.uid, compressed)
+        uploadFile = compressed
+      }
+    } catch (e) {
+      defaultConf.debug && console.log('压缩失败，使用原文件上传: ', e)
+    }
+  }
+  const message = validateFile(uploadFile, (fileTypes as any)[`${props.desc.upType || 'image'}Suffixes`], attrs.value.maxSize)
   if (message !== true) {
+    compressedFiles.delete(file.uid)
     ElMessage.warning(message)
     return false
   }
   try {
-    // 这里先用本地地址进行占位
-    file.url = URL.createObjectURL(file)
+    // 这里先用本地地址进行占位（有压缩版用压缩版，预览一致且更省内存）
+    file.url = URL.createObjectURL(uploadFile)
     // 获取文件上传的action
     let actionInfo = {} as IUpAction
     if (props.desc?.action) actionInfo = await getActionInfo(props.desc?.action, { fileName: file.name })
@@ -213,9 +235,9 @@ async function handelUploadBefore(file: any) {
     }
 
     if (!props.desc?.uploadFn && defaultConf.upload?.type === 'minio') {
-      attrs.value.data = file
+      attrs.value.data = uploadFile
       attrs.value.headers = {
-        'Content-Type': file.type
+        'Content-Type': uploadFile.type
       }
     }
   } catch (e) {
@@ -300,6 +322,10 @@ async function handelUploadSuccess(response: any, file: any) {
   } else {
     file.url = file.raw.furl
   }
+  // fsize 记录压缩后的真实体积（el-upload 的 file.size 是压缩前快照）
+  const compressedSize = compressedFiles.get(file.raw?.uid ?? file.uid)?.size
+  if (compressedSize) file.size = compressedSize
+  compressedFiles.delete(file.raw?.uid ?? file.uid)
   handelListChange(file, 1)
 }
 
@@ -337,6 +363,7 @@ function handelUploadRemove(file: any, fileList?: any[]) {
   // doRemove 恒传删除后列表（beforeUpload 拒绝路径经 upload-content→handleRemove→doRemove 亦然），
   // Array.isArray 仅作旧版/变体防御
   if (Array.isArray(fileList)) onUploadChange(file, fileList)
+  compressedFiles.delete(file.raw?.uid ?? file.uid)
   handelListChange(file, 0)
 }
 
@@ -528,6 +555,9 @@ function handleOutOfLimit() {
 function handelRequest(param: any) {
   param.action = upAction.value
   param.actionInfo = upActionInfo.value
+  // 有压缩结果时替换实际上传的文件（预签名按文件名签，压缩版名称/类型不变，PUT 不受影响）
+  const compressed = compressedFiles.get(param.file?.uid)
+  if (compressed) param.file = compressed
   const uploadFn = props.desc?.uploadFn || defaultConf.upload?.uploadFn
   return uploadFn(param)
 }

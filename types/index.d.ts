@@ -115,6 +115,8 @@ export interface IFormDescItem extends IDescItem {
   multiple?: boolean
   noTip?: boolean
   maxSize?: number
+  // 字段级上传前压缩钩子，优先于 config.upload.compress
+  compress?: (file: File) => Promise<File>
   remote?: Function
   // 如果是列表
   tableConfig?: ITableConfig
@@ -565,6 +567,8 @@ export interface ICRUDConfig {
     maxISize?: number
     // 上传文件最大限制
     maxFSize?: number
+    // 上传前压缩钩子：大小校验/上传之前调用；回传压缩后的 File 则按压缩版校验并上传，回传原文件或抛错则原样上传
+    compress?: (file: File) => Promise<File>
     // 真正的上传方法
     uploadFn?: (data?: Object) => Promise<any>
     // 获取上传的token信息

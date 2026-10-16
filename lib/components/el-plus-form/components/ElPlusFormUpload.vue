@@ -57,7 +57,7 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { ref, computed, useAttrs, onBeforeMount, watch, inject, nextTick, type Ref } from 'vue'
+import { ref, computed, useAttrs, onBeforeMount, onBeforeUnmount, watch, inject, nextTick, type Ref } from 'vue'
 import { getAttrs, getEvents } from '../mixins'
 import { ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
@@ -105,6 +105,9 @@ const emits = defineEmits(['update:modelValue', 'validateThis'])
 const currentValue = useVModel(props, 'modelValue', emits, { passive: true, deep: true, defaultValue: [] }) as Ref<Array<any>>
 
 const attrs = ref({} as any)
+// 使用方透传的 attrs/事件回调（组件只声明 update:modelValue/validateThis 两个 emit，@remove/@error 等落在 attrs）。
+// 内部记账 handler 在 attrs 合并时恒胜（防槽位泄漏死锁），此处仅供各 handler 记账完成后补调使用方回调
+const userAttrs = useAttrs()
 const isInit = ref(false)
 const onEvents = ref(getEvents(props))
 
@@ -128,6 +131,66 @@ const uploadRef = ref()
 // 压缩结果暂存：key 为 el-upload raw file 的 uid；handelUploadBefore 压缩后存入，
 // handelRequest 上传前替换、handelUploadSuccess 记录压缩后大小并清理，handelUploadRemove 兜底清理
 const compressedFiles = new Map<number, File>()
+
+// ===== 上传并发队列 =====
+// 批量选择时 el-upload 会同时发起全部上传，浏览器对同域仅 ~6 个并发连接、其余排队，
+// 预签名链接在排队期间过期（慢网大文件批量上传到十几个后开始 403）。
+// 故上传链接/token 的获取从 beforeUpload 开头推迟到排队轮到该文件之后：取完立即上传，不进浏览器排队。
+// 槽位在文件上传结束（onSuccess/onError/onRemove）时释放而非发起时；并发放行的文件在
+// handelUploadBefore 的同步写入块中写共享 upAction、紧接发起请求（相邻微任务，不可被插队），
+// 顺带消除了原批量场景下并发 beforeUpload 竞写 upAction 的竞态。
+const uploadQueue: Array<{ uid: number; resolve: (ok: boolean) => void }> = []
+const activeSlots = new Set<number>()
+// Math.max 钳制：显式配 0/负数（?? 不会过滤 0）会导致 pumpQueue 永不放行、全部上传无限排队
+const uploadConcurrency = computed(() => Math.max(1, props.desc?.concurrency ?? defaultConf.upload?.concurrency ?? 6))
+let uploadQueueClosed = false
+
+function pumpQueue() {
+  while (activeSlots.size < uploadConcurrency.value && uploadQueue.length > 0) {
+    const next = uploadQueue.shift()!
+    activeSlots.add(next.uid)
+    next.resolve(true)
+  }
+}
+
+/**
+ * 排队等待上传槽位：轮到返回 true；被取消（用户删除排队文件/组件卸载）返回 false。
+ * 内部永不 reject，取消走 beforeUpload return false 的 el-upload 标准移除链路
+ */
+function acquireSlot(uid: number): Promise<boolean> {
+  if (uploadQueueClosed) return Promise.resolve(false)
+  return new Promise((resolve) => {
+    uploadQueue.push({ uid, resolve })
+    pumpQueue()
+  })
+}
+
+/**
+ * 释放槽位（上传结束/失败/在途删除时调用），幂等
+ */
+function releaseSlot(uid: number) {
+  if (activeSlots.delete(uid)) pumpQueue()
+}
+
+/**
+ * 文件被删除/取消：排队中的直接摘除，已在途的释放槽位
+ */
+function cancelSlot(uid: number) {
+  const idx = uploadQueue.findIndex((w) => w.uid === uid)
+  if (idx >= 0) {
+    const [waiter] = uploadQueue.splice(idx, 1)
+    waiter.resolve(false)
+    return
+  }
+  releaseSlot(uid)
+}
+
+onBeforeUnmount(() => {
+  uploadQueueClosed = true
+  while (uploadQueue.length > 0) {
+    uploadQueue.shift()!.resolve(false)
+  }
+})
 
 const showPreview = ref(false)
 const previewIndex = ref(0)
@@ -160,12 +223,17 @@ onBeforeMount(async () => {
     autoUpload: props.desc.autoUpload ?? true,
     accept: props.desc.accept || (fileTypes as any)[`${props.desc.upType || 'image'}Types`].join(','),
     maxSize: props.desc.maxSize || (isImageType.value ? defaultConf.upload?.maxISize : defaultConf.upload?.maxFSize),
+    onExceed: handleOutOfLimit,
+    onPreview: handelPreview,
+    ...userAttrs,
+    // 内部记账 handler 必须排在 ...useAttrs() 之后恒胜：使用方写的 @remove/@error 会落进 attrs，
+    // 若覆盖内部 handler 则槽位不释放（并发队列下 6 槽泄漏后全队列死锁）且 listChange 记账丢失；
+    // 使用方回调在内部 handler 尾部补调（见各 handler 内的 userAttrs 调用），能力不丢；
+    // onExceed/onPreview 同样内部恒胜 + 尾部补调；@before-upload 不透传（内部已含排队取槽，用户再否决需槽位回滚）
     beforeUpload: handelUploadBefore,
     onRemove: handelUploadRemove,
     onSuccess: handelUploadSuccess,
-    onExceed: handleOutOfLimit,
-    onPreview: handelPreview,
-    ...useAttrs()
+    onError: handelUploadError
   })
   // 如果有自定义上传函数，则走自定义，否则走action
   if (props.desc?.uploadFn || defaultConf.upload?.uploadFn) {
@@ -221,27 +289,59 @@ async function handelUploadBefore(file: any) {
   try {
     // 这里先用本地地址进行占位（有压缩版用压缩版，预览一致且更省内存）
     file.url = URL.createObjectURL(uploadFile)
-    // 获取文件上传的action
+  } catch (e) {
+    defaultConf.debug && console.log('生成本地预览地址出错: ', e)
+  }
+  // 排队：轮到该文件的前一刻才取上传链接/token（排队等待期文件处于 ready 态，卡片灰化等待）
+  if (!(await acquireSlot(file.uid))) return false
+  try {
+    // 先取完所有异步数据，再在一个同步块内完成全部共享状态写入（upAction / attrs.data / attrs.headers）：
+    // 写入与 el-upload doUpload 读取（beforeUpload resolve 后的相邻微任务）之间不能有 await 挂起点，
+    // 否则并发放行的其他文件可能在此期间覆盖共享 upAction，导致本文件拿错上传链接
     let actionInfo = {} as IUpAction
     if (props.desc?.action) actionInfo = await getActionInfo(props.desc?.action, { fileName: file.name })
     if (!actionInfo.action) actionInfo = await getActionInfo(defaultConf.upload?.action, { fileName: file.name })
+    // 空链接防御：getActionInfo 不抛错但返回空（如配置的 action 函数返回空值）时，
+    // 继续走下去会拿空/旧 action 发请求——恰好绕过下方 catch 的「不能吞错继续」，故显式拦截
+    if (!actionInfo.action) {
+      defaultConf.debug && console.warn('获取上传链接为空，取消上传: ', file.name)
+      return false
+    }
+    const needToken = !!(
+      props.desc?.token ||
+      defaultConf.upload?.token
+    )
+    const token = needToken ? await getToken(props.desc?.token || defaultConf.upload?.token, file) : ''
+
+    // ↓↓↓ 同步写入块（与函数 return 相邻，微任务链不可被并发写插队）↓↓↓
     upAction.value = actionInfo.action
+    // 链接随文件走：并发场景共享 upAction 仍可能被「后完成取链接的文件」在「本文件写入与本文件 doUpload 读取之间」
+    // 的微任务插队覆盖（HTTP 完成顺序不定，纯拼网速），导致传错对象；handelRequest 优先取文件自己的 actionInfo
+    file.actionInfo = actionInfo
     file.uploadId = actionInfo.uploadId || ''
     file.furl = actionInfo.furl
-
-    // 获取上传的token
-    if (props.desc?.token || defaultConf.upload?.token) {
-      attrs.value.data = { token: await getToken(props.desc?.token || defaultConf.upload?.token, file) }
+    // data/headers 同理随文件走：attrs.value.data/headers 仍是共享态，并发放行的其他文件可能在本文件
+    // 写入与本文件 doUpload 读取之间的微任务间隙覆盖（token 路径带错 token；minio 路径 PUT body 变成别人的文件字节，
+    // 静默数据错乱）；handelRequest 里同样优先取文件自己的这份。
+    // 遗留缺口：无 uploadFn、走 el-upload 默认 ajax 的纯 token 路径不经 handelRequest，attrs.value.data 仍共享——
+    // 仅「按文件发不同 token」的用法有风险（token 同值无影响），后续如需收敛再统一包 per-file httpRequest
+    let dataVal: any
+    let headersVal: any
+    if (needToken) {
+      dataVal = { token }
     }
-
     if (!props.desc?.uploadFn && defaultConf.upload?.type === 'minio') {
-      attrs.value.data = uploadFile
-      attrs.value.headers = {
-        'Content-Type': uploadFile.type
-      }
+      dataVal = uploadFile
+      headersVal = { 'Content-Type': uploadFile.type }
     }
+    file.uploadData = { data: dataVal, headers: headersVal }
+    if (dataVal !== undefined) attrs.value.data = dataVal
+    if (headersVal !== undefined) attrs.value.headers = headersVal
   } catch (e) {
     defaultConf.debug && console.log('获取action出错: ', e)
+    // 拒绝该文件走 el-upload 标准移除链路（onRemove → cancelSlot 释放槽位），
+    // 不能吞错继续：拿旧 action/空 action 发请求可能打到错误地址甚至以假成功回调
+    return false
   }
 }
 
@@ -295,7 +395,7 @@ async function getToken(token: string | Object | Function | undefined, param?: a
  * @param file
  * @param fileList
  */
-async function handelUploadSuccess(response: any, file: any) {
+async function handelUploadSuccess(response: any, file: any, fileList?: any[]) {
   if (response && Object.keys(response).length > 0) {
     // 从结果集中获取一下furl
     const tempUrl = getValue(defaultConf.upload?.actionMap?.objectUrlKey || [], response.request || response.result || response)
@@ -326,7 +426,21 @@ async function handelUploadSuccess(response: any, file: any) {
   const compressedSize = compressedFiles.get(file.raw?.uid ?? file.uid)?.size
   if (compressedSize) file.size = compressedSize
   compressedFiles.delete(file.raw?.uid ?? file.uid)
+  releaseSlot(file.raw?.uid ?? file.uid)
   handelListChange(file, 1)
+  // 补调使用方回调（内部 handler 恒胜后，使用方 @success 的能力由此保留）
+  ;(userAttrs.onSuccess as any)?.(response, file, fileList)
+}
+
+/**
+ * 上传失败：释放并发槽位（失败文件不占 limit 名额，见 activeCount 注释）
+ * @param err
+ * @param file
+ */
+function handelUploadError(_err: any, file: any, fileList?: any[]) {
+  releaseSlot(file.raw?.uid ?? file.uid)
+  // 补调使用方回调（同上）
+  ;(userAttrs.onError as any)?.(_err, file, fileList)
 }
 
 /**
@@ -364,7 +478,10 @@ function handelUploadRemove(file: any, fileList?: any[]) {
   // Array.isArray 仅作旧版/变体防御
   if (Array.isArray(fileList)) onUploadChange(file, fileList)
   compressedFiles.delete(file.raw?.uid ?? file.uid)
+  cancelSlot(file.raw?.uid ?? file.uid)
   handelListChange(file, 0)
+  // 补调使用方回调（内部 handler 恒胜后，使用方 @remove 的能力由此保留）
+  ;(userAttrs.onRemove as any)?.(file, fileList)
 }
 
 /**
@@ -418,6 +535,8 @@ function handelPreview(file: any) {
   } else {
     previewDrawerRef.value?.openPreview(file, props.desc.previewDrawer)
   }
+  // 补调使用方回调（内部 handler 恒胜后，使用方 @preview 的能力由此保留）
+  ;(userAttrs.onPreview as any)?.(file)
 }
 
 // ===== card 模式：文件卡片渲染辅助 =====
@@ -546,6 +665,8 @@ function onCardRemove(file: any) {
  */
 function handleOutOfLimit() {
   ElMessage.error('数量最多只能上传' + attrs.value.limit + '个图片/文件!!!')
+  // 补调使用方回调（内部 handler 恒胜后，使用方 @exceed 的能力由此保留）
+  ;(userAttrs.onExceed as any)?.()
 }
 
 /**
@@ -553,8 +674,16 @@ function handleOutOfLimit() {
  * @param param
  */
 function handelRequest(param: any) {
-  param.action = upAction.value
-  param.actionInfo = upActionInfo.value
+  // 链接随文件走：优先取本文件在 beforeUpload 里存的 actionInfo/uploadData（须在压缩替换之前取，压缩 File 上没有），
+  // 共享 upAction/upActionInfo/attrs.data/attrs.headers 仅作旧数据兜底；并发文件互相覆盖共享值不再影响本文件
+  const fileActionInfo = param.file?.actionInfo
+  param.action = fileActionInfo?.action || upAction.value
+  param.actionInfo = fileActionInfo || upActionInfo.value
+  const fileUploadData = param.file?.uploadData
+  if (fileUploadData?.data !== undefined) param.data = fileUploadData.data
+  if (fileUploadData?.headers !== undefined) param.headers = fileUploadData.headers
+  // 原始 raw 文件引用（压缩替换前），供应用层 uploadFn 过期重取链接后回写 uploadId/furl（success 从 file.raw 读）
+  param.rawFile = param.file
   // 有压缩结果时替换实际上传的文件（预签名按文件名签，压缩版名称/类型不变，PUT 不受影响）
   const compressed = compressedFiles.get(param.file?.uid)
   if (compressed) param.file = compressed

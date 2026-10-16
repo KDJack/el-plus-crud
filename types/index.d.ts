@@ -571,6 +571,8 @@ export interface ICRUDConfig {
     compress?: (file: File) => Promise<File>
     // 真正的上传方法
     uploadFn?: (data?: Object) => Promise<any>
+    // 同时上传的文件数：预签名链接在轮到上传前一刻才获取，过大会导致链接在排队期间过期（默认 6，同 desc.concurrency）
+    concurrency?: number
     // 获取上传的token信息
     token?: string | Object | ((data?: Object) => Promise<Object>)
     // 获取文件上传的token对象key，如果不在根级，则需使用数组的形式。如：data.xxx.token 就需要写为 ['data', 'xxx', 'token']

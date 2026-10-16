@@ -19,7 +19,7 @@
       </div>
       <!-- card 模式：用 #file 插槽自定义每个文件项为卡片，复用 el-upload 的上传中进度/成功/失败状态 -->
       <template v-if="cardMode" #file="{ file }">
-        <div class="upload-file-card" :class="{ 'is-fail': file.status === 'fail' }" @click="onCardClick(file)">
+        <div class="upload-file-card" :class="{ 'is-fail': file.status === 'fail', 'is-waiting': file.status === 'ready' }" @click="onCardClick(file)">
           <img v-if="isImage(file) && imgUrl(file)" class="file-thumb" :src="imgUrl(file)" />
           <div v-else class="file-type-icon" :class="typeClass(file)">{{ typeLabel(file) }}</div>
           <div class="file-info">
@@ -887,6 +887,24 @@ watch(
     &.is-fail {
       border-color: var(--el-color-danger-light-5);
       background: var(--el-color-danger-light-9);
+    }
+
+    // 未上传（ready：选完还没开始传，含 beforeUpload 异步耗时 / 手动上传等待期）整卡灰化，
+    // 进入 uploading 摘类后随 transition 平滑恢复正常
+    &.is-waiting {
+      background: var(--el-fill-color-light);
+      border-color: var(--el-border-color-lighter);
+
+      .file-name {
+        color: var(--el-text-color-placeholder);
+      }
+
+      // 缩略图 / 类型色块图标整体灰化
+      .file-thumb,
+      .file-type-icon {
+        filter: grayscale(1);
+        opacity: 0.65;
+      }
     }
   }
 

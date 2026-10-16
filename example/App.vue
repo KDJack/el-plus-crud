@@ -34,6 +34,8 @@ let formData = reactive({
     { name: '现场照片-01.jpg', url: 'https://picsum.photos/320/200', furl: 'https://picsum.photos/320/200', suffix: '.jpg', fsize: 1048576, uid: 102 },
     { name: '现场照片-02.jpg', url: 'https://picsum.photos/320/200', furl: 'https://picsum.photos/320/200', suffix: '.jpg', fsize: 819200, uid: 103 }
   ],
+  // 未上传灰卡演示字段（选择文件后 ready 态整卡灰化）
+  grayDemo: [] as any[],
   contract: [{ name: '中标通知书.pdf', furl: 'https://example.com/中标通知书.pdf', suffix: '.pdf', fsize: 2411724, uid: 201 }],
   report: [{ name: '季度工作报告.docx', furl: 'https://example.com/季度工作报告.docx', suffix: '.docx', fsize: 1572864, uid: 202 }],
   budget: [{ name: '年度预算表.xlsx', furl: 'https://example.com/年度预算表.xlsx', suffix: '.xlsx', fsize: 655360, uid: 203 }],
@@ -137,6 +139,9 @@ const mockUpload = (param: any) =>
       }
     }, 200)
   })
+// 慢 action：模拟取预签名耗时 2s —— 选完文件后卡片停留 ready 态（is-waiting 整卡灰化），
+// beforeUpload 返回后进入 uploading 摘灰恢复正常，用于演示灰卡过渡
+const slowAction = () => new Promise((resolve) => setTimeout(() => resolve(''), 2000))
 const formGroupConfig = ref({
   column: 2,
   // requestFn: () => {},
@@ -199,7 +204,9 @@ const formGroupConfig = ref({
         banner: { type: 'upload', label: '横幅图', required: true, uploadFn: mockUpload, addText: '上传横幅', formatHint: '建议尺寸200*300 16:9 最大2M' },
         qrcode: { type: 'upload', label: '二维码', required: true, uploadFn: mockUpload },
         // colspan:3 跨满整行，演示多图 + 自定义按钮文案
-        photos: { type: 'upload', label: '现场照片', required: true, multiple: true, limit: 5, colspan: 3, uploadFn: mockUpload, addText: '继续添加照片', formatHint: '最多 5 张' }
+        photos: { type: 'upload', label: '现场照片', required: true, multiple: true, limit: 5, colspan: 3, uploadFn: mockUpload, addText: '继续添加照片', formatHint: '最多 5 张' },
+        // 未上传灰卡演示：选完文件先灰 2 秒（slowAction 模拟取预签名），开始上传后恢复正常色
+        grayDemo: { type: 'upload', label: '灰卡演示', action: slowAction, uploadFn: mockUpload, tip: '选择后卡片灰显 2 秒，开始上传后恢复正常' }
       } as IFormDesc
     },
     {

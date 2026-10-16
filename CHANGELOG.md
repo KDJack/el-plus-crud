@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.140](https://github.com/KDJack/el-plus-crud/compare/v0.1.139...v0.1.140) (2026-10-16)
+
+
+### Features
+
+* **upload:** 上传前压缩钩子 desc.compress / config.upload.compress ([8b29fd3](https://github.com/KDJack/el-plus-crud/commit/8b29fd30d2d91731c6421092e7beb75e2355edb8))
+
+
+### Bug Fixes
+
+* **form:** 单列/窄屏隐藏 isBlank 占位项，清理 vif 默认值死代码 ([1add803](https://github.com/KDJack/el-plus-crud/commit/1add80366fcbd4194a36231149b6ae33d23bf239))
+
 ### [0.1.139](https://github.com/KDJack/el-plus-crud/compare/v0.1.138...v0.1.139) (2026-09-09)
 
 ### [0.1.138](https://github.com/KDJack/el-plus-crud/compare/v0.1.137...v0.1.138) (2026-09-09)

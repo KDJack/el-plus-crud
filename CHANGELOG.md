@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.141](https://github.com/KDJack/el-plus-crud/compare/v0.1.140...v0.1.141) (2026-10-16)
+
+
+### Features
+
+* **upload:** 上传并发队列，预签名链接/token 延迟到轮到上传时获取 ([fba4d21](https://github.com/KDJack/el-plus-crud/commit/fba4d21dfe5954bddb711487fac7a9bc50214e7a))
+* **upload:** 未上传文件卡片灰化，开始上传后恢复正常色 ([97dcf94](https://github.com/KDJack/el-plus-crud/commit/97dcf94ba72d71f24c98f143bca3272b33d9858e))
+
 ### [0.1.140](https://github.com/KDJack/el-plus-crud/compare/v0.1.139...v0.1.140) (2026-10-16)
 
 

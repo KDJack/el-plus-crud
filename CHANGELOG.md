@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.142](https://github.com/KDJack/el-plus-crud/compare/v0.1.141...v0.1.142) (2026-10-29)
+
+
+### Features
+
+* **form:** btns「更多」触发器改为纯文本+下拉箭头，禁用态灰化 ([b694bd0](https://github.com/KDJack/el-plus-crud/commit/b694bd071dd660f8e445aa47ecbde61aab1334c9))
+
 ### [0.1.141](https://github.com/KDJack/el-plus-crud/compare/v0.1.140...v0.1.141) (2026-10-16)
 
 

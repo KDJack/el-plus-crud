@@ -172,6 +172,7 @@ const formGroupConfig = ref({
         _tempDelBtns: {
           type: 'btns',
           showLabel: false,
+          // 按钮数超过 limit(默认3) 时收进「更多」下拉（纯文本 + 箭头触发）
           btns: [
             {
               type: 'success',
@@ -183,6 +184,17 @@ const formGroupConfig = ref({
               label: '删除',
               showLabel: false,
               confirm: '确定要删除该点位？'
+            },
+            {
+              label: '编辑',
+              showLabel: false,
+              on: { click: () => ElMessage.info('点击了编辑') }
+            },
+            {
+              label: '导出',
+              showLabel: false,
+              confirm: '确定要导出当前数据？',
+              on: { click: () => ElMessage.success('点击了导出') }
             }
           ]
         }

@@ -10,9 +10,9 @@
     </template>
     <template v-if="limitList && limitList.length > 0">
       <el-dropdown class="group-menu-btn" :size="desc.size || 'default'" :disabled="disabled || desc.disabled">
-        <el-button type="primary" :size="desc.size || 'default'" :plain="desc.plain ?? true">
+        <span class="dropdown-link-text" :class="{ 'is-disabled-text': disabled || desc.disabled }">
           更多<el-icon class="el-icon--right"><ArrowDown /></el-icon>
-        </el-button>
+        </span>
         <template #dropdown>
           <el-dropdown-menu>
             <el-dropdown-item v-for="(item, i) in limitList" :key="i + (item.label || item.title)" v-on="handelEvelt(item)">
@@ -160,6 +160,19 @@ onMounted(() => {
   .group-menu-btn {
     margin-left: 10px;
     align-items: center;
+  }
+
+  .dropdown-link-text {
+    cursor: pointer;
+    color: var(--el-color-primary);
+    display: flex;
+    align-items: center;
+    font-size: var(--el-font-size-base);
+
+    &.is-disabled-text {
+      color: var(--el-text-color-placeholder);
+      cursor: not-allowed;
+    }
   }
 }
 </style>

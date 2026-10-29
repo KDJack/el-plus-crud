@@ -12,6 +12,7 @@
 <script setup lang="ts" name="listDemo">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import { ITableConfig } from 'types'
 
 const router = useRouter()
@@ -90,9 +91,16 @@ const tableConfig = ref({
     {
       type: 'btns',
       label: '操作',
-      width: '100',
+      width: '240',
       fixed: 'right',
-      btns: [{ label: '详情', on: { click: (row: any) => router.push({ path: '/demo-detail', query: { id: row.id, name: row.name } }) } }]
+      // 按钮数超过 limit(默认3) 时收进「更多」下拉（纯文本 + 箭头触发）
+      btns: [
+        { label: '详情', on: { click: (row: any) => router.push({ path: '/demo-detail', query: { id: row.id, name: row.name } }) } },
+        { label: '编辑', on: { click: (row: any) => ElMessage.info(`编辑：${row.name}`) } },
+        { label: '复制', on: { click: (row: any) => ElMessage.success(`已复制：${row.name}`) } },
+        { label: '导出', confirm: '确定导出该条数据？', on: { click: (row: any) => ElMessage.success(`已导出：${row.name}`) } },
+        { label: '删除', type: 'danger', confirm: '确定删除该条数据？', on: { click: (row: any) => ElMessage.warning(`已删除：${row.name}`) } }
+      ]
     }
   ]
 } as ITableConfig)

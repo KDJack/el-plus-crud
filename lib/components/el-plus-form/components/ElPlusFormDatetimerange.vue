@@ -35,7 +35,7 @@ const isInit = ref(false)
 const onEvents = ref(getEvents(props))
 
 onBeforeMount(async () => {
-  attrs.value = await getAttrs(props, { type: 'datetimerange', format: 'YYYY-MM-DD HH:mm:ss', valueFormat: 'x', editable: false, ...useAttrs() })
+  attrs.value = await getAttrs(props, { type: 'datetimerange', 'unlink-panels': true, format: 'YYYY-MM-DD HH:mm:ss', valueFormat: 'x', editable: false, ...useAttrs() })
   isInit.value = true
 })
 </script>
